@@ -105,8 +105,6 @@ export default function Nexus() {
           {/* Links */}
           <g className={styles.links}>
             {links.map((link, i) => {
-              const source = nodes.find(n => n.slug === link.source);
-              const target = nodes.find(n => n.slug === link.target);
               const sourceNode = nodes.find(n => n.slug === link.source);
               const targetNode = nodes.find(n => n.slug === link.target);
 
@@ -122,12 +120,12 @@ export default function Nexus() {
               return (
                 <line
                   key={`${link.source}-${link.target}-${i}`}
-                  x1={source.x}
-                  y1={source.y}
-                  x2={target.x}
-                  y2={target.y}
+                  x1={sourceNode.x}
+                  y1={sourceNode.y}
+                  x2={targetNode.x}
+                  y2={targetNode.y}
                   className={`${styles.link} ${isActive ? styles.linkActive : ''} ${isDimmed ? styles.linkDimmed : ''}`}
-                  style={{ '--hue': source.hue }}
+                  style={{ '--hue': sourceNode.hue }}
                 />
               );
             })}
@@ -196,19 +194,21 @@ export default function Nexus() {
                   <p className={`${styles.detailArcana} t-deco`}>{c.arcana}</p>
                   <h2 className={`${styles.detailRole} t-display`}>{c.role}</h2>
                   <p className={`${styles.detailEssence} t-body`}>{c.essence}</p>
-                  <div className={styles.detailRelations}>
-                    <p className="t-deco" style={{ fontSize: '10px', color: 'var(--color-gold)', marginBottom: '8px' }}>CONNECTED TO</p>
-                    <div className={styles.relList}>
-                      {c.relations.map(rel => {
-                        const rc = CHARACTERS.find(x => x.slug === rel);
-                        return (
-                          <span key={rel} className={styles.relTag} style={{ borderColor: rc?.hue }}>
-                            {rc?.role}
-                          </span>
-                        );
-                      })}
+                  {c.relations?.length > 0 && (
+                    <div className={styles.detailRelations}>
+                      <p className="t-deco" style={{ fontSize: '10px', color: 'var(--color-gold)', marginBottom: '8px' }}>CONNECTED TO</p>
+                      <div className={styles.relList}>
+                        {c.relations.map(rel => {
+                          const rc = CHARACTERS.find(x => x.slug === rel);
+                          return (
+                            <span key={rel} className={styles.relTag} style={{ borderColor: rc?.hue }}>
+                              {rc?.role}
+                            </span>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </>
               );
             })()}

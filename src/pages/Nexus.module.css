@@ -143,6 +143,8 @@
 .nodePulse {
   animation: pulse 2s infinite;
   pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
 @keyframes pulse {
