@@ -1,0 +1,17 @@
+@keyframes subtleBreath {
+  0%, 100% { opacity: var(--backdrop-opacity, 1); }
+  50% { opacity: calc(var(--backdrop-opacity, 1) * 0.57); }
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background-image: url('/assets/textures/dark-leaf-pattern.jpg');
+  background-size: 800px;
+  background-repeat: repeat;
+  mix-blend-mode: screen;
+  filter: saturate(0);
+  pointer-events: none;
+  --backdrop-opacity: var(--texture-opacity, 0.2);
+  animation: subtleBreath 30s ease-in-out infinite;
+}

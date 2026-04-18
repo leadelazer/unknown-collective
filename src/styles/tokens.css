@@ -1,0 +1,64 @@
+:root {
+  /* ── Colors ── */
+  /* Optional global override, e.g. set --theme-saturation: 6%; */
+  --theme-saturation: 25%;
+  --color-ink:       hsl(120 5% 5%);
+  --color-ink-card:  hsl(120 3%% 18%);
+  --color-paper:     hsl(39 var(--theme-saturation, 33%) 82%);
+  --color-paper-2:   hsl(35 var(--theme-saturation, 46%) 78%);
+  --color-gold:      hsl(29 var(--theme-saturation, 29%) 52%);
+  --color-gold-hi:   hsl(20 var(--theme-saturation, 45%) 55%);
+  --color-rose:      hsl(0 var(--theme-saturation, 18%) 65%);
+  --color-muted:     hsl(33 var(--theme-saturation, 15%) 64%);
+  --color-muted-dk:  hsl(224 var(--theme-saturation, 21%) 29%);
+
+  /* ── Typography ── */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body:    'Inter', 'Helvetica Neue', sans-serif;
+  --font-mono:    'IBM Plex Mono', monospace;
+
+  /* ── Font sizes ── */
+  --text-xs:   10px;
+  --text-sm:   13px;
+  --text-base: 15px;
+  --text-md:   18px;
+  --text-lg:   22px;
+  --text-xl:   32px;
+  --text-2xl:  48px;
+  --text-3xl:  72px;
+  --text-4xl:  96px;
+  --text-hero: 116px;
+
+  /* ── Spacing ── */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-16:  64px;
+  --space-20:  80px;
+  --space-24:  96px;
+  --space-28:  112px;
+
+  /* ── Borders ── */
+  --border-gold:        1px solid var(--color-gold);
+  --border-gold-faint:  1px solid color-mix(in srgb, var(--color-gold) 33%, transparent);
+  --border-gold-mid:    1px solid color-mix(in srgb, var(--color-gold) 55%, transparent);
+
+  /* ── Transitions ── */
+  --transition-fast:   0.3s ease;
+  --transition-mid:    0.5s ease;
+  --transition-slow:   0.6s cubic-bezier(.2,.7,.2,1);
+
+  /* ── Texture ── */
+  --texture-opacity: 0.1;
+
+  /* ── Layout ── */
+  --max-width:       1600px;
+  --max-width-text:  900px;
+  --page-padding:    var(--space-16);
+}

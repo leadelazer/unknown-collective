@@ -1,0 +1,18 @@
+.rule {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-gold);
+  width: 100%;
+}
+
+.line {
+  flex: 1;
+  border-top: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  height: 4px;
+}
+
+.diamond {
+  flex-shrink: 0;
+}

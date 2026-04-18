@@ -1,0 +1,9 @@
+She was not born to this city. She arrived during the baroque era – a time of heavy gold and hollow elegance – marrying into an aristocracy that treated her like a foreign curiosity. She spent her first years in silence, observing the gears of the court and learning the local rhythms. She didn't just adapt; she mastered the art of being exactly what they wanted to see.
+
+Luise was never a mere ornament. She used the royal court as a workshop, sponsoring local talent and turning the palace into a hub for intellectual friction. She had a passion for the arts, but she had a sharper hunger for the truth. Beneath the silk, she was a pragmatist. She would often walk the streets in disguise – trading her titles for a common cloak – to see the struggle of the people without the filter of her station. This habit of seeing the world as it was, rather than how it was presented, earned her a seat in the Collective.
+
+Then she met Freddy. He was a scholar who smelled of old paper and radical ideas – a man of humble birth and an unyielding spirit. He challenged her in ways the court never could. It was a connection built on intellectual kinship, a quiet fire that the social norms of the time were designed to extinguish.
+
+The world wouldn't allow a Duchess to stand beside a baker’s son, so she changed the world’s rules. She used her influence to force his induction into the Collective. There was resistance – Freddy’s philosophies were too loud for the old guard – but she didn’t flinch. She secured his place as The Provost.
+
+In the Collective, their bond finally found a space to exist. It wasn't a fairy tale – it was a partnership of disparate outlooks and shared longing. They became a legend in the city’s unseen narrative, a reminder that some ties are too strong for the surface world to break.

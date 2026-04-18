@@ -1,0 +1,9 @@
+He was born in 1680 with flour on his hands. As a baker's son, he spent his pre-dawn hours kneading dough and listening to bells. It was a life of repetitive motion, but he was looking past the rooftops. He didn't want the bread – he wanted the recipe for how the world worked.
+
+War provided his real education. He was drafted into the mud and the noise, returning with a mind that was colder and much wider. A man they called the Weaver noticed him – a commoner who could see the board. The Weaver sponsored his studies in law and logic. Freddy didn't just learn the law – he learned how to use it as a lever.
+
+By 1708, he was immersed in the university, turning debate into an art form. His intellect caught the right eyes, eventually landing him in a shadow archive – a library beneath a library that officially didn't exist. He became a human barometer for the city, reading the political weather and advising the powerful. He moved from the bakery to the chancellor's seat without losing his edge.
+
+In 1720, he was inducted into the Collective, where he met the Duchess. In the streets, they were a scandal – in the Collective, they were a match. It was a connection built on shared secrets rather than shared blood. It couldn't survive the daylight of the era, so it became a legend – a long, quiet devotion that didn't need a marriage certificate to be real.
+
+Now, he is the Curator. He keeps the records and plans the moves. He sits in his office with an old white falcon, watching the entity they call the Bind. He wants to break the thing that is strangling the city's potential. He knows better than anyone: knowledge isn't power unless you know exactly where to apply the pressure.

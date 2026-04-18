@@ -1,0 +1,80 @@
+.footer {
+  padding: var(--space-20) var(--page-padding) var(--space-16);
+  border-top: var(--border-gold-faint);
+  position: relative;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: var(--space-16);
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.about {}
+
+.title {
+  font-size: 28px;
+  color: var(--color-paper);
+}
+
+.blurb {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  max-width: 360px;
+  margin-top: var(--space-3);
+  line-height: 1.6;
+}
+
+.colTitle {
+  font-size: var(--text-xs);
+  color: var(--color-gold);
+  letter-spacing: 0.3em;
+  margin-bottom: var(--space-3);
+}
+
+.colList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3) ;
+}
+
+.colLink {
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  font-size: 14px;
+  color: var(--color-paper-2);
+  transition: color var(--transition-fast);
+}
+
+.colLink:hover {
+  color: var(--color-gold-hi);
+}
+
+.colophon {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  line-height: 1.7;
+}
+
+.year {
+  color: var(--color-gold-hi);
+}
+
+.rule {
+  margin-top: var(--space-16);
+  max-width: var(--max-width);
+  margin-inline: auto;
+}
+
+.motto {
+  font-size: 9px;
+  color: var(--color-muted);
+  letter-spacing: 0.4em;
+  text-align: center;
+  margin-top: var(--space-6);
+}

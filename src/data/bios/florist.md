@@ -1,0 +1,1 @@
+Amelia keeps a small shop off Gärtnerplatz where nothing is priced and everything is arranged as a sentence. She learned floriography from her Irish grandmother and uses it, she says, because speech is too blunt for the things worth saying. New arrivals often find themselves holding a bouquet they didn't quite ask for, and understanding  –  two days later  –  what was meant.

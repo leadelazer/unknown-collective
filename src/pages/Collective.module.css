@@ -1,0 +1,224 @@
+.page {
+  position: relative;
+  min-height: 100vh;
+}
+
+.header {
+  padding: var(--space-20) var(--page-padding) var(--space-12);
+  max-width: 1700px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.eyebrow {
+  font-size: var(--text-xs);
+  color: var(--color-gold);
+  letter-spacing: 0.4em;
+  margin-bottom: var(--space-4);
+}
+
+.title {
+  font-size: 88px;
+  color: var(--color-paper);
+}
+
+.titleAccent {
+  color: var(--color-gold-hi);
+}
+
+.intro {
+  font-size: var(--text-base);
+  color: var(--color-muted);
+  max-width: 520px;
+  margin-top: var(--space-5);
+  line-height: 1.6;
+}
+
+/* ── Filter bar ── */
+.filterBar {
+  display: flex;
+  gap: 6px;
+  margin-top: var(--space-10);
+  margin-bottom: var(--space-12);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filterLabel {
+  font-size: var(--text-xs);
+  color: var(--color-gold);
+  letter-spacing: 0.3em;
+  margin-right: var(--space-3);
+}
+
+.filterBtn {
+  font-size: var(--text-xs);
+  background: transparent;
+  color: var(--color-paper-2);
+  border: var(--border-gold-mid);
+  padding: 8px 16px;
+  letter-spacing: 0.25em;
+  transition: all var(--transition-fast);
+}
+
+.filterBtn:hover {
+  border-color: var(--color-gold-hi);
+  color: var(--color-gold-hi);
+}
+
+.filterActive {
+  background: var(--color-gold-hi);
+  color: var(--color-ink);
+  border-color: var(--color-gold-hi);
+}
+
+/* ── Grid ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px 28px;
+  padding: 0 var(--page-padding) var(--space-28);
+  max-width: 1700px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Card ── */
+.card {
+  position: relative;
+  cursor: pointer;
+  padding-top: var(--space-3);
+  background: none;
+  border: none;
+  text-align: left;
+}
+
+.cardMeta {
+  font-size: var(--text-xs);
+  color: var(--color-gold);
+  letter-spacing: 0.2em;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.cardTier {
+  color: var(--color-muted);
+}
+
+.cardImageWrap {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  background: var(--color-ink-card);
+  border: var(--border-gold-mid);
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
+}
+
+.card:hover .cardImageWrap {
+  border-color: var(--color-gold-hi);
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.78) grayscale(0.15);
+  transform: scale(1);
+  transition: filter var(--transition-slow), transform var(--transition-slow);
+}
+
+.card:hover .cardImage {
+  filter: brightness(1) contrast(1.02);
+  transform: scale(1.03);
+}
+
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, color-mix(in srgb, var(--color-ink) 96%, transparent) 10%, color-mix(in srgb, var(--color-ink) 50%, transparent) 40%, transparent 70%);
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.cardArcana {
+  font-size: 9px;
+  color: var(--color-gold-hi);
+  letter-spacing: 0.3em;
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+}
+
+.card:hover .cardArcana {
+  opacity: 1;
+}
+
+.cardRole {
+  font-size: 22px;
+  color: var(--color-paper);
+}
+
+.cardName {
+  font-size: var(--text-sm);
+  color: var(--color-paper-2);
+}
+
+.cardEssence {
+  font-size: var(--text-sm);
+  color: var(--color-paper-2);
+  line-height: 1.2;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, opacity 0.5s ease;
+}
+
+.card:hover .cardEssence {
+  max-height: 80px;
+  opacity: 1;
+}
+
+.cardCorner {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 0;
+  height: 0;
+  border-left: 16px solid transparent;
+  border-bottom: 16px solid transparent;
+  opacity: 0.9;
+  filter: brightness(1.5);
+}
+
+/* ── Placeholder ── */
+.placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--hue) 20%, transparent) 0%, var(--color-ink-card) 60%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.placeholderPattern {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(45deg, transparent 0, transparent 8px, color-mix(in srgb, var(--hue) 13%, transparent) 8px, color-mix(in srgb, var(--hue) 13%, transparent) 9px);
+}
+
+.placeholderLabel {
+  font-size: var(--text-xs);
+  letter-spacing: 0.3em;
+  color: var(--hue);
+  background: var(--color-ink);
+  padding: 8px 14px;
+  border: 1px solid var(--hue);
+  position: relative;
+  z-index: 1;
+}
