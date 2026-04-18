@@ -5,6 +5,7 @@ import Character from './pages/Character.jsx';
 import Tiers from './pages/Tiers.jsx';
 import Manifesto from './pages/Manifesto.jsx';
 import Chronicle from './pages/Chronicle.jsx';
+import Nexus from './pages/Nexus.jsx';
 import About from './pages/About.jsx';
 
 export default function App() {
@@ -13,6 +14,7 @@ export default function App() {
       <Routes>
         <Route path="/"                  element={<Home />} />
         <Route path="/collective"        element={<Collective />} />
+        <Route path="/nexus"             element={<Nexus />} />
         <Route path="/character/:slug"   element={<Character />} />
         <Route path="/tiers"             element={<Tiers />} />
         <Route path="/manifesto"         element={<Manifesto />} />

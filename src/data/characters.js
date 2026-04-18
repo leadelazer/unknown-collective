@@ -17,6 +17,8 @@ export const CHARACTERS = [
       { src: '/assets/artifacts/floriography.png', title: 'Floriographic plate', caption: 'Annotated in three hands.' },
       { src: '/assets/botanics/lavender.png', title: 'Lavender, IX', caption: 'Devotion. Silence. Distrust.' },
       { src: '/assets/botanics/michaelmas-daisy.png', title: 'Michaelmas daisy', caption: 'A farewell kept polite.' },
+      { src: '/assets/stories/floral-friends-maybe.png', title: 'Garden Consultation', caption: 'Carla and Amelia discussing the language of soil.' },
+      { src: '/assets/stories/floral-friends-maybe-2.png', title: 'The Gärtnerplatz Arrangement', caption: 'A bouquet sent to the Duchess in silence.' },
     ],
     storyLabel: 'The Language of Flowers',
   },
@@ -59,6 +61,7 @@ export const CHARACTERS = [
       { src: '/assets/stories/frederike-young.png', title: 'Frederike, age nineteen', caption: 'The year she left Hessen.' },
       { src: '/assets/stories/lake.png', title: 'Lake Starnberg, twilight', caption: 'Where the Oracle keeps her summers.' },
       { src: '/assets/stories/lohengrin.png', title: 'The Lohengrin', caption: 'A quiet hour before the performance.' },
+      { src: '/assets/stories/clara-sketched-by-frederike.png', title: 'Sketch of a Friend', caption: 'Carla in the herb garden, 1891.' },
     ],
     storyLabel: 'Fragments from the Notebook',
   },
@@ -73,6 +76,11 @@ export const CHARACTERS = [
     talisman: "The holder of the Gardener card is blessed with an appreciation for the delicate balance in nature and the beauty of growth. They understand the value of patience and persistent effort. Endowed with an intuitive knowledge of nature's cycles, they are able to anticipate change and make the best of each season. The Gardener's ability to nurture and cultivate growth can apply to all areas of life, from relationships to projects.",
     shadow: "As a Talisman, Carla provides an inviting space for growth, but when she falls into her Shadow, her nurturing can take a turn towards possessiveness. There's a fine line between nurturing and controlling, a line that's often blurred in Carla's efforts to grow and protect. In their Shadow form, Carla might become overbearing, trying to control nature's course rather than letting it grow freely. Her nurturing might border on smothering, not allowing for natural decay and rebirth.",
     relations: ['oracle', 'weavers', 'baker', 'brewer'],
+    stories: [
+      { src: '/assets/stories/clara-sketched-by-frederike.png', title: 'A Rare Moment of Rest', caption: 'Sketched by Frederike in the estate gardens.' },
+      { src: '/assets/stories/floral-friends-maybe.png', title: 'The Seed Exchange', caption: 'Amelia often visits for more than just flowers.' },
+    ],
+    storyLabel: 'Garden Lore',
   },
   {
     n: 4, arcana: 'The Emperor', role: 'The Merchant Prince',
@@ -99,6 +107,11 @@ export const CHARACTERS = [
     relations: ['curator','florist'],
     artifact: 'Correspondence with Freddy, bound in silk ribbon.',
     quote: 'Every city rewrites itself daily. My role is to remember which truths survive the revision.',
+    stories: [
+      { src: '/assets/stories/lohengrin.png', title: 'The Royal Box', caption: 'Where the city\'s futures are whispered between acts.' },
+      { src: '/assets/stories/lakeside.png', title: 'Lakeside Summers', caption: 'The Duchess often retreats when the city grows too loud.' },
+    ],
+    storyLabel: 'Echoes of the Court',
   },
   {
     n: 6, arcana: 'The Lovers', role: 'The Weavers', name: 'Heinrich and Matilda Weber',
@@ -274,7 +287,7 @@ export const CHARACTERS = [
   {
     n: 19, arcana: 'The Sun', role: 'The Brewer',
     tier: 'grounded', slug: 'brewer',
-    img: null, hue: '#C89040',
+    img: '/assets/echos/shepherd-boy.png', hue: '#C89040',
     keywords: ['joy', 'celebration', 'energy'],
     essence: 'Long nights. The gin is clean.',
     detail: true,
@@ -284,6 +297,10 @@ export const CHARACTERS = [
     relations: ['gardener', 'cook', 'baker'],
     artifact: 'A small bottle of the gin, unlabelled. Given only on certain evenings. Never explained.',
     quote: 'There will be time for all of it. But not until the glass is empty.',
+    stories: [
+      { src: '/assets/botanics/lavender.png', title: 'The Sun-Drenched Infusion', caption: 'Extracting the essence of a summer afternoon.' },
+    ],
+    storyLabel: 'The Tasting Room',
   },
   {
     n: 20, arcana: 'Judgment', role: 'The Keymaker',

@@ -5,6 +5,7 @@ import styles from './Nav.module.css';
 const NAV_LINKS = [
   { to: '/',           label: 'Portal' },
   { to: '/collective', label: 'The Collective' },
+  { to: '/nexus',      label: 'Nexus' },
   { to: '/tiers',      label: 'Tiers' },
   { to: '/manifesto',  label: 'Manifesto' },
   { to: '/chronicle',  label: 'Chronicle' },

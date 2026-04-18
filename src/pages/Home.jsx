@@ -80,16 +80,14 @@ function HeroSection({ navigate }) {
 }
 
 function FeaturedPortraits({ navigate }) {
-  const [featured, setFeatured] = useState([]);
-  const [hover, setHover] = useState(1);
-
-  useEffect(() => {
+  const [featured] = useState(() => {
     const indices = new Set();
     while (indices.size < 3) {
       indices.add(Math.floor(Math.random() * CHARACTERS.length));
     }
-    setFeatured(Array.from(indices).map(i => CHARACTERS[i]));
-  }, []);
+    return Array.from(indices).map(i => CHARACTERS[i]);
+  });
+  const [hover, setHover] = useState(1);
 
   return (
     <div className={styles.portraits}>

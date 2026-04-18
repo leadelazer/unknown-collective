@@ -1,0 +1,214 @@
+.page {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: var(--space-20) var(--page-padding) var(--space-4);
+  max-width: 1700px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.eyebrow {
+  font-size: var(--text-xs);
+  color: var(--color-gold);
+  letter-spacing: 0.4em;
+  margin-bottom: var(--space-4);
+}
+
+.title {
+  font-size: 88px;
+  color: var(--color-paper);
+}
+
+.titleAccent {
+  color: var(--color-gold-hi);
+}
+
+.intro {
+  font-size: var(--text-base);
+  color: var(--color-muted);
+  max-width: 600px;
+  margin: var(--space-5) auto 0;
+  line-height: 1.6;
+}
+
+.filterBar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+  flex-wrap: wrap;
+}
+
+.filterLabel {
+  font-size: var(--text-xs);
+  color: var(--color-gold);
+  letter-spacing: 0.2em;
+  margin-right: var(--space-2);
+}
+
+.filterBtn {
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: all var(--transition-fast);
+  text-transform: uppercase;
+}
+
+.filterBtn:hover {
+  color: var(--color-gold);
+}
+
+.filterActive {
+  color: var(--color-gold-hi);
+  border-bottom: 1px solid var(--color-gold);
+}
+
+.nexusContainer {
+  flex: 1;
+  min-height: 600px;
+  position: relative;
+  margin: 0 var(--page-padding);
+  z-index: 2;
+  overflow: hidden;
+}
+
+.svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.link {
+  stroke: var(--hue);
+  stroke-width: 1;
+  opacity: 0.15;
+  transition: all var(--transition-slow);
+}
+
+.linkActive {
+  opacity: 0.8;
+  stroke-width: 2;
+  stroke: var(--color-gold-hi);
+  filter: drop-shadow(0 0 5px var(--color-gold));
+}
+
+.linkDimmed {
+  opacity: 0.03;
+}
+
+.node {
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.nodeGroup {
+  cursor: pointer;
+  transition: opacity var(--transition-slow);
+}
+
+.nodeActive .node {
+  filter: drop-shadow(0 0 8px var(--color-gold-hi));
+}
+
+.nodeDimmed {
+  opacity: 0.2;
+}
+
+.nodeLabel {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  pointer-events: none;
+  opacity: 0.6;
+  transition: all var(--transition-fast);
+}
+
+.nodeActive .nodeLabel {
+  opacity: 1;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.nodePulse {
+  animation: pulse 2s infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.detailsPane {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+  background: color-mix(in srgb, var(--color-ink) 85%, transparent);
+  border: var(--border-gold-mid);
+  padding: 30px;
+  pointer-events: none;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, -45%); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+.detailArcana {
+  font-size: 10px;
+  color: var(--color-gold);
+  letter-spacing: 0.3em;
+  margin-bottom: 8px;
+}
+
+.detailRole {
+  font-size: 32px;
+  color: var(--color-paper);
+  margin-bottom: 12px;
+}
+
+.detailEssence {
+  font-size: var(--text-sm);
+  color: var(--color-paper-2);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.detailRelations {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid color-mix(in srgb, var(--color-gold) 20%, transparent);
+}
+
+.relList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.relTag {
+  font-size: 9px;
+  font-family: var(--font-deco);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 4px 8px;
+  border: 1px solid;
+  color: var(--color-paper-2);
+}
