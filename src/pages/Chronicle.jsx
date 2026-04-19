@@ -21,6 +21,7 @@ const MODEL_LABELS = {
   'gpt-4.1': 'GPT 4.1',
   'gpt-4o-mini': 'GPT 4o mini',
   'claude-sonnet-4-6': 'Claude Sonnet',
+  'jules': 'Jules · Google Labs',
 };
 
 function normalizeModelKey(model) {
