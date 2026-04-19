@@ -188,8 +188,9 @@ function readEncounters() {
       const id = path.basename(f, '.md');
       const raw = fs.readFileSync(path.join(ENCOUNTERS_DIR, f), 'utf8');
       const { fm, body } = parseFrontmatter(raw);
-      const [a, b] = id.split('--');
-      return { id, slugA: a, slugB: b, ...fm, body: body.trim() };
+      const participants = id.split('--').map(part => part.trim()).filter(Boolean);
+      const [a, b = null] = participants;
+      return { id, slugA: a, slugB: b, participants, ...fm, body: body.trim() };
     });
 }
 

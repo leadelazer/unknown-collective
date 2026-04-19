@@ -6,8 +6,8 @@ name: Freddy Azibo
 tier: luminaries
 slug: curator
 hue: "#D4B66E"
-flower: "Foxglove"
-flowerMeaning: "insincerity"
+flower: Foxglove
+flowerMeaning: insincerity
 palette: ["#D4B66E", "#1A2744", "#8B7340"]
 keywords: [manifestation, resourcefulness, inspired action]
 essence: Cold archives. He knew the odds.
@@ -37,7 +37,7 @@ storyLabel: From the Archive
 
 ## Talisman
 
-Freddy's story is an inspiration for those who hold his card. It's a tale of perseverance and unexpected alliances, underpinned by relentless pursuit of knowledge. This card represents the power of wisdom and the importance of being open to unconventional paths. The holder of the Magician card might find themselves in unexpected intellectual pursuits or forming alliances that challenge their preconceived notions. A newfound curiosity and a knack for problem-solving may surface, bolstered by a deepening understanding of the intricate threads that weave together the fabric of your own reality.
+Freddy's story is an inspiration for those who hold his card. It's a tale of perseverance and unexpected alliances, underpinned by relentless pursuit of knowledge. This card represents the power of wisdom and the importance of being open to unconventional paths. The holder of hi card might find themselves in unexpected intellectual pursuits or forming alliances that challenge their preconceived notions. A newfound curiosity and a knack for problem-solving may surface, bolstered by a deepening understanding of the intricate threads that weave together the fabric of your own reality.
 
 ## Shadow
 

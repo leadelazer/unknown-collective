@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+function encounterParticipants(encounter) {
+  return Array.isArray(encounter.participants) && encounter.participants.length > 0
+    ? encounter.participants
+    : [encounter.slugA, encounter.slugB].filter(Boolean);
+}
+
 export default function EncounterPanel({ encounterId, allCharacters, onSave, onDelete }) {
   const [draft, setDraft] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -32,19 +38,22 @@ export default function EncounterPanel({ encounterId, allCharacters, onSave, onD
 
   if (!draft) return <div className="empty"><p>Loading…</p></div>;
 
-  const charA = allCharacters.find(c => c.slug === draft.slugA);
-  const charB = allCharacters.find(c => c.slug === draft.slugB);
+  const participants = encounterParticipants(draft)
+    .map(slug => allCharacters.find(c => c.slug === slug))
+    .filter(Boolean);
+  const participantRoles = participants.map(character => character.role);
+  const headerLabel = participantRoles.join(' · ');
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
       <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', background: 'var(--surface)', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-          {charA && <div style={{ width: 28, height: 28, borderRadius: 6, background: charA.hue }} title={charA.role} />}
-          <span style={{ fontSize: 14, color: 'var(--text-3)' }}>⟷</span>
-          {charB && <div style={{ width: 28, height: 28, borderRadius: 6, background: charB.hue }} title={charB.role} />}
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+          {participants.map(character => (
+            <div key={character.slug} style={{ width: 28, height: 28, borderRadius: 6, background: character.hue }} title={character.role} />
+          ))}
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 600, fontSize: 14 }}>{charA?.role} & {charB?.role}</div>
+          <div style={{ fontWeight: 600, fontSize: 14 }}>{headerLabel || draft.id}</div>
           <div style={{ fontSize: 12, color: 'var(--text-3)' }}>Encounter</div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
@@ -65,7 +74,7 @@ export default function EncounterPanel({ encounterId, allCharacters, onSave, onD
             style={{ minHeight: 480 }}
             value={draft.body || ''}
             onChange={e => set('body', e.target.value)}
-            placeholder={`What happened between ${charA?.role || draft.slugA} and ${charB?.role || draft.slugB}?\n\nWrite freely — this is source material for coherence checks and future lore.`}
+            placeholder={`What happened between ${participantRoles.join(', ') || draft.id}?\n\nWrite freely — this is source material for coherence checks and future lore.`}
           />
         </div>
       </div>

@@ -3,6 +3,12 @@ import React, { useState } from 'react';
 const TIERS = ['guides', 'luminaries', 'guardians', 'custodians', 'grounded'];
 const TIER_ORDER = { guides: 0, luminaries: 1, guardians: 2, custodians: 3, grounded: 4 };
 
+function encounterParticipants(encounter) {
+  return Array.isArray(encounter.participants) && encounter.participants.length > 0
+    ? encounter.participants
+    : [encounter.slugA, encounter.slugB].filter(Boolean);
+}
+
 export default function Sidebar({ characters, encounters, lore, selected, onSelect, onNewEncounter, onNewLore }) {
   const [search, setSearch] = useState('');
   const [newEncSlugA, setNewEncSlugA] = useState('');
@@ -18,14 +24,12 @@ export default function Sidebar({ characters, encounters, lore, selected, onSele
 
   const filteredEncounters = encounters.filter(encounter => {
     if (!q) return true;
-    const left = characters.find(c => c.slug === encounter.slugA);
-    const right = characters.find(c => c.slug === encounter.slugB);
+    const participants = encounterParticipants(encounter);
+    const roles = participants.map(slug => characters.find(c => c.slug === slug)?.role).filter(Boolean);
     const haystack = [
       encounter.title,
-      encounter.slugA,
-      encounter.slugB,
-      left?.role,
-      right?.role,
+      ...participants,
+      ...roles,
     ].filter(Boolean).join(' ').toLowerCase();
     return haystack.includes(q);
   });
@@ -72,9 +76,11 @@ export default function Sidebar({ characters, encounters, lore, selected, onSele
         <div className="nav-section">
           <div className="nav-section-label">Encounters</div>
           {filteredEncounters.map(e => {
-            const left = characters.find(c => c.slug === e.slugA);
-            const right = characters.find(c => c.slug === e.slugB);
-            const sub = [left?.role?.replace('The ', ''), right?.role?.replace('The ', '')].filter(Boolean).join(' × ');
+            const participants = encounterParticipants(e);
+            const sub = participants
+              .map(slug => characters.find(c => c.slug === slug)?.role?.replace('The ', ''))
+              .filter(Boolean)
+              .join(' × ');
             return (
             <div
               key={e.id}

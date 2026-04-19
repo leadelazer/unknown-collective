@@ -9,6 +9,15 @@ import Dashboard from './components/Dashboard.jsx';
 
 const API = '/api';
 
+const DEFAULT_GRAPH_STATE = {
+  pinnedSlug: null,
+  compareSlug: null,
+  tierFilter: null,
+  edgeMode: 'all',
+  neighborhoodDepth: 1,
+  issueFilter: 'all',
+};
+
 export default function App() {
   const [characters, setCharacters] = useState([]);
   const [encounters, setEncounters] = useState([]);
@@ -19,6 +28,7 @@ export default function App() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [view, setView] = useState('editor'); // 'editor' | 'graph' | 'dashboard'
   const [syncing, setSyncing] = useState(false);
+  const [graphState, setGraphState] = useState(DEFAULT_GRAPH_STATE);
 
   const showToast = useCallback((msg, type = 'success') => {
     setToast({ msg, type });
@@ -46,6 +56,22 @@ export default function App() {
 
   useEffect(() => { loadAll(); }, []);
 
+  useEffect(() => {
+    const validSlugs = new Set(characters.map(c => c.slug));
+    setGraphState(state => {
+      const pinnedSlug = validSlugs.has(state.pinnedSlug) ? state.pinnedSlug : null;
+      const compareSlug = validSlugs.has(state.compareSlug) && state.compareSlug !== pinnedSlug ? state.compareSlug : null;
+      if (pinnedSlug === state.pinnedSlug && compareSlug === state.compareSlug) return state;
+      return { ...state, pinnedSlug, compareSlug };
+    });
+  }, [characters]);
+
+  useEffect(() => {
+    if (view !== 'graph') return;
+    if (selected?.type !== 'character') return;
+    setGraphState(state => state.pinnedSlug ? state : { ...state, pinnedSlug: selected.id });
+  }, [view, selected]);
+
   // Cmd+K to open palette
   useEffect(() => {
     const handler = (e) => {
@@ -67,6 +93,51 @@ export default function App() {
     setSyncing(false);
   }
 
+  async function handleCreateEncounter(slugA, slugB, { openAfterCreate = true } = {}) {
+    try {
+      const r = await fetch(`${API}/encounters`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slugA, slugB }),
+      });
+      const d = await r.json();
+      if (!r.ok || !d?.id) {
+        showToast(d?.error || 'Failed to create encounter', 'error');
+        return null;
+      }
+      await loadAll();
+      if (openAfterCreate) {
+        setSelected({ type: 'encounter', id: d.id });
+        setView('editor');
+      }
+      return d;
+    } catch {
+      showToast('Failed to create encounter', 'error');
+      return null;
+    }
+  }
+
+  async function handleCreateLore(title) {
+    try {
+      const r = await fetch(`${API}/lore`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title }),
+      });
+      const d = await r.json();
+      if (!r.ok || !d?.id) {
+        showToast(d?.error || 'Failed to create lore', 'error');
+        return null;
+      }
+      await loadAll();
+      setSelected({ type: 'lore', id: d.id });
+      return d;
+    } catch {
+      showToast('Failed to create lore', 'error');
+      return null;
+    }
+  }
+
   const selectedChar = selected?.type === 'character'
     ? characters.find(c => c.slug === selected.id)
     : null;
@@ -79,18 +150,8 @@ export default function App() {
         lore={lore}
         selected={selected}
         onSelect={setSelected}
-        onNewEncounter={async (slugA, slugB) => {
-          const r = await fetch(`${API}/encounters`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slugA, slugB }) });
-          const d = await r.json();
-          await loadAll();
-          setSelected({ type: 'encounter', id: d.id });
-        }}
-        onNewLore={async (title) => {
-          const r = await fetch(`${API}/lore`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title }) });
-          const d = await r.json();
-          await loadAll();
-          setSelected({ type: 'lore', id: d.id });
-        }}
+        onNewEncounter={handleCreateEncounter}
+        onNewLore={handleCreateLore}
       />
 
       <div className="main">
@@ -124,7 +185,23 @@ export default function App() {
             onRefresh={loadAll}
           />
         ) : view === 'graph' ? (
-          <GraphView characters={characters} selected={selected} onSelect={id => setSelected({ type: 'character', id })} />
+          <GraphView
+            characters={characters}
+            encounters={encounters}
+            selectedCharacterSlug={selected?.type === 'character' ? selected.id : null}
+            graphState={graphState}
+            onGraphStateChange={setGraphState}
+            onOpenCharacter={slug => {
+              setSelected({ type: 'character', id: slug });
+              setView('editor');
+            }}
+            onOpenEncounter={encounterId => {
+              setSelected({ type: 'encounter', id: encounterId });
+              setView('editor');
+            }}
+            onCreateEncounter={handleCreateEncounter}
+            showToast={showToast}
+          />
         ) : selected?.type === 'character' ? (
           <CharacterEditor
             key={selected.id}
