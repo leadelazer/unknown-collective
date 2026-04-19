@@ -5,6 +5,7 @@ import { TIERS, ROMAN } from '../data/tiers.js';
 import Nav from '../components/Nav.jsx';
 import Footer from '../components/Footer.jsx';
 import TextureBackdrop from '../components/TextureBackdrop.jsx';
+import { assetUrl } from '../utils/assetUrl.js';
 import styles from './Collective.module.css';
 
 export default function Collective() {
@@ -66,7 +67,7 @@ function CharCard({ c, navigate }) {
 
       <div className={styles.cardImageWrap}>
         {c.img
-          ? <img src={c.img} alt={c.role} className={styles.cardImage} />
+          ? <img src={assetUrl(c.img)} alt={c.role} className={styles.cardImage} />
           : <PortraitPlaceholder role={c.role} hue={c.hue} />
         }
 

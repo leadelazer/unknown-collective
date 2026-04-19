@@ -3,6 +3,7 @@ import { CHARACTERS } from '../data/characters.js';
 import Nav from '../components/Nav.jsx';
 import Footer from '../components/Footer.jsx';
 import TextureBackdrop from '../components/TextureBackdrop.jsx';
+import { assetUrl } from '../utils/assetUrl.js';
 import styles from './Chronicle.module.css';
 
 const SEED_ECHOES = [
@@ -98,7 +99,7 @@ function EchoCard({ e }) {
     <article className={styles.echo}>
       <div className={styles.echoPortrait}>
         {c.img
-          ? <img src={c.img} alt={c.role} className={styles.echoImg} />
+          ? <img src={assetUrl(c.img)} alt={c.role} className={styles.echoImg} />
           : <div className={styles.echoImgFallback} style={{ background: c.hue + '44' }} />
         }
       </div>
