@@ -1,0 +1,190 @@
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import Sidebar from './components/Sidebar.jsx';
+import CharacterEditor from './components/CharacterEditor.jsx';
+import EncounterPanel from './components/EncounterPanel.jsx';
+import LorePanel from './components/LorePanel.jsx';
+import GraphView from './components/GraphView.jsx';
+import CmdPalette from './components/CmdPalette.jsx';
+import Dashboard from './components/Dashboard.jsx';
+
+const API = '/api';
+
+export default function App() {
+  const [characters, setCharacters] = useState([]);
+  const [encounters, setEncounters] = useState([]);
+  const [lore, setLore] = useState([]);
+  const [selected, setSelected] = useState(null); // { type: 'character'|'encounter'|'lore', id }
+  const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState(null);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [view, setView] = useState('editor'); // 'editor' | 'graph' | 'dashboard'
+  const [syncing, setSyncing] = useState(false);
+
+  const showToast = useCallback((msg, type = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 2500);
+  }, []);
+
+  async function loadAll() {
+    setLoading(true);
+    try {
+      const [chars, encs, loreItems] = await Promise.all([
+        fetch(`${API}/characters`).then(r => r.json()),
+        fetch(`${API}/encounters`).then(r => r.json()),
+        fetch(`${API}/lore`).then(r => r.json()),
+      ]);
+      setCharacters(chars);
+      setEncounters(encs);
+      setLore(loreItems);
+      if (!selected && chars.length) setSelected({ type: 'character', id: chars[0].slug });
+    } catch {
+      showToast('Failed to load data', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { loadAll(); }, []);
+
+  // Cmd+K to open palette
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); setPaletteOpen(p => !p); }
+      if (e.key === 'Escape') setPaletteOpen(false);
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
+  async function handleSync() {
+    setSyncing(true);
+    try {
+      const r = await fetch(`${API}/sync`, { method: 'POST' });
+      const d = await r.json();
+      if (d.ok) showToast('Synced → characters.js rebuilt');
+      else showToast(d.error || 'Sync failed', 'error');
+    } catch { showToast('Sync failed', 'error'); }
+    setSyncing(false);
+  }
+
+  const selectedChar = selected?.type === 'character'
+    ? characters.find(c => c.slug === selected.id)
+    : null;
+
+  return (
+    <div className="layout">
+      <Sidebar
+        characters={characters}
+        encounters={encounters}
+        lore={lore}
+        selected={selected}
+        onSelect={setSelected}
+        onNewEncounter={async (slugA, slugB) => {
+          const r = await fetch(`${API}/encounters`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slugA, slugB }) });
+          const d = await r.json();
+          await loadAll();
+          setSelected({ type: 'encounter', id: d.id });
+        }}
+        onNewLore={async (title) => {
+          const r = await fetch(`${API}/lore`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title }) });
+          const d = await r.json();
+          await loadAll();
+          setSelected({ type: 'lore', id: d.id });
+        }}
+      />
+
+      <div className="main">
+        <div className="topbar">
+          <div className="topbar-breadcrumb">
+            UC Studio
+            {selected && <> › <span>{selected.type === 'character' ? selectedChar?.role : selected.id}</span></>}
+          </div>
+          <div className="topbar-actions">
+            <button className="btn btn-ghost btn-sm" onClick={() => setView(v => v === 'dashboard' ? 'editor' : 'dashboard')}>
+              {view === 'dashboard' ? '← Editor' : 'Agents'}
+            </button>
+            <button className="btn btn-ghost btn-sm" onClick={() => setView(v => v === 'graph' ? 'editor' : 'graph')}>
+              {view === 'graph' ? '← Editor' : 'Graph'}
+            </button>
+            <button className="btn btn-ghost btn-sm" onClick={handleSync} disabled={syncing}>
+              {syncing ? 'Syncing…' : '⟳ Sync'}
+            </button>
+            <button className="btn btn-ghost btn-sm" onClick={() => setPaletteOpen(true)}>⌘K</button>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="empty"><p>Loading…</p></div>
+        ) : view === 'dashboard' ? (
+          <Dashboard
+            characters={characters}
+            encounters={encounters}
+            lore={lore}
+            showToast={showToast}
+            onRefresh={loadAll}
+          />
+        ) : view === 'graph' ? (
+          <GraphView characters={characters} selected={selected} onSelect={id => setSelected({ type: 'character', id })} />
+        ) : selected?.type === 'character' ? (
+          <CharacterEditor
+            key={selected.id}
+            character={selectedChar}
+            allCharacters={characters}
+            onSave={async (data) => {
+              const r = await fetch(`${API}/characters/${selected.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+              if (r.ok) { showToast('Saved'); await loadAll(); }
+              else showToast('Save failed', 'error');
+            }}
+            onNavigate={slug => setSelected({ type: 'character', id: slug })}
+            showToast={showToast}
+          />
+        ) : selected?.type === 'encounter' ? (
+          <EncounterPanel
+            key={selected.id}
+            encounterId={selected.id}
+            allCharacters={characters}
+            onSave={async (data) => {
+              const r = await fetch(`${API}/encounters/${selected.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+              if (r.ok) { showToast('Saved'); await loadAll(); }
+              else showToast('Save failed', 'error');
+            }}
+            onDelete={async () => {
+              await fetch(`${API}/encounters/${selected.id}`, { method: 'DELETE' });
+              await loadAll();
+              setSelected(null);
+            }}
+          />
+        ) : selected?.type === 'lore' ? (
+          <LorePanel
+            key={selected.id}
+            loreId={selected.id}
+            onSave={async (data) => {
+              const r = await fetch(`${API}/lore/${selected.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+              if (r.ok) { showToast('Saved'); await loadAll(); }
+              else showToast('Save failed', 'error');
+            }}
+            onDelete={async () => {
+              await fetch(`${API}/lore/${selected.id}`, { method: 'DELETE' });
+              await loadAll();
+              setSelected(null);
+            }}
+          />
+        ) : (
+          <div className="empty"><h3>Select an item</h3><p>Choose a character, encounter, or lore entry from the sidebar.</p></div>
+        )}
+      </div>
+
+      {paletteOpen && (
+        <CmdPalette
+          characters={characters}
+          encounters={encounters}
+          lore={lore}
+          onSelect={(sel) => { setSelected(sel); setPaletteOpen(false); }}
+          onClose={() => setPaletteOpen(false)}
+        />
+      )}
+
+      {toast && <div className={`toast ${toast.type === 'error' ? 'error' : ''}`}>{toast.msg}</div>}
+    </div>
+  );
+}

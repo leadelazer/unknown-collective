@@ -1,0 +1,49 @@
+name: UC Agent Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Agent action to run'
+        required: true
+        type: choice
+        options:
+          - patch-fields
+          - add-encounter
+          - coherence-check
+          - expand-lore
+      model:
+        description: 'GitHub Models model to use'
+        required: false
+        default: 'gpt-4o-mini'
+        type: string
+
+jobs:
+  run-agent:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to commit drafts back
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run agent
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AGENT_ACTION: ${{ inputs.action }}
+          AGENT_MODEL: ${{ inputs.model }}
+        run: node studio/scripts/run-agent.js
+
+      - name: Commit and push drafts
+        run: |
+          git config user.name "UC Agent"
+          git config user.email "agent@unknown-collective"
+          git add src/data/drafts/
+          git diff --staged --quiet && echo "No new drafts" || (
+            git commit -m "agent(${{ inputs.action }}): new draft"
+            git push
+          )

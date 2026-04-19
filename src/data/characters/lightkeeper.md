@@ -1,0 +1,25 @@
+---
+n: 17
+arcana: The Star
+role: The Lightkeeper
+name: null
+tier: guides
+slug: lightkeeper
+hue: "#C8A45A"
+keywords: [hope, faith, renewal]
+essence: One match. A dark street. Watch.
+detail: true
+artifact: "A lamplighter's pole, its brass tip still warm. He has never explained why."
+quote: I do not make promises about what comes next. I just keep the light on so you can find your way to it.
+relations: [ferryman, curator, timekeeper]
+stories: []
+storyLabel: null
+---
+
+## Talisman
+
+The Lightkeeper's card carries the energy of hope made practical — not wishful thinking but steady maintenance of what allows life to continue. Those who hold it may find a renewed sense of purpose in small acts, and a capacity to sustain faith in difficult conditions. The card does not promise light at the end. It is the light, held steady, in the middle.
+
+## Shadow
+
+The shadow of the Lightkeeper is hope that becomes passive — a vigil without action, waiting for something to change while refusing to step into the dark to change it. The bearer risks mistaking endurance for sufficiency, keeping a small flame alive while declining to carry it anywhere. The star is beautiful. But a star that only watches is not the same as a star that guides.
