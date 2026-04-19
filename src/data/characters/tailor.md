@@ -15,6 +15,13 @@ detail: true
 artifact: A needle case of polished bone, containing threads in colours that do not appear in any dye catalogue Elijah has ever found.
 quote: I do not make clothes. I make the version of you that was already there, waiting to be worn.
 relations: [oracle, weavers, mirrormaker]
+relationNotes:
+  - slug: oracle
+    note: She brought him fabric descriptions from three different readings. He made one coat.
+  - slug: weavers
+    note: He has bought from their stock for twelve years. He has never met them in person.
+  - slug: mirrormaker
+    note: Valentin sends clients to him after the mirror. He sends them back after the fitting.
 stories: []
 storyLabel: null
 ---

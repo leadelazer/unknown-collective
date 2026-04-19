@@ -15,6 +15,15 @@ detail: true
 artifact: null
 quote: null
 relations: [duchess, curator, obsidian-count, mapmaker]
+relationNotes:
+  - slug: duchess
+    note: She countersigned the deed. He has not forgotten whose signature came first.
+  - slug: curator
+    note: He funds a private shelf in the archive. Access is not listed in any catalogue.
+  - slug: obsidian-count
+    note: They settled a warehouse dispute out of court. The terms were not filed.
+  - slug: mapmaker
+    note: He commissioned a survey of two districts. The Mapmaker delivered one.
 stories: []
 storyLabel: null
 ---

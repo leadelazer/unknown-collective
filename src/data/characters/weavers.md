@@ -15,6 +15,13 @@ detail: true
 artifact: null
 quote: null
 relations: [the-bind, curator, florist]
+relationNotes:
+  - slug: the-bind
+    note: They created the Bind's pattern. It has not been woven again.
+  - slug: curator
+    note: He held a length of their fabric in the archive for three years before returning it, unasked.
+  - slug: florist
+    note: The flowers arrived the same morning as the cloth. The client never asked how this happened.
 stories: []
 storyLabel: null
 ---

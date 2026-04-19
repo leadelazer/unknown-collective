@@ -15,6 +15,15 @@ detail: true
 artifact: null
 quote: null
 relations: [baker, gardener, duchess, ferryman]
+relationNotes:
+  - slug: baker
+    note: He passes dough across the shared wall every morning before the bakehouse opens.
+  - slug: gardener
+    note: She leaves produce at the kitchen door on market days. The Cook leaves the latch open.
+  - slug: duchess
+    note: The Duchess's household has ordered from this kitchen for nine years. No contract exists.
+  - slug: ferryman
+    note: Food is left at the river crossing on the long nights. The Ferryman does not acknowledge it.
 stories: []
 storyLabel: null
 ---

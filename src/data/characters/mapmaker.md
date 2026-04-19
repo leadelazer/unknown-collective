@@ -15,6 +15,19 @@ detail: true
 artifact: A brass surveying compass, its casing engraved with the course of the river as it ran in 1719. The cerulean smudge on its dial face has never fully faded.
 quote: The city believes itself permanent. Every map I make proves it wrong.
 relations: [duchess, curator, oracle, keymaker, doorwarden, ferryman]
+relationNotes:
+  - slug: duchess
+    note: She granted access to the private district for the survey. She retained one copy of the result.
+  - slug: curator
+    note: He deposits unfinished charts with Freddy when he leaves the city. Most have been returned, once corrected.
+  - slug: oracle
+    note: She amended a proof that had sat uncorrected for six years. He revised the print without comment.
+  - slug: keymaker
+    note: She opened a locked courtyard so the survey could continue. Niklas recorded her initials in the margin.
+  - slug: doorwarden
+    note: The Doorwarden holds the key to the lower registry. Niklas needs it roughly once a year.
+  - slug: ferryman
+    note: The river crossing appears on every map. The Ferryman's route appears on none of them.
 stories: []
 storyLabel: null
 ---

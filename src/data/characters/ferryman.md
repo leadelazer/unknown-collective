@@ -15,6 +15,13 @@ detail: true
 artifact: null
 quote: null
 relations: [mapmaker, lightkeeper, duchess]
+relationNotes:
+  - slug: mapmaker
+    note: Niklas mapped the crossing point three times. Each time, the Ferryman had moved the landing post.
+  - slug: lightkeeper
+    note: The Lightkeeper extinguishes the lamp when the last crossing is done. The Ferryman has never asked him to.
+  - slug: duchess
+    note: She takes the early crossing twice a year. She does not speak. He does not charge.
 stories: []
 storyLabel: null
 ---

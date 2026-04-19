@@ -101,6 +101,20 @@ export const CHARACTERS = [
           "duchess",
           "merchant-prince"
     ],
+    relationNotes: [
+          {
+                "slug": "oracle",
+                "note": "She came to the archive twice in a winter. Both times she left without speaking."
+          },
+          {
+                "slug": "duchess",
+                "note": "They have exchanged letters continuously for eleven years. The subject has never been fully resolved."
+          },
+          {
+                "slug": "merchant-prince",
+                "note": "The Merchant Prince funds two shelves of the archive. The Curator has not acknowledged this publicly."
+          }
+    ],
     artifact: "Index of forgotten correspondences, bound in indigo.",
     quote: "Every city keeps a second library. Mine is the one that reads you back.",
     stories: [
@@ -152,6 +166,20 @@ export const CHARACTERS = [
           "curator",
           "tailor",
           "mapmaker"
+    ],
+    relationNotes: [
+          {
+                "slug": "curator",
+                "note": "He once filed a letter she wrote to herself. She did not retrieve it."
+          },
+          {
+                "slug": "tailor",
+                "note": "He stitched the lining of her coat after she described, without knowing it, exactly what she needed."
+          },
+          {
+                "slug": "mapmaker",
+                "note": "He showed her a proof once — a street that appeared only on certain years. She corrected one detail. He kept the correction."
+          }
     ],
     artifact: "A field notebook, the lake, 1889.",
     quote: "I do not see the future. I see what the present is trying to be.",
@@ -206,6 +234,24 @@ export const CHARACTERS = [
           "baker",
           "brewer"
     ],
+    relationNotes: [
+          {
+                "slug": "oracle",
+                "note": "The Gardener leaves the gate unlatched on certain mornings. The Oracle is the only one who uses it."
+          },
+          {
+                "slug": "weavers",
+                "note": "The Weavers bought dried flowers from her stall three seasons running. The orders were identical each time."
+          },
+          {
+                "slug": "baker",
+                "note": "She delivers grain to the bakehouse every autumn. They do not converse."
+          },
+          {
+                "slug": "brewer",
+                "note": "He collects the botanical trimmings she leaves at the supply entrance each Saturday."
+          }
+    ],
   },
   {
     n: 4,
@@ -238,6 +284,24 @@ export const CHARACTERS = [
           "obsidian-count",
           "mapmaker"
     ],
+    relationNotes: [
+          {
+                "slug": "duchess",
+                "note": "She countersigned the deed. He has not forgotten whose signature came first."
+          },
+          {
+                "slug": "curator",
+                "note": "He funds a private shelf in the archive. Access is not listed in any catalogue."
+          },
+          {
+                "slug": "obsidian-count",
+                "note": "They settled a warehouse dispute out of court. The terms were not filed."
+          },
+          {
+                "slug": "mapmaker",
+                "note": "He commissioned a survey of two districts. The Mapmaker delivered one."
+          }
+    ],
   },
   {
     n: 5,
@@ -268,6 +332,16 @@ export const CHARACTERS = [
     relations: [
           "curator",
           "florist"
+    ],
+    relationNotes: [
+          {
+                "slug": "curator",
+                "note": "Eleven years of correspondence, kept in a silk-ribboned bundle in her writing room."
+          },
+          {
+                "slug": "florist",
+                "note": "She sent flowers to a funeral the Florist had already arranged. The order was identical."
+          }
     ],
     artifact: "Correspondence with Freddy, bound in silk ribbon.",
     quote: "Every city rewrites itself daily. My role is to remember which truths survive the revision.",
@@ -302,6 +376,20 @@ export const CHARACTERS = [
           "the-bind",
           "curator",
           "florist"
+    ],
+    relationNotes: [
+          {
+                "slug": "the-bind",
+                "note": "They created the Bind's pattern. It has not been woven again."
+          },
+          {
+                "slug": "curator",
+                "note": "He held a length of their fabric in the archive for three years before returning it, unasked."
+          },
+          {
+                "slug": "florist",
+                "note": "The flowers arrived the same morning as the cloth. The client never asked how this happened."
+          }
     ],
   },
   {
@@ -363,6 +451,28 @@ export const CHARACTERS = [
           "curator",
           "gardener"
     ],
+    relationNotes: [
+          {
+                "slug": "florist",
+                "note": "He carried her inventory out of a burning building on an autumn evening. She filed no report."
+          },
+          {
+                "slug": "mapmaker",
+                "note": "The fire at the old exchange erased three blocks from Niklas's working map. He redrew them with the Firefighter's corrections."
+          },
+          {
+                "slug": "keymaker",
+                "note": "She cut a lock for him at a warehouse doorway while the fire was still visible two streets over."
+          },
+          {
+                "slug": "curator",
+                "note": "The archive required evacuation twice in one decade. The Firefighter held the rear both times."
+          },
+          {
+                "slug": "gardener",
+                "note": "He helped carry the cold frames from the garden wall the night of the lower-district fire. Nothing was said."
+          }
+    ],
     artifact: "A fire axe, its handle worn smooth from use, its blade still bearing the scorch marks of the fire at the royal residence in 1750. The axe is both tool and testimony — the instrument that broke open the Collective's hall door and let the survivors out into the night air.",
     quote: "I do not fight fire because I am unafraid of it. I fight it because I know what it takes.",
   },
@@ -395,6 +505,20 @@ export const CHARACTERS = [
           "mapmaker",
           "lightkeeper",
           "duchess"
+    ],
+    relationNotes: [
+          {
+                "slug": "mapmaker",
+                "note": "Niklas mapped the crossing point three times. Each time, the Ferryman had moved the landing post."
+          },
+          {
+                "slug": "lightkeeper",
+                "note": "The Lightkeeper extinguishes the lamp when the last crossing is done. The Ferryman has never asked him to."
+          },
+          {
+                "slug": "duchess",
+                "note": "She takes the early crossing twice a year. She does not speak. He does not charge."
+          }
     ],
   },
   {
@@ -431,6 +555,32 @@ export const CHARACTERS = [
           "doorwarden",
           "ferryman"
     ],
+    relationNotes: [
+          {
+                "slug": "duchess",
+                "note": "She granted access to the private district for the survey. She retained one copy of the result."
+          },
+          {
+                "slug": "curator",
+                "note": "He deposits unfinished charts with Freddy when he leaves the city. Most have been returned, once corrected."
+          },
+          {
+                "slug": "oracle",
+                "note": "She amended a proof that had sat uncorrected for six years. He revised the print without comment."
+          },
+          {
+                "slug": "keymaker",
+                "note": "She opened a locked courtyard so the survey could continue. Niklas recorded her initials in the margin."
+          },
+          {
+                "slug": "doorwarden",
+                "note": "The Doorwarden holds the key to the lower registry. Niklas needs it roughly once a year."
+          },
+          {
+                "slug": "ferryman",
+                "note": "The river crossing appears on every map. The Ferryman's route appears on none of them."
+          }
+    ],
     artifact: "A brass surveying compass, its casing engraved with the course of the river as it ran in 1719. The cerulean smudge on its dial face has never fully faded.",
     quote: "The city believes itself permanent. Every map I make proves it wrong.",
   },
@@ -464,6 +614,20 @@ export const CHARACTERS = [
           "merchant-prince",
           "curator",
           "the-bind"
+    ],
+    relationNotes: [
+          {
+                "slug": "merchant-prince",
+                "note": "They reached a settlement in a warehouse dispute. No clerk was present."
+          },
+          {
+                "slug": "curator",
+                "note": "He left a legal annotation in one of the archive's catalogues. The Curator did not remove it."
+          },
+          {
+                "slug": "the-bind",
+                "note": "The Bind complicated the Count's clearest case. He still considers the ruling unresolved."
+          }
     ],
     artifact: "A legal text bound in black leather, its margins dense with Leopold's annotations in dark blue ink — a lifetime of adjustments to a law he has never quite accepted as sufficient.",
     quote: "The law is not justice. It is the closest we have managed to come.",
@@ -499,6 +663,24 @@ export const CHARACTERS = [
           "cook",
           "brewer"
     ],
+    relationNotes: [
+          {
+                "slug": "curator",
+                "note": "The archive takes a loaf every Thursday. The account is kept in a separate ledger."
+          },
+          {
+                "slug": "gardener",
+                "note": "She delivers grain and dried herbs to the bakehouse door. There is no invoice."
+          },
+          {
+                "slug": "cook",
+                "note": "They share a wall. The schedules do not overlap by accident."
+          },
+          {
+                "slug": "brewer",
+                "note": "The spent grain goes across the alley to the distillery. Nothing is wasted."
+          }
+    ],
     artifact: "A sourdough starter, kept alive for decades in a clay crock sealed with cloth. The Baker claims it predates the Collective. No one has verified this.",
     quote: "Everything worth eating requires something to die first. That is not a tragedy. That is bread.",
   },
@@ -533,6 +715,24 @@ export const CHARACTERS = [
           "obsidian-count",
           "timekeeper"
     ],
+    relationNotes: [
+          {
+                "slug": "weavers",
+                "note": "The Weavers made the first binding. The Bind does not record this as debt."
+          },
+          {
+                "slug": "curator",
+                "note": "The Curator holds one written account of the Bind's origin. The file is sealed."
+          },
+          {
+                "slug": "obsidian-count",
+                "note": "He cited the Bind in a ruling once. The argument was not accepted."
+          },
+          {
+                "slug": "timekeeper",
+                "note": "The Bind arrived before the Timekeeper last winter. Nothing was exchanged."
+          }
+    ],
     artifact: "A shuttle of dark wood, still threaded. No one moves it. No one is sure who placed it there.",
   },
   {
@@ -566,6 +766,24 @@ export const CHARACTERS = [
           "duchess",
           "ferryman"
     ],
+    relationNotes: [
+          {
+                "slug": "baker",
+                "note": "He passes dough across the shared wall every morning before the bakehouse opens."
+          },
+          {
+                "slug": "gardener",
+                "note": "She leaves produce at the kitchen door on market days. The Cook leaves the latch open."
+          },
+          {
+                "slug": "duchess",
+                "note": "The Duchess's household has ordered from this kitchen for nine years. No contract exists."
+          },
+          {
+                "slug": "ferryman",
+                "note": "Food is left at the river crossing on the long nights. The Ferryman does not acknowledge it."
+          }
+    ],
   },
   {
     n: 15,
@@ -597,6 +815,20 @@ export const CHARACTERS = [
           "obsidian-count",
           "duchess",
           "oracle"
+    ],
+    relationNotes: [
+          {
+                "slug": "obsidian-count",
+                "note": "The Count sat before the mirror once and did not speak for a quarter hour. He paid double."
+          },
+          {
+                "slug": "duchess",
+                "note": "He made her mirror. She keeps it covered except when she is alone."
+          },
+          {
+                "slug": "oracle",
+                "note": "She stood in his shop for twenty minutes, then bought nothing. She returned the following week."
+          }
     ],
     artifact: "An obsidian hand mirror, its surface never entirely still. Valentin claims it shows the viewer what they most need to see, not what they came to look at.",
     quote: "Everyone who sits before my mirror is disappointed. Most of them come back.",
@@ -632,6 +864,20 @@ export const CHARACTERS = [
           "mapmaker",
           "merchant-prince"
     ],
+    relationNotes: [
+          {
+                "slug": "keymaker",
+                "note": "She provides the blanks. The Doorwarden copies what is needed and keeps no record."
+          },
+          {
+                "slug": "mapmaker",
+                "note": "He recorded this building's threshold in three surveys. The Doorwarden moved the mark each time."
+          },
+          {
+                "slug": "merchant-prince",
+                "note": "The Merchant Prince had the north entrance sealed. Elara received no instruction, only the bill."
+          }
+    ],
     artifact: "A set of lockpicks, hand-forged, kept in a case of Indian yellow leather. Elara does not use them often. She rarely needs to.",
     quote: "I do not break doors down. I wait for them to understand that they have already opened.",
   },
@@ -664,6 +910,20 @@ export const CHARACTERS = [
           "ferryman",
           "curator",
           "timekeeper"
+    ],
+    relationNotes: [
+          {
+                "slug": "ferryman",
+                "note": "The lamp at the river crossing marks the last hour of crossings. The Ferryman has never once been late."
+          },
+          {
+                "slug": "curator",
+                "note": "He replaced the reading room lamps twice without billing. The Curator noted it; no payment was made."
+          },
+          {
+                "slug": "timekeeper",
+                "note": "The Timekeeper adjusts the hour when the lamp is lit. The Lightkeeper does not know this."
+          }
     ],
     artifact: "A lamplighter's pole, its brass tip still warm. He has never explained why.",
     quote: "I do not make promises about what comes next. I just keep the light on so you can find your way to it.",
@@ -699,6 +959,20 @@ export const CHARACTERS = [
           "weavers",
           "mirrormaker"
     ],
+    relationNotes: [
+          {
+                "slug": "oracle",
+                "note": "She brought him fabric descriptions from three different readings. He made one coat."
+          },
+          {
+                "slug": "weavers",
+                "note": "He has bought from their stock for twelve years. He has never met them in person."
+          },
+          {
+                "slug": "mirrormaker",
+                "note": "Valentin sends clients to him after the mirror. He sends them back after the fitting."
+          }
+    ],
     artifact: "A needle case of polished bone, containing threads in colours that do not appear in any dye catalogue Elijah has ever found.",
     quote: "I do not make clothes. I make the version of you that was already there, waiting to be worn.",
   },
@@ -731,6 +1005,20 @@ export const CHARACTERS = [
           "gardener",
           "cook",
           "baker"
+    ],
+    relationNotes: [
+          {
+                "slug": "gardener",
+                "note": "She brings botanicals to the still-room gate on Saturday mornings. The Brewer settles the account monthly."
+          },
+          {
+                "slug": "cook",
+                "note": "Kitchen scraps go to the distillery for stock. The arrangement has never been written down."
+          },
+          {
+                "slug": "baker",
+                "note": "The spent grain crosses the alley to the bakehouse. Neither party has ever discussed the arrangement."
+          }
     ],
     artifact: "A small bottle of the gin, unlabelled. Given only on certain evenings. Never explained.",
     quote: "There will be time for all of it. But not until the glass is empty.",
@@ -766,6 +1054,24 @@ export const CHARACTERS = [
           "doorwarden",
           "mapmaker"
     ],
+    relationNotes: [
+          {
+                "slug": "the-bind",
+                "note": "A key was found threaded into the Bind's shuttle. The Keymaker was not asked about it."
+          },
+          {
+                "slug": "duchess",
+                "note": "She made the key for the Duchess's east correspondence box. A copy exists; it was never requested."
+          },
+          {
+                "slug": "doorwarden",
+                "note": "The Doorwarden orders duplicate blanks every quarter. The Keymaker does not ask what they unlock."
+          },
+          {
+                "slug": "mapmaker",
+                "note": "He left an access schematic on her workbench for a survey he could not otherwise complete."
+          }
+    ],
     artifact: "A folded diagram, left on the Curator's desk, showing a schematic of a cabinet that does not yet exist. The tags in its drawers are labelled with future dates.",
     quote: "Try again. But ask differently.",
   },
@@ -799,6 +1105,24 @@ export const CHARACTERS = [
           "lightkeeper",
           "curator",
           "the-bind"
+    ],
+    relationNotes: [
+          {
+                "slug": "ferryman",
+                "note": "The Ferryman's last crossing aligns with the Timekeeper's late count. One of them adjusts for the other."
+          },
+          {
+                "slug": "lightkeeper",
+                "note": "The lamp timing has shifted three minutes over four years. The Timekeeper has not mentioned it."
+          },
+          {
+                "slug": "curator",
+                "note": "The Curator found a clock in the archive that runs seven minutes fast. The Timekeeper wound it."
+          },
+          {
+                "slug": "the-bind",
+                "note": "The Bind took a record the Timekeeper had marked completed. The record was not returned."
+          }
     ],
     quote: "Nothing ends. It only changes what it is becoming.",
   }

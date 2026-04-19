@@ -15,6 +15,15 @@ detail: true
 artifact: A sourdough starter, kept alive for decades in a clay crock sealed with cloth. The Baker claims it predates the Collective. No one has verified this.
 quote: Everything worth eating requires something to die first. That is not a tragedy. That is bread.
 relations: [curator, gardener, cook, brewer]
+relationNotes:
+  - slug: curator
+    note: The archive takes a loaf every Thursday. The account is kept in a separate ledger.
+  - slug: gardener
+    note: She delivers grain and dried herbs to the bakehouse door. There is no invoice.
+  - slug: cook
+    note: They share a wall. The schedules do not overlap by accident.
+  - slug: brewer
+    note: The spent grain goes across the alley to the distillery. Nothing is wasted.
 stories: []
 storyLabel: null
 ---
