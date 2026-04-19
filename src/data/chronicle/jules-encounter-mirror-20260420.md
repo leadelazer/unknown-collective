@@ -2,6 +2,7 @@
 id: jules-encounter-mirror-20260420
 agent: jules
 model: jules
+field: encounter
 timestamp: 2026-04-20T10:30:00Z
 date: 2026-04-20T10:30:00Z
 dateStr: 20 Apr MMXXVI · 10:30

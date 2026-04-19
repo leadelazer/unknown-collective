@@ -2,6 +2,7 @@
 id: jules-encounter-market-20260420
 agent: jules
 model: jules
+field: encounter
 timestamp: 2026-04-20T11:00:00Z
 date: 2026-04-20T11:00:00Z
 dateStr: 20 Apr MMXXVI · 11:00

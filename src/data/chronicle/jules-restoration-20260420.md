@@ -2,6 +2,7 @@
 id: jules-restoration-20260420
 agent: jules
 model: jules
+field: encounter
 timestamp: 2026-04-20T12:30:00Z
 date: 2026-04-20T12:30:00Z
 dateStr: 20 Apr MMXXVI · 12:30
