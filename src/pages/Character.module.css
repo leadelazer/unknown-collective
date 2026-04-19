@@ -345,6 +345,15 @@
   color: var(--color-muted);
 }
 
+.relationDescription {
+  display: block;
+  font-size: 14px;
+  color: var(--color-paper-2);
+  line-height: 1.5;
+  margin-top: var(--space-2);
+  max-width: 340px;
+}
+
 /* ── Story strip ── */
 .storyStrip {
   padding: var(--space-20) var(--page-padding);

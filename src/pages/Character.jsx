@@ -142,7 +142,9 @@ function DetailedCharacter({ c, tier, navigate }) {
             <div>
               <p className={`${styles.extrasLabel} t-deco`}>Relations in the Collective</p>
               <div className={styles.relations}>
-                {c.relations.map(slug => {
+                {c.relations.map(rel => {
+                  const slug = typeof rel === 'string' ? rel : rel.slug;
+                  const description = typeof rel === 'string' ? null : rel.description || null;
                   const r = CHARACTERS.find(x => x.slug === slug);
                   if (!r) return null;
                   return (
@@ -156,12 +158,9 @@ function DetailedCharacter({ c, tier, navigate }) {
                         : <div className={styles.relationImg} style={{ background: r.hue + '44' }} />
                       }
                       <div>
-                        <span className={`${styles.relationArcana} t-deco`}>{r.flower || r.arcana}</span>
-                        {r.flowerMeaning && (
-                          <span className={`${styles.relationFlowerMeaning} t-body`}>{r.flowerMeaning}</span>
-                        )}
                         <span className={`${styles.relationRole} t-display`}>{r.role}</span>
                         {r.name && <span className={`${styles.relationPersonName} t-body`}>{r.name}</span>}
+                        {description && <span className={`${styles.relationDescription} t-body`}>{description}</span>}
                       </div>
                     </button>
                   );
