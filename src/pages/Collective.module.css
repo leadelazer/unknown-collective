@@ -112,13 +112,13 @@
   position: relative;
   aspect-ratio: 3 / 4;
   background: var(--color-ink-card);
-  border: var(--border-gold-mid);
+  border: 1px solid color-mix(in srgb, var(--card-primary) 40%, transparent);
   overflow: hidden;
   transition: border-color var(--transition-fast);
 }
 
 .card:hover .cardImageWrap {
-  border-color: var(--color-gold-hi);
+  border-color: var(--card-secondary);
 }
 
 .cardImage {
@@ -143,19 +143,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  gap: 4px;
-}
-
-.cardArcana {
-  font-size: 9px;
-  color: var(--color-gold-hi);
-  letter-spacing: 0.3em;
-  opacity: 0.6;
-  transition: opacity var(--transition-fast);
-}
-
-.card:hover .cardArcana {
-  opacity: 1;
+  gap: 6px;
 }
 
 .cardRole {
@@ -183,13 +171,33 @@
   opacity: 1;
 }
 
+.cardPalette {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 2px;
+  opacity: 0.58;
+  transition: opacity var(--transition-fast);
+}
+
+.card:hover .cardPalette {
+  opacity: 0.82;
+}
+
+.cardPaletteSwatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-paper) 18%, transparent);
+  box-shadow: 0 0 0 1px rgba(7, 10, 9, 0.5) inset;
+}
+
 .cardCorner {
   position: absolute;
   top: 2px;
   left: 2px;
   width: 0;
   height: 0;
-  border-left: 16px solid transparent;
+  border-left: 16px solid var(--card-primary);
   border-bottom: 16px solid transparent;
   opacity: 0.9;
   filter: brightness(1.5);

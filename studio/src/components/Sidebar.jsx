@@ -16,6 +16,22 @@ export default function Sidebar({ characters, encounters, lore, selected, onSele
     !q || c.role?.toLowerCase().includes(q) || c.name?.toLowerCase().includes(q) || c.arcana?.toLowerCase().includes(q)
   );
 
+  const filteredEncounters = encounters.filter(encounter => {
+    if (!q) return true;
+    const left = characters.find(c => c.slug === encounter.slugA);
+    const right = characters.find(c => c.slug === encounter.slugB);
+    const haystack = [
+      encounter.title,
+      encounter.slugA,
+      encounter.slugB,
+      left?.role,
+      right?.role,
+    ].filter(Boolean).join(' ').toLowerCase();
+    return haystack.includes(q);
+  });
+
+  const filteredLore = lore.filter(item => !q || `${item.title || ''} ${item.id || ''}`.toLowerCase().includes(q));
+
   const grouped = TIERS.map(tier => ({
     tier,
     chars: filtered.filter(c => c.tier === tier).sort((a, b) => a.n - b.n),
@@ -55,16 +71,22 @@ export default function Sidebar({ characters, encounters, lore, selected, onSele
         {/* Encounters */}
         <div className="nav-section">
           <div className="nav-section-label">Encounters</div>
-          {encounters.map(e => (
+          {filteredEncounters.map(e => {
+            const left = characters.find(c => c.slug === e.slugA);
+            const right = characters.find(c => c.slug === e.slugB);
+            const sub = [left?.role?.replace('The ', ''), right?.role?.replace('The ', '')].filter(Boolean).join(' × ');
+            return (
             <div
               key={e.id}
               className={`nav-item ${selected?.type === 'encounter' && selected?.id === e.id ? 'active' : ''}`}
               onClick={() => onSelect({ type: 'encounter', id: e.id })}
+              title={sub || e.id}
             >
               <span style={{ fontSize: 12, color: 'var(--text-3)' }}>⟷</span>
               <span className="nav-label">{e.title || e.id}</span>
             </div>
-          ))}
+            );
+          })}
           {showEncForm ? (
             <div style={{ padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
               <select value={newEncSlugA} onChange={e => setNewEncSlugA(e.target.value)} style={{ fontSize: 12, padding: '4px 8px', border: '1px solid var(--border)', borderRadius: 4, background: 'var(--surface)' }}>
@@ -90,7 +112,7 @@ export default function Sidebar({ characters, encounters, lore, selected, onSele
         {/* Lore */}
         <div className="nav-section">
           <div className="nav-section-label">Lore</div>
-          {lore.map(l => (
+          {filteredLore.map(l => (
             <div
               key={l.id}
               className={`nav-item ${selected?.type === 'lore' && selected?.id === l.id ? 'active' : ''}`}

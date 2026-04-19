@@ -7,7 +7,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
-import { computeGaps, computeContentRatings, buildAgentPrompt, parseDraftOutput, buildWritingPrompt } from './scripts/agent-core.js';
+import { computeGaps, computeContentRatings, buildAgentPrompt, parseDraftOutput, buildWritingPrompt, buildCoherenceFixPrompt, choosePatchField, getFieldLabel, normalizeTargetField } from './scripts/agent-core.js';
+import { evaluateCanonicalRoster } from './scripts/evals.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA = path.join(__dirname, '../src/data');
@@ -91,6 +92,24 @@ function parseSections(body) {
   return sections;
 }
 
+function parsePalette(sectionBody) {
+  return (sectionBody || '')
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(Boolean)
+    .slice(0, 3);
+}
+
+function parseRelationNotes(sectionBody) {
+  return (sectionBody || '')
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(Boolean)
+    .map(line => line.match(/^-\s*([^:]+):\s*(.+)$/))
+    .filter(Boolean)
+    .map(([, slug, note]) => ({ slug: slug.trim(), note: note.trim() }));
+}
+
 function readChar(slug) {
   const charFile = path.join(CHARS_DIR, `${slug}.md`);
   const bioFile = path.join(BIOS_DIR, `${slug}.md`);
@@ -149,6 +168,18 @@ function yamlStr(v) {
   return JSON.stringify(v);
 }
 
+function readArchitectureEntry(role) {
+  try {
+    const archPath = path.join(LORE_DIR, 'arcana-architecture.md');
+    if (!fs.existsSync(archPath)) return null;
+    const archDoc = fs.readFileSync(archPath, 'utf8');
+    const match = archDoc.match(new RegExp(`## \\d+\.\\s+${role.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')}[\\s\\S]*?(?=\n---\n## |$)`));
+    return match ? match[0].trim() : null;
+  } catch {
+    return null;
+  }
+}
+
 function readEncounters() {
   if (!fs.existsSync(ENCOUNTERS_DIR)) return [];
   return fs.readdirSync(ENCOUNTERS_DIR)
@@ -176,8 +207,11 @@ function readLore() {
 
 // ─── Chronicle helpers ────────────────────────────────────────────────────────
 
-// Max tokens for a chronicle field note: 2–4 sentences fits comfortably in 300 tokens
-const CHRONICLE_NOTE_MAX_TOKENS = 300;
+const DEFAULT_MODEL_SYSTEM_PROMPT = 'You write like a journalist covering strange municipal history — dry, specific, observational. Short sentences. Physical details. No fantasy language, no superlatives, no self-help tone. You are documenting real-seeming people, not mythological figures. The city is NEVER named — do not write Munich, Munchen, Eisbach, Marienplatz, Isar, or any real landmark; use abstract spatial language (the river, the central square, the northern district). Follow all formatting instructions exactly. Output only what is asked — no preamble or commentary outside the specified tags.';
+const CHRONICLE_SYSTEM_PROMPT = 'You are writing an agent field note after approving an edit. The note must sound like an editorial log, not a character monologue and not fiction. First-person singular is allowed and preferred when describing reasoning. State what was weak, what evidence guided the revision, and why particular details were kept or added. Keep the character at arm\'s length: they can answer back briefly, but they are not the narrator. No mention of AI, prompts, or hidden process. No fantasy language. Output only the requested note body.';
+
+// Max tokens for a chronicle field note: enough room for editorial reasoning plus a short line of dialogue.
+const CHRONICLE_NOTE_MAX_TOKENS = 420;
 
 function formatDateStr(d) {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -200,21 +234,55 @@ function formatFileDate(d) {
   return `${YYYY}${MM}${DD}-${hh}${mm}${ss}`;
 }
 
-function buildChroniclePrompt(char, field, draftContent) {
-  const fieldLabel = field === 'talisman-shadow' ? 'talisman and shadow' : field;
-  const gapDesc = field === 'talisman-shadow'
-    ? `talisman and shadow descriptions were missing`
-    : `${fieldLabel} was empty`;
-  const contentPreview = (draftContent || '').slice(0, 300);
-  const flowerLine = char.flower ? `\n- Flower: ${char.flower}${char.flowerMeaning ? ` (${char.flowerMeaning})` : ''}` : '';
-  return `You are writing a field note — a brief archival log entry made by the agent that just patched this character record.
+function snippet(text, maxChars = 240) {
+  if (!text) return '(none)';
+  const normalized = String(text).replace(/\s+/g, ' ').trim();
+  if (!normalized) return '(none)';
+  if (normalized.length <= maxChars) return normalized;
+  return normalized.slice(0, Math.max(0, maxChars - 1)).trimEnd() + '…';
+}
 
-Voice: quiet archivist. Measured, specific, a little distant. Like a note left in a margin.
-Length: exactly 2–4 sentences.
-Do not use: "I explored", "I crafted", "I delved", "I created", "I generated", "I developed", "fascinating", "intricate", "tapestry", "nuanced".
+function getFieldLabel(field) {
+  if (field === 'talisman-shadow') return 'talisman and shadow';
+  return field || 'bio';
+}
+
+function getFieldGapDescription(char, field) {
+  if (field === 'talisman-shadow') {
+    const missing = [];
+    if (!char.talisman || char.talisman.trim().length < 40) missing.push('talisman');
+    if (!char.shadow || char.shadow.trim().length < 40) missing.push('shadow');
+    if (!missing.length) return 'the card text was thin and needed sharper archetypal logic';
+    if (missing.length === 2) return 'both card sections were missing or too thin';
+    return `the ${missing[0]} section was missing or too thin`;
+  }
+
+  if (!char.bio || char.bio.trim().length < 80) return 'the bio was missing or too thin';
+  return `${field} needed a more grounded shape`;
+}
+
+function buildChroniclePrompt(char, field, previousContent, draftContent, relatedChars = []) {
+  const fieldLabel = getFieldLabel(field);
+  const gapDesc = getFieldGapDescription(char, field);
+  const previousPreview = snippet(previousContent, 260);
+  const updatedPreview = snippet(draftContent, 320);
+  const flowerLine = char.flower ? `\n- Flower: ${char.flower}${char.flowerMeaning ? ` (${char.flowerMeaning})` : ''}` : '';
+  const relationLine = relatedChars.length
+    ? relatedChars.map(c => `${c.role} (${c.slug})`).join(', ')
+    : '(none listed)';
+
+  return `You are writing a field note after patching this character record.
+
+Voice: agent commentary. Editorial, candid, specific. The note should sound like a working log from the agent who made the change.
+Length: 3–5 sentences.
+The focus is reasoning, not summary.
+Use first person when it helps: "I kept", "I cut", "I anchored", "I left the mystery intact" are all acceptable.
+Include at most one brief line of dialogue or reported speech from the character if it clarifies why the edit landed the way it did.
+Do not use: "I explored", "I delved", "I crafted", "I generated", "fascinating", "intricate", "tapestry", "nuanced".
 Do not mention: AI, language model, or prompt.
-Do not repeat the model name — it is in the frontmatter.
-Do not start with "I".
+Do not write as the character.
+Do not summarize the draft paragraph by paragraph.
+Do not start with scene-setting or atmospheric filler.
 
 Character context:
 - Name: ${char.name || char.role}
@@ -222,12 +290,123 @@ Character context:
 - Arcana: ${char.arcana}
 - Keywords: ${(char.keywords || []).join(', ')}
 - Essence: ${char.essence || '(none)'}${flowerLine}
+- Relations in play: ${relationLine}
 
 Field patched: ${fieldLabel}
-Gap found: The ${char.role}'s ${gapDesc}.
-Draft begins: "${contentPreview}"
+Gap found: ${gapDesc}.
+Previous content snapshot: ${previousPreview}
+Updated content snapshot: ${updatedPreview}
+
+Structure:
+Sentence 1: identify the editorial problem.
+Sentence 2: name the evidence or character logic that guided the revision.
+Sentence 3: explain one or two choices you made in the new copy.
+Sentence 4 or 5: optional brief exchange or resistance from the character, if useful.
 
 Write only the field note body. No preamble, no sign-off, no quotation marks.`;
+}
+
+function buildEncounterChroniclePrompt(chars, title, previousContent, draftContent) {
+  const charLines = chars.map(char => {
+    if (!char) return '(missing character record)';
+    return `${char.role} (${char.slug}, ${char.arcana}): ${snippet(char.essence, 100)} [${(char.keywords || []).join(', ')}]`;
+  }).join('\n');
+
+  return `You are writing a field note after approving an encounter entry.
+
+Voice: agent commentary. Editorial, candid, specific.
+Length: 3–5 sentences.
+Focus on why this pair and this event were worth recording, what tension or evidence from the character records supported the scene, and why the title or framing was shaped this way.
+Include at most one brief reported line from one of the characters if it clarifies the choice.
+Do not mention AI, prompts, or hidden process.
+Do not write the note as fiction.
+
+Encounter title: ${title || '(untitled)'}
+Characters in play:
+${charLines}
+
+Previous encounter snapshot: ${snippet(previousContent, 260)}
+Approved encounter snapshot: ${snippet(draftContent, 340)}
+
+Structure:
+Sentence 1: identify the editorial gap or opportunity.
+Sentence 2: name the character tension that justified the encounter.
+Sentence 3: explain one choice in the title or scene framing.
+Sentence 4 or 5: optional brief resistance or reply from one character.
+
+Write only the field note body. No preamble, no sign-off, no quotation marks.`;
+}
+
+function buildLoreChroniclePrompt(action, title, previousContent, draftContent) {
+  const subject = action === 'coherence-check' ? 'coherence report' : 'lore entry';
+  return `You are writing a field note after approving a ${subject}.
+
+Voice: agent commentary. Editorial, candid, specific.
+Length: 3–5 sentences.
+Focus on why this topic needed a standalone entry or audit, what evidence in the archive made it necessary, and how the approved draft was shaped.
+Do not mention AI, prompts, or hidden process.
+Do not write the note as fiction.
+
+Approved title: ${title || '(untitled)'}
+Previous snapshot: ${snippet(previousContent, 260)}
+Approved snapshot: ${snippet(draftContent, 340)}
+
+Structure:
+Sentence 1: identify the gap, contradiction, or need.
+Sentence 2: name the evidence base or archive logic.
+Sentence 3: explain one decision in scope or framing.
+Sentence 4 or 5: optional note about ambiguity left in place.
+
+Write only the field note body. No preamble, no sign-off, no quotation marks.`;
+}
+
+function writeChronicleEntry(metadata, text) {
+  const now = new Date();
+  const content = ['---'];
+  const fileId = `${metadata.idBase}-${formatFileDate(now)}`;
+  const frontmatter = {
+    id: fileId,
+    type: 'agent-note',
+    model: metadata.model || 'gpt-4o-mini',
+    action: metadata.action || 'patch-fields',
+    field: metadata.field || '',
+    slug: metadata.slug || '',
+    slugA: metadata.slugA || '',
+    slugB: metadata.slugB || '',
+    title: metadata.title || '',
+    targetId: metadata.targetId || '',
+    date: now.toISOString(),
+    dateStr: formatDateStr(now),
+    persona: metadata.persona || metadata.slug || '',
+  };
+
+  for (const [key, value] of Object.entries(frontmatter)) {
+    content.push(`${key}: ${yamlStr(value)}`);
+  }
+
+  content.push('---', '', text.trim());
+  fs.writeFileSync(path.join(CHRONICLE_DIR, `${fileId}.md`), content.join('\n'), 'utf8');
+  execSync('node src/data/sync-chronicle.js', { cwd: UC_ROOT, encoding: 'utf8' });
+}
+
+function mergeEncounterContent(existingEncounter, title, additionBody) {
+  const existingTitle = existingEncounter?.title?.trim();
+  const nextTitle = existingTitle || title || '(untitled)';
+  const existingBody = existingEncounter?.body?.trim() || '';
+  const incomingBody = (additionBody || '').trim();
+
+  if (!existingBody) {
+    return { title: nextTitle, body: incomingBody };
+  }
+
+  if (!incomingBody || existingBody === incomingBody || existingBody.includes(incomingBody)) {
+    return { title: nextTitle, body: existingBody };
+  }
+
+  return {
+    title: nextTitle,
+    body: `${existingBody}\n\n${incomingBody}`,
+  };
 }
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
@@ -347,7 +526,7 @@ app.post('/api/sync', (req, res) => {
 
 // ─── GitHub Models ────────────────────────────────────────────────────────────
 
-async function callGitHubModels(prompt, model = 'gpt-4o-mini', maxTokens = 2000) {
+async function callGitHubModels(prompt, model = 'gpt-4o-mini', maxTokens = 2000, systemPrompt = DEFAULT_MODEL_SYSTEM_PROMPT) {
   let token = process.env.GITHUB_TOKEN;
   if (!token) {
     try { token = execSync('gh auth token', { encoding: 'utf8' }).trim(); }
@@ -365,13 +544,14 @@ async function callGitHubModels(prompt, model = 'gpt-4o-mini', maxTokens = 2000)
       );
     }
   }
+  prompt = fitPromptToModel(prompt, model);
   const r = await fetch('https://models.inference.ai.azure.com/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
     body: JSON.stringify({
       model, max_tokens: maxTokens,
       messages: [
-        { role: 'system', content: 'You write like a journalist covering strange municipal history — dry, specific, observational. Short sentences. Physical details. No fantasy language, no superlatives, no self-help tone. You are documenting real-seeming people, not mythological figures. Follow all formatting instructions exactly. Output only what is asked — no preamble or commentary outside the specified tags.' },
+        { role: 'system', content: systemPrompt },
         { role: 'user', content: prompt },
       ],
     }),
@@ -384,6 +564,24 @@ async function callGitHubModels(prompt, model = 'gpt-4o-mini', maxTokens = 2000)
   const d = await r.json();
   if (!r.ok) throw new Error(d.error?.message || `GitHub Models error ${r.status}`);
   return d.choices[0]?.message?.content || '';
+}
+
+function estimateTokens(text) {
+  return Math.ceil((text || '').length / 4);
+}
+
+function inputTokenLimit(model) {
+  if ((model || '').startsWith('gpt-4.1')) return 7600;
+  return 12000;
+}
+
+function fitPromptToModel(prompt, model) {
+  const limit = inputTokenLimit(model);
+  if (estimateTokens(prompt) <= limit) return prompt;
+
+  const notice = '\n\n[Context truncated to fit the model input limit. Use only the remaining instructions and context.]';
+  const maxChars = Math.max(1000, limit * 4 - notice.length);
+  return prompt.slice(0, maxChars).trimEnd() + notice;
 }
 
 function getGitHubRepo() {
@@ -405,6 +603,7 @@ app.get('/api/gaps', (req, res) => {
   res.json({
     gaps,
     ratings: computeContentRatings(chars),
+    evals: evaluateCanonicalRoster(chars),
     total: chars.length,
     encounterCount: readEncounters().length,
     loreCount: readLore().length,
@@ -430,18 +629,121 @@ app.delete('/api/drafts/:id', (req, res) => {
   res.json({ ok: true });
 });
 
+app.post('/api/characters/:slug/fix-relation', (req, res) => {
+  const { relatedSlug } = req.body || {};
+  if (!relatedSlug) return res.status(400).json({ error: 'relatedSlug required' });
+  try {
+    const left = readChar(req.params.slug);
+    const right = readChar(relatedSlug);
+    if (!left || !right) return res.status(404).json({ error: 'Character not found' });
+
+    const leftRelations = new Set(left.relations || []);
+    const rightRelations = new Set(right.relations || []);
+    leftRelations.add(relatedSlug);
+    rightRelations.add(req.params.slug);
+
+    writeChar(req.params.slug, { ...left, relations: Array.from(leftRelations) });
+    writeChar(relatedSlug, { ...right, relations: Array.from(rightRelations) });
+
+    try {
+      execSync('node src/data/sync-all.js', { cwd: UC_ROOT, encoding: 'utf8' });
+    } catch {}
+
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/api/agent/fix-coherence', async (req, res) => {
+  const { slug, issueText, preferredField = null, model = 'gpt-4o-mini' } = req.body || {};
+  if (!slug || !issueText) return res.status(400).json({ error: 'slug and issueText required' });
+  try {
+    const char = readChar(slug);
+    if (!char) return res.status(404).json({ error: `Character ${slug} not found` });
+
+    const relatedChars = (char.relations || []).map(rel => readChar(rel)).filter(Boolean);
+    const architectureEntry = readArchitectureEntry(char.role);
+    const rawOutput = await callGitHubModels(
+      buildCoherenceFixPrompt(char, issueText, relatedChars, architectureEntry, preferredField),
+      model,
+      1400,
+    );
+    const parsed = parseDraftOutput(rawOutput);
+    if (!parsed) return res.status(422).json({ error: 'Agent output did not match expected format', raw: rawOutput });
+
+    const field = parsed.attrs.field || preferredField || 'keywords';
+    const draftId = `coherence-fix-${slug}-${field}-${new Date().toISOString().slice(0, 10)}`;
+    const draftFm = {
+      action: 'coherence-fix',
+      model,
+      slug,
+      field,
+      reasoning: parsed.reasoning,
+      issueText,
+    };
+
+    let front = '---\n';
+    for (const [k, v] of Object.entries(draftFm)) front += `${k}: ${yamlStr(v)}\n`;
+    front += '---\n';
+    fs.writeFileSync(path.join(DRAFTS_DIR, `${draftId}.md`), front + '\n' + parsed.content, 'utf8');
+
+    res.json({ ok: true, draftId, field, reasoning: parsed.reasoning });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.post('/api/drafts/:id/approve', async (req, res) => {
   const file = path.join(DRAFTS_DIR, `${req.params.id}.md`);
   if (!fs.existsSync(file)) return res.status(404).json({ error: 'Draft not found' });
   const raw = fs.readFileSync(file, 'utf8');
   const { fm, body } = parseFrontmatter(raw);
   let charForChronicle = null;
+  let encounterForChronicle = null;
+  let loreForChronicle = null;
   try {
-    if (fm.action === 'patch-fields' && fm.slug) {
+    if ((fm.action === 'patch-fields' || fm.action === 'targeted-update') && fm.slug) {
       const char = readChar(fm.slug);
       if (!char) return res.status(404).json({ error: `Character ${fm.slug} not found` });
       charForChronicle = char;
       if (fm.field === 'talisman-shadow') {
+        const sections = parseSections(body);
+        writeChar(fm.slug, { ...char, talisman: sections.talisman || char.talisman, shadow: sections.shadow || char.shadow });
+      } else if (fm.field === 'talisman') {
+        const sections = parseSections(body);
+        writeChar(fm.slug, { ...char, talisman: sections.talisman || body.trim() || char.talisman });
+      } else if (fm.field === 'shadow') {
+        const sections = parseSections(body);
+        writeChar(fm.slug, { ...char, shadow: sections.shadow || body.trim() || char.shadow });
+      } else if (fm.field === 'floriography-palette') {
+        const sections = parseSections(body);
+        const palette = parsePalette(sections.palette);
+        writeChar(fm.slug, {
+          ...char,
+          flower: sections.flower || char.flower,
+          flowerMeaning: sections['flower meaning'] || char.flowerMeaning,
+          palette: palette.length > 0 ? palette : char.palette,
+        });
+      } else if (fm.field === 'relation-notes') {
+        const sections = parseSections(body);
+        const relationNotes = parseRelationNotes(sections['relation notes'] || body);
+        writeChar(fm.slug, { ...char, relationNotes: relationNotes.length > 0 ? relationNotes : char.relationNotes });
+      } else if (['artifact', 'quote', 'essence'].includes(fm.field)) {
+        writeChar(fm.slug, { ...char, [fm.field]: body.trim() || char[fm.field] });
+      } else {
+        writeChar(fm.slug, { ...char, bio: body });
+      }
+    } else if (fm.action === 'coherence-fix' && fm.slug) {
+      const char = readChar(fm.slug);
+      if (!char) return res.status(404).json({ error: `Character ${fm.slug} not found` });
+      charForChronicle = char;
+      if (fm.field === 'keywords') {
+        const keywords = body.split(',').map(s => s.trim()).filter(Boolean).slice(0, 3);
+        writeChar(fm.slug, { ...char, keywords });
+      } else if (fm.field === 'essence') {
+        writeChar(fm.slug, { ...char, essence: body.trim() });
+      } else if (fm.field === 'talisman-shadow') {
         const sections = parseSections(body);
         writeChar(fm.slug, { ...char, talisman: sections.talisman || char.talisman, shadow: sections.shadow || char.shadow });
       } else {
@@ -449,10 +751,24 @@ app.post('/api/drafts/:id/approve', async (req, res) => {
       }
     } else if (fm.action === 'add-encounter' && fm.slugA && fm.slugB) {
       const id = [fm.slugA, fm.slugB].sort().join('--');
-      fs.writeFileSync(path.join(ENCOUNTERS_DIR, `${id}.md`), `---\ntitle: ${yamlStr(fm.title || id)}\n---\n\n${body}`, 'utf8');
+      const previousEncounter = readEncounters().find(entry => entry.id === id) || null;
+      const mergedEncounter = mergeEncounterContent(previousEncounter, fm.title || id, body);
+      fs.writeFileSync(path.join(ENCOUNTERS_DIR, `${id}.md`), `---\ntitle: ${yamlStr(mergedEncounter.title)}\n---\n\n${mergedEncounter.body}`, 'utf8');
+      encounterForChronicle = {
+        id,
+        title: mergedEncounter.title,
+        previous: previousEncounter,
+        chars: [readChar(fm.slugA), readChar(fm.slugB)].filter(Boolean),
+      };
     } else if (fm.action === 'expand-lore' || fm.action === 'coherence-check') {
       const loreId = fm.targetId || req.params.id;
+      const previousLore = readLore().find(entry => entry.id === loreId) || null;
       fs.writeFileSync(path.join(LORE_DIR, `${loreId}.md`), `---\ntitle: ${yamlStr(fm.title || loreId)}\n---\n\n${body}`, 'utf8');
+      loreForChronicle = {
+        id: loreId,
+        title: fm.title || loreId,
+        previous: previousLore,
+      };
     }
     fs.unlinkSync(file);
 
@@ -463,31 +779,78 @@ app.post('/api/drafts/:id/approve', async (req, res) => {
       console.error('sync-all failed after approve:', syncErr.message);
     }
 
-    // Generate chronicle entry for patch-fields approvals (best-effort)
-    if (fm.action === 'patch-fields' && fm.slug && charForChronicle) {
+    // Generate chronicle entry for approvals (best-effort)
+    if ((fm.action === 'patch-fields' || fm.action === 'targeted-update') && fm.slug && charForChronicle) {
       try {
         const field = fm.field || 'bio';
         const model = fm.model || 'gpt-4o-mini';
-        const noteText = await callGitHubModels(buildChroniclePrompt(charForChronicle, field, body), model, CHRONICLE_NOTE_MAX_TOKENS);
-        const now = new Date();
-        const fileId = `${fm.slug}-${field}-${formatFileDate(now)}`;
-        const content = [
-          '---',
-          `id: ${fileId}`,
-          `type: agent-note`,
-          `model: ${model}`,
-          `action: ${fm.action}`,
-          `field: ${field}`,
-          `slug: ${fm.slug}`,
-          `date: ${now.toISOString()}`,
-          `dateStr: ${formatDateStr(now)}`,
-          `persona: ${fm.slug}`,
-          '---',
-          '',
-          noteText.trim(),
-        ].join('\n');
-        fs.writeFileSync(path.join(CHRONICLE_DIR, `${fileId}.md`), content, 'utf8');
-        execSync('node src/data/sync-chronicle.js', { cwd: UC_ROOT, encoding: 'utf8' });
+        const relatedChars = (charForChronicle.relations || [])
+          .map(slug => readChar(slug))
+          .filter(Boolean);
+        const previousContent = field === 'talisman-shadow'
+          ? `Talisman: ${charForChronicle.talisman || '(missing)'}\nShadow: ${charForChronicle.shadow || '(missing)'}`
+          : charForChronicle.bio || '(missing)';
+        const noteText = await callGitHubModels(
+          buildChroniclePrompt(charForChronicle, field, previousContent, body, relatedChars),
+          model,
+          CHRONICLE_NOTE_MAX_TOKENS,
+          CHRONICLE_SYSTEM_PROMPT,
+        );
+        writeChronicleEntry({
+          idBase: `${fm.slug}-${field}`,
+          model,
+          action: fm.action,
+          field,
+          slug: fm.slug,
+          persona: fm.slug,
+        }, noteText);
+      } catch (chronicleErr) {
+        console.error('Chronicle generation failed:', chronicleErr.message);
+      }
+    } else if (fm.action === 'add-encounter' && encounterForChronicle) {
+      try {
+        const model = fm.model || 'gpt-4o-mini';
+        const previousContent = encounterForChronicle.previous
+          ? `Title: ${encounterForChronicle.previous.title || '(untitled)'}\n${encounterForChronicle.previous.body || ''}`
+          : '(no previous encounter entry)';
+        const noteText = await callGitHubModels(
+          buildEncounterChroniclePrompt(encounterForChronicle.chars, encounterForChronicle.title, previousContent, body),
+          model,
+          CHRONICLE_NOTE_MAX_TOKENS,
+          CHRONICLE_SYSTEM_PROMPT,
+        );
+        writeChronicleEntry({
+          idBase: `${encounterForChronicle.id}-encounter`,
+          model,
+          action: fm.action,
+          field: 'encounter',
+          slugA: fm.slugA,
+          slugB: fm.slugB,
+          title: encounterForChronicle.title,
+        }, noteText);
+      } catch (chronicleErr) {
+        console.error('Chronicle generation failed:', chronicleErr.message);
+      }
+    } else if ((fm.action === 'expand-lore' || fm.action === 'coherence-check') && loreForChronicle) {
+      try {
+        const model = fm.model || 'gpt-4o-mini';
+        const previousContent = loreForChronicle.previous
+          ? `Title: ${loreForChronicle.previous.title || '(untitled)'}\n${loreForChronicle.previous.body || ''}`
+          : '(no previous lore entry)';
+        const noteText = await callGitHubModels(
+          buildLoreChroniclePrompt(fm.action, loreForChronicle.title, previousContent, body),
+          model,
+          CHRONICLE_NOTE_MAX_TOKENS,
+          CHRONICLE_SYSTEM_PROMPT,
+        );
+        writeChronicleEntry({
+          idBase: `${loreForChronicle.id}-${fm.action}`,
+          model,
+          action: fm.action,
+          field: fm.action === 'coherence-check' ? 'coherence-report' : 'lore',
+          title: loreForChronicle.title,
+          targetId: loreForChronicle.id,
+        }, noteText);
       } catch (chronicleErr) {
         console.error('Chronicle generation failed:', chronicleErr.message);
       }
@@ -502,7 +865,7 @@ app.post('/api/drafts/:id/approve', async (req, res) => {
 // ─── Agent: run locally via GitHub Models ─────────────────────────────────────
 
 app.post('/api/agent/run', async (req, res) => {
-  const { action, model = 'gpt-4o-mini' } = req.body;
+  const { action, model = 'gpt-4o-mini', target = null } = req.body;
   try {
     const chars = fs.readdirSync(CHARS_DIR).filter(f => f.endsWith('.md'))
       .map(f => readChar(path.basename(f, '.md'))).filter(Boolean)
@@ -521,27 +884,37 @@ app.post('/api/agent/run', async (req, res) => {
       const top = gaps[0];
       const selection = {
         slug: top.slug,
-        field: top.issues.includes('talisman') || top.issues.includes('shadow') ? 'talisman-shadow' : 'bio',
+        field: choosePatchField(top.issues),
         reason: `auto-selected: highest-priority gap (${top.issues.filter(i => !i.startsWith('broken')).join(', ')})`
       };
 
       // Phase 2: load full context and write
       const char = chars.find(c => c.slug === selection.slug);
       const relatedChars = (char.relations || []).map(r => chars.find(c => c.slug === r)).filter(Boolean);
-      // Load the full Opus architecture entry for this character
-      let architectureEntry = null;
-      try {
-        const archPath = path.join(LORE_DIR, 'arcana-architecture.md');
-        if (fs.existsSync(archPath)) {
-          const archDoc = fs.readFileSync(archPath, 'utf8');
-          const match = archDoc.match(new RegExp(`## \\d+\.\\s+${char.role.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')}[\\s\\S]*?(?=\n---\n## |$)`));
-          if (match) architectureEntry = match[0].trim();
-        }
-      } catch { /* ignore — falls back to ARCANA_NOTES */ }
+      const architectureEntry = readArchitectureEntry(char.role);
       content = await callGitHubModels(buildWritingPrompt(char, selection.field, relatedChars, architectureEntry), model, 2000);
 
       draftId = `${char.slug}-${selection.field}-${ts}`;
       draftFm = { action, model, slug: char.slug, field: selection.field, reasoning: selection.reason };
+    } else if (action === 'targeted-update') {
+      if (!target?.slug) return res.status(400).json({ error: 'target.slug is required' });
+      const field = normalizeTargetField(target.field);
+      const char = chars.find(c => c.slug === target.slug);
+      if (!char) return res.status(404).json({ error: `Character ${target.slug} not found` });
+
+      const relatedChars = (char.relations || []).map(r => chars.find(c => c.slug === r)).filter(Boolean);
+      const architectureEntry = readArchitectureEntry(char.role);
+      const instructions = String(target.instructions || '').trim();
+      content = await callGitHubModels(buildWritingPrompt(char, field, relatedChars, architectureEntry, instructions), model, 2000);
+
+      draftId = `${char.slug}-${field}-${ts}`;
+      draftFm = {
+        action,
+        model,
+        slug: char.slug,
+        field,
+        reasoning: instructions ? `targeted update: ${instructions}` : `targeted update for ${getFieldLabel(field).toLowerCase()}`,
+      };
     } else if (action === 'add-encounter') {
       const prompt = buildAgentPrompt(action, chars, gaps, encounters, loreTitles);
       const rawOutput = await callGitHubModels(prompt, model);

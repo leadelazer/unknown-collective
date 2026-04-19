@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CHARACTERS } from '../data/characters.js';
-import { TIERS, ROMAN } from '../data/tiers.js';
+import { TIERS } from '../data/tiers.js';
+import { resolveCharacterPalette } from '../data/paletteSystem.js';
 import Nav from '../components/Nav.jsx';
 import Footer from '../components/Footer.jsx';
 import TextureBackdrop from '../components/TextureBackdrop.jsx';
@@ -29,13 +30,13 @@ export default function Collective() {
 
         <div className={styles.filterBar}>
           <span className={`${styles.filterLabel} t-deco`}>Tier</span>
-          {[['all', 'All'], ...Object.entries(TIERS).map(([k, t]) => [k, t.name])].map(([k, l]) => (
+          {[['all', 'All'], ...Object.entries(TIERS).map(([key, tier]) => [key, tier.name])].map(([key, label]) => (
             <button
-              key={k}
-              onClick={() => setFilter(k)}
-              className={`${styles.filterBtn} t-deco ${filter === k ? styles.filterActive : ''}`}
+              key={key}
+              onClick={() => setFilter(key)}
+              className={`${styles.filterBtn} t-deco ${filter === key ? styles.filterActive : ''}`}
             >
-              {l}
+              {label}
             </button>
           ))}
         </div>
@@ -52,16 +53,22 @@ export default function Collective() {
 
 function CharCard({ c, navigate }) {
   const [hov, setHov] = useState(false);
+  const palette = resolveCharacterPalette(c);
 
   return (
     <article
       className={`${styles.card} ${hov ? styles.cardHover : ''}`}
+      style={{
+        '--card-primary': palette[0],
+        '--card-secondary': palette[1],
+        '--card-tertiary': palette[2],
+      }}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       onClick={() => navigate(`/character/${c.slug}`)}
     >
       <div className={`${styles.cardMeta} t-deco`}>
-        <span>N° {String(c.n).padStart(2, '0')} · {ROMAN[c.n]}</span>
+        <span>N° {String(c.n).padStart(2, '0')}</span>
         <span className={styles.cardTier}>{TIERS[c.tier].short.toUpperCase()}</span>
       </div>
 
@@ -72,12 +79,21 @@ function CharCard({ c, navigate }) {
         }
 
         <div className={styles.cardOverlay}>
-          <span className={`${styles.cardArcana} t-deco`}>{c.arcana}</span>
+          <div className={styles.cardPalette} aria-label={`${c.role} palette`}>
+            {palette.map((hex, index) => (
+              <span
+                key={`${c.slug}-${hex}-${index}`}
+                className={styles.cardPaletteSwatch}
+                style={{ background: hex }}
+                title={hex}
+              />
+            ))}
+          </div>
           <span className={`${styles.cardRole} t-display`}>{c.role}</span>
           <span className={`${styles.cardEssence} t-body`}>{c.essence}</span>
         </div>
 
-        <div className={styles.cardCorner} style={{ borderLeftColor: c.hue }} />
+        <div className={styles.cardCorner} />
       </div>
     </article>
   );

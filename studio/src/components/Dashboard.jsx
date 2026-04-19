@@ -4,10 +4,24 @@ const API = '/api';
 
 const ACTIONS = [
   { id: 'patch-fields', label: 'Patch Weak Content', description: 'Agent picks the thinnest character content and rewrites talisman, shadow, or bio. You review before anything is applied.' },
-  { id: 'add-encounter', label: 'Add Encounter', description: 'Agent picks two related characters with no encounter yet and writes their shared narrative.' },
+  { id: 'add-encounter', label: 'Add Encounter', description: 'Agent picks a related pair that needs a new incident and extends that encounter thread over time.' },
   { id: 'coherence-check', label: 'Coherence Check', description: 'Audits all characters for broken relations, keyword misalignment, and tier logic. Writes a report.' },
   { id: 'expand-lore', label: 'Expand Lore', description: 'Agent identifies a gap in world lore - a place, ritual, or systemic element - and writes a new entry.' },
 ];
+
+const TARGETED_FIELDS = [
+  { value: 'bio', label: 'Bio' },
+  { value: 'talisman', label: 'Talisman' },
+  { value: 'shadow', label: 'Shadow' },
+  { value: 'talisman-shadow', label: 'Talisman + Shadow' },
+  { value: 'artifact', label: 'Artifact' },
+  { value: 'quote', label: 'Quote' },
+  { value: 'essence', label: 'Essence' },
+  { value: 'relation-notes', label: 'Relationship Summaries' },
+  { value: 'floriography-palette', label: 'Flower + Palette' },
+];
+
+const FIELD_LABELS = Object.fromEntries(TARGETED_FIELDS.map(item => [item.value, item.label]));
 
 const MODELS = [
   { label: 'GPT-4o mini', value: 'gpt-4o-mini' },
@@ -27,6 +41,9 @@ const ISSUE_COLORS = {
   talisman: { bg: '#fef3c7', color: '#92400e' },
   shadow: { bg: '#fce7f3', color: '#9d174d' },
   bio: { bg: '#f0f9ff', color: '#0c4a6e' },
+  flower: { bg: '#ecfdf5', color: '#065f46' },
+  palette: { bg: '#eef2ff', color: '#3730a3' },
+  relation: { bg: '#fff7ed', color: '#9a3412' },
 };
 
 function IssuePill({ issue }) {
@@ -79,8 +96,141 @@ function DraftBody({ content, preview }) {
   );
 }
 
-function DraftModal({ draft, characters, encounters, lore, onApprove, onReject, onClose }) {
+function extractReportSection(text, heading) {
+  const match = text?.match(new RegExp(`## ${heading}\\n([\\s\\S]*?)(?=\\n## |$)`));
+  return match ? match[1].trim() : '';
+}
+
+function splitIssueLines(sectionText) {
+  if (!sectionText) return [];
+  const normalized = sectionText.replace(/\r/g, '').trim();
+  if (!normalized) return [];
+  if (normalized.includes('\n- ')) {
+    return normalized.split(/\n(?=- )/).map(item => item.replace(/^-\s*/, '').trim()).filter(Boolean);
+  }
+  if (normalized.startsWith('- ')) {
+    return normalized.slice(2).split(/\s+-\s+/).map(item => item.trim()).filter(Boolean);
+  }
+  return normalized.split(/\n+/).map(item => item.trim()).filter(Boolean);
+}
+
+function inferCharacter(text, characters) {
+  const lower = (text || '').toLowerCase();
+  return characters.find(char => lower.includes(char.slug.toLowerCase()) || lower.includes(char.role.toLowerCase()));
+}
+
+function inferField(text, fallback = null) {
+  const lower = (text || '').toLowerCase();
+  if (lower.includes('keyword')) return 'keywords';
+  if (lower.includes('essence')) return 'essence';
+  if (lower.includes('talisman') || lower.includes('shadow')) return 'talisman-shadow';
+  if (lower.includes('bio') || lower.includes('description') || lower.includes('tone')) return 'bio';
+  return fallback;
+}
+
+function parseIssueLine(line, section, characters) {
+  const structured = line.match(/^kind=(\S+)\s+slug=(\S+)\s+related=(\S+)\s+field=(\S+)\s+::\s+([\s\S]+)$/);
+  if (structured) {
+    return {
+      kind: structured[1],
+      slug: structured[2] !== 'none' ? structured[2] : null,
+      relatedSlug: structured[3] !== 'none' ? structured[3] : null,
+      field: structured[4] !== 'none' ? structured[4] : null,
+      detail: structured[5].trim(),
+      raw: line,
+    };
+  }
+
+  if (section === 'broken') {
+    const match = line.match(/^([a-z0-9-]+)\s*→\s*([a-z0-9-]+)\s*\(([^)]+)\)$/i);
+    if (match) {
+      return {
+        kind: 'broken-relation',
+        slug: match[1],
+        relatedSlug: match[2],
+        field: null,
+        detail: match[3],
+        raw: line,
+      };
+    }
+  }
+
+  if (section === 'keywords') {
+    const match = line.match(/^([a-z0-9-]+):\s*([\s\S]+)$/i);
+    if (match) {
+      return {
+        kind: 'keywords',
+        slug: match[1],
+        relatedSlug: null,
+        field: 'keywords',
+        detail: match[2].trim(),
+        raw: line,
+      };
+    }
+  }
+
+  if (section === 'tone') {
+    const char = inferCharacter(line, characters);
+    return {
+      kind: 'tone',
+      slug: char?.slug || null,
+      relatedSlug: null,
+      field: inferField(line),
+      detail: line,
+      raw: line,
+    };
+  }
+
+  return {
+    kind: section,
+    slug: inferCharacter(line, characters)?.slug || null,
+    relatedSlug: null,
+    field: inferField(line),
+    detail: line,
+    raw: line,
+  };
+}
+
+function parseCoherenceReport(text, characters) {
+  const broken = splitIssueLines(extractReportSection(text, 'Broken Relations')).map(line => parseIssueLine(line, 'broken', characters));
+  const keywords = splitIssueLines(extractReportSection(text, 'Keyword Audit')).map(line => parseIssueLine(line, 'keywords', characters));
+  const tone = splitIssueLines(extractReportSection(text, 'Tone Violations')).map(line => parseIssueLine(line, 'tone', characters));
+  const recommendations = splitIssueLines(extractReportSection(text, 'Recommendations'));
+  return { broken, keywords, tone, recommendations };
+}
+
+function CoherenceIssueRow({ issue, characters, onFixRelation, onFixIssue, busyKey }) {
+  const char = issue.slug ? characters.find(c => c.slug === issue.slug) : null;
+  const related = issue.relatedSlug ? characters.find(c => c.slug === issue.relatedSlug) : null;
+  const rowKey = `${issue.kind}:${issue.slug || 'none'}:${issue.relatedSlug || 'none'}:${issue.field || 'none'}`;
+  const busy = busyKey === rowKey;
+
+  return (
+    <div style={{ border: '1px solid var(--border)', borderRadius: 8, padding: '12px 14px', display: 'flex', gap: 12, alignItems: 'flex-start', justifyContent: 'space-between' }}>
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 6 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-3)' }}>{issue.kind.replace('-', ' ')}</span>
+          {char && <span style={{ fontSize: 12, color: 'var(--text-2)' }}>{char.role}</span>}
+          {related && <span style={{ fontSize: 12, color: 'var(--text-3)' }}>↔ {related.role}</span>}
+          {issue.field && issue.field !== 'none' && <IssuePill issue={issue.field} />}
+        </div>
+        <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>{issue.detail}</div>
+      </div>
+      <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+        {issue.kind === 'broken-relation' && issue.slug && issue.relatedSlug && (
+          <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => onFixRelation(issue)}>{busy ? 'Fixing…' : 'Fix relation'}</button>
+        )}
+        {issue.kind !== 'broken-relation' && issue.slug && (
+          <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => onFixIssue(issue)}>{busy ? 'Drafting…' : 'Draft fix'}</button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DraftModal({ draft, characters, encounters, lore, onApprove, onReject, onClose, onFixIssue, onFixRelation, busyIssueKey }) {
   const char = characters?.find(c => c.slug === draft.slug);
+  const coherence = draft.action === 'coherence-check' ? parseCoherenceReport(draft.content, characters) : null;
   const existingEncounter = draft.action === 'add-encounter'
     ? encounters?.find(e => [e.slugA, e.slugB].sort().join('--') === [draft.slugA, draft.slugB].sort().join('--'))
     : null;
@@ -89,20 +239,51 @@ function DraftModal({ draft, characters, encounters, lore, onApprove, onReject, 
     : null;
 
   let currentContent = null;
-  if (draft.field === 'talisman-shadow') {
+  if (draft.action === 'coherence-fix') {
+    if (draft.field === 'keywords') {
+      currentContent = [{ label: 'Current Keywords', text: char?.keywords?.join(', ') || null }];
+    } else if (draft.field === 'essence') {
+      currentContent = [{ label: 'Current Essence', text: char?.essence || null }];
+    } else if (draft.field === 'talisman-shadow') {
+      const parts = [];
+      if (char?.talisman) parts.push({ label: 'Current Talisman', text: char.talisman });
+      if (char?.shadow) parts.push({ label: 'Current Shadow', text: char.shadow });
+      currentContent = parts.length > 0 ? parts : [{ label: 'No existing content', text: null }];
+    } else {
+      currentContent = [{ label: 'Current Bio', text: char?.bio || null }];
+    }
+  } else if (draft.field === 'talisman-shadow') {
     const parts = [];
     if (char?.talisman) parts.push({ label: 'Current Talisman', text: char.talisman });
     if (char?.shadow) parts.push({ label: 'Current Shadow', text: char.shadow });
     currentContent = parts.length > 0 ? parts : [{ label: 'No existing content', text: null }];
+  } else if (draft.field === 'talisman') {
+    currentContent = [{ label: 'Current Talisman', text: char?.talisman || null }];
+  } else if (draft.field === 'shadow') {
+    currentContent = [{ label: 'Current Shadow', text: char?.shadow || null }];
   } else if (draft.field === 'bio') {
     currentContent = char?.bio
       ? [{ label: 'Current Bio', text: Array.isArray(char.bio) ? char.bio.join('\n\n') : char.bio }]
       : [{ label: 'No existing bio', text: null }];
+  } else if (draft.field === 'artifact' || draft.field === 'quote' || draft.field === 'essence') {
+    currentContent = [{ label: `Current ${FIELD_LABELS[draft.field] || draft.field}`, text: char?.[draft.field] || null }];
+  } else if (draft.field === 'relation-notes') {
+    currentContent = [{
+      label: 'Current Relationship Summaries',
+      text: Array.isArray(char?.relationNotes) && char.relationNotes.length > 0
+        ? char.relationNotes.map(note => `- ${note.slug}: ${note.note}`).join('\n')
+        : null,
+    }];
+  } else if (draft.field === 'floriography-palette') {
+    currentContent = [{
+      label: 'Current Flower + Palette',
+      text: [char?.flower, char?.flowerMeaning, ...(Array.isArray(char?.palette) ? char.palette : [])].filter(Boolean).join('\n') || null,
+    }];
   } else if (draft.action === 'add-encounter') {
     currentContent = existingEncounter
       ? [
           { label: 'Current Title', text: existingEncounter.title || null },
-          { label: 'Current Narrative', text: existingEncounter.body || null },
+          { label: 'Existing Encounter Thread', text: existingEncounter.body || null },
         ]
       : [{ label: 'No existing encounter', text: null }];
   } else if (draft.action === 'expand-lore' || draft.action === 'coherence-check') {
@@ -114,8 +295,10 @@ function DraftModal({ draft, characters, encounters, lore, onApprove, onReject, 
       : [{ label: 'No existing lore entry', text: null }];
   }
 
-  const draftTitle = draft.action === 'patch-fields'
-    ? `${char?.role || draft.slug} - ${draft.field}`
+  const draftTitle = draft.action === 'patch-fields' || draft.action === 'targeted-update'
+    ? `${char?.role || draft.slug} - ${FIELD_LABELS[draft.field] || draft.field}`
+    : draft.action === 'coherence-fix'
+      ? `${char?.role || draft.slug} - fix ${draft.field}`
     : draft.action === 'add-encounter'
       ? `Encounter: ${draft.slugA} x ${draft.slugB}`
       : draft.action === 'expand-lore'
@@ -128,7 +311,7 @@ function DraftModal({ draft, characters, encounters, lore, onApprove, onReject, 
         <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'flex-start', gap: 16 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.09em', color: 'var(--text-3)', marginBottom: 4 }}>
-              {ACTIONS.find(a => a.id === draft.action)?.label}
+              {actionLabel(draft.action)}
             </div>
             <div style={{ fontSize: 17, fontWeight: 600 }}>{draftTitle}</div>
             {char && (
@@ -154,7 +337,41 @@ function DraftModal({ draft, characters, encounters, lore, onApprove, onReject, 
           </div>
         )}
 
-        <div style={{ flex: 1, overflow: 'auto', display: 'grid', gridTemplateColumns: currentContent ? '1fr 1.6fr' : '1fr' }}>
+        <div style={{ flex: 1, overflow: 'auto', display: 'grid', gridTemplateColumns: coherence ? '1fr' : currentContent ? '1fr 1.6fr' : '1fr' }}>
+          {coherence && (
+            <div style={{ padding: '20px 24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.09em', color: 'var(--text-3)', marginBottom: 12 }}>Broken Relations</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {coherence.broken.length > 0 ? coherence.broken.map((issue, idx) => <CoherenceIssueRow key={`broken-${idx}`} issue={issue} characters={characters} onFixRelation={onFixRelation} onFixIssue={onFixIssue} busyKey={busyIssueKey} />) : <div style={{ fontSize: 13, color: 'var(--text-3)' }}>No broken relation issues found.</div>}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.09em', color: 'var(--text-3)', marginBottom: 12 }}>Keyword Audit</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {coherence.keywords.length > 0 ? coherence.keywords.map((issue, idx) => <CoherenceIssueRow key={`keywords-${idx}`} issue={issue} characters={characters} onFixRelation={onFixRelation} onFixIssue={onFixIssue} busyKey={busyIssueKey} />) : <div style={{ fontSize: 13, color: 'var(--text-3)' }}>No keyword issues found.</div>}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.09em', color: 'var(--text-3)', marginBottom: 12 }}>Tone Violations</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {coherence.tone.length > 0 ? coherence.tone.map((issue, idx) => <CoherenceIssueRow key={`tone-${idx}`} issue={issue} characters={characters} onFixRelation={onFixRelation} onFixIssue={onFixIssue} busyKey={busyIssueKey} />) : <div style={{ fontSize: 13, color: 'var(--text-3)' }}>No tone issues found.</div>}
+                </div>
+              </div>
+
+              {coherence.recommendations.length > 0 && (
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.09em', color: 'var(--text-3)', marginBottom: 12 }}>Recommendations</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {coherence.recommendations.map((item, idx) => <div key={`recommendation-${idx}`} style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.6 }}>{item}</div>)}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {currentContent && (
             <div style={{ padding: '20px 24px', borderRight: '1px solid var(--border)', background: 'var(--surface-2)', overflowY: 'auto' }}>
               <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.09em', color: 'var(--text-3)', marginBottom: 16 }}>Existing</div>
@@ -162,31 +379,31 @@ function DraftModal({ draft, characters, encounters, lore, onApprove, onReject, 
                 <div key={i} style={{ marginBottom: i < currentContent.length - 1 ? 20 : 0 }}>
                   <div style={{ fontSize: 11, color: 'var(--text-3)', marginBottom: 6, fontWeight: 500 }}>{label}</div>
                   {text
-                    ? <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: 'var(--text-2)' }}>{text}</p>
+                    ? <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: 'var(--text-2)', whiteSpace: 'pre-wrap' }}>{text}</p>
                     : <p style={{ margin: 0, fontSize: 13, color: 'var(--text-3)', fontStyle: 'italic' }}>Empty</p>}
                 </div>
               ))}
             </div>
           )}
 
-          <div style={{ padding: '20px 24px', overflowY: 'auto' }}>
+          {!coherence && <div style={{ padding: '20px 24px', overflowY: 'auto' }}>
             <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.09em', color: 'var(--text-3)', marginBottom: 16 }}>
-              {currentContent ? 'Proposed' : 'Draft'}
+              {draft.action === 'add-encounter' && currentContent ? 'Proposed Addition' : currentContent ? 'Proposed' : 'Draft'}
             </div>
             <DraftBody content={draft.content} preview={draft.preview} />
-          </div>
+          </div>}
         </div>
 
         <div style={{ padding: '14px 24px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface)' }}>
           <div style={{ fontSize: 12, color: 'var(--text-3)' }}>
-            Review the proposed content before applying.
+            {coherence ? 'Use the issue buttons to create actual fix drafts. Saving the report only stores the audit text.' : draft.action === 'add-encounter' ? 'Applying this draft appends it to the existing encounter thread instead of replacing it.' : 'Review the proposed content before applying.'}
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button onClick={onReject} style={{ padding: '7px 18px', borderRadius: 5, fontSize: 13, fontWeight: 500, cursor: 'pointer', background: 'var(--red-soft)', color: 'var(--red)', border: '1px solid #f5c6c2' }}>
               Discard
             </button>
             <button onClick={onApprove} style={{ padding: '7px 18px', borderRadius: 5, fontSize: 13, fontWeight: 600, cursor: 'pointer', background: 'var(--accent)', color: '#fff', border: 'none' }}>
-              Apply to source files
+              {coherence ? 'Save report to lore' : 'Apply to source files'}
             </button>
           </div>
         </div>
@@ -200,6 +417,11 @@ const crd = { background: 'var(--surface)', border: '1px solid var(--border)', b
 const sel = { fontSize: 12, padding: '4px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius)', background: 'var(--surface)', color: 'var(--text)', outline: 'none' };
 const pBtn = { padding: '3px 10px', borderRadius: 4, fontSize: 12, fontWeight: 500, cursor: 'pointer' };
 
+function actionLabel(action) {
+  if (action === 'targeted-update') return 'Targeted Update';
+  return ACTIONS.find(a => a.id === action)?.label || action;
+}
+
 export default function Dashboard({ characters, encounters, lore, showToast, onRefresh }) {
   const [stats, setStats] = useState(null);
   const [drafts, setDrafts] = useState([]);
@@ -210,6 +432,10 @@ export default function Dashboard({ characters, encounters, lore, showToast, onR
   const [running, setRunning] = useState(null);
   const [lastRun, setLastRun] = useState(null);
   const [modalDraft, setModalDraft] = useState(null);
+  const [busyIssueKey, setBusyIssueKey] = useState(null);
+  const [targetSlug, setTargetSlug] = useState('');
+  const [targetField, setTargetField] = useState('bio');
+  const [targetInstructions, setTargetInstructions] = useState('');
   const pollRef = useRef(null);
 
   function checkRepo() {
@@ -230,6 +456,10 @@ export default function Dashboard({ characters, encounters, lore, showToast, onR
     return () => clearInterval(pollRef.current);
   }, []);
 
+  useEffect(() => {
+    if (!targetSlug && characters?.length) setTargetSlug(characters[0].slug);
+  }, [characters, targetSlug]);
+
   async function loadStats() {
     try {
       setStats(await fetch(`${API}/gaps`).then(r => r.json()));
@@ -242,14 +472,14 @@ export default function Dashboard({ characters, encounters, lore, showToast, onR
     } catch {}
   }
 
-  async function runLocal(action) {
+  async function runLocal(action, payload = {}) {
     setRunning(action);
     setLastRun(null);
     try {
       const d = await fetch(`${API}/agent/run`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, model }),
+        body: JSON.stringify({ action, model, ...payload }),
       }).then(r => r.json());
 
       if (d.ok) {
@@ -312,6 +542,20 @@ export default function Dashboard({ characters, encounters, lore, showToast, onR
     else dispatchActions(action);
   }
 
+  function handleTargetedRun() {
+    if (!targetSlug) {
+      showToast('Choose a character first', 'error');
+      return;
+    }
+    runLocal('targeted-update', {
+      target: {
+        slug: targetSlug,
+        field: targetField,
+        instructions: targetInstructions,
+      },
+    });
+  }
+
   async function approveDraft(id) {
     const d = await fetch(`${API}/drafts/${id}/approve`, { method: 'POST' }).then(r => r.json());
     if (d.ok) {
@@ -332,10 +576,51 @@ export default function Dashboard({ characters, encounters, lore, showToast, onR
     await loadDrafts();
   }
 
+  async function fixRelation(issue) {
+    const key = `${issue.kind}:${issue.slug || 'none'}:${issue.relatedSlug || 'none'}:${issue.field || 'none'}`;
+    setBusyIssueKey(key);
+    try {
+      const d = await fetch(`${API}/characters/${issue.slug}/fix-relation`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ relatedSlug: issue.relatedSlug }),
+      }).then(r => r.json());
+      if (!d.ok) throw new Error(d.error || 'Relation fix failed');
+      showToast('Relation fixed in source files');
+      await loadStats();
+      if (onRefresh) onRefresh();
+    } catch (e) {
+      showToast(e.message, 'error');
+    }
+    setBusyIssueKey(null);
+  }
+
+  async function draftCoherenceFix(issue) {
+    const key = `${issue.kind}:${issue.slug || 'none'}:${issue.relatedSlug || 'none'}:${issue.field || 'none'}`;
+    setBusyIssueKey(key);
+    try {
+      const d = await fetch(`${API}/agent/fix-coherence`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: issue.slug, issueText: issue.raw || issue.detail, preferredField: issue.field, model }),
+      }).then(r => r.json());
+      if (!d.ok) throw new Error(d.error || 'Fix draft failed');
+      await loadDrafts();
+      showToast('Fix draft created');
+    } catch (e) {
+      showToast(e.message, 'error');
+    }
+    setBusyIssueKey(null);
+  }
+
   function draftLabel(d) {
-    if (d.action === 'patch-fields') {
+    if (d.action === 'patch-fields' || d.action === 'targeted-update') {
       const char = characters?.find(c => c.slug === d.slug);
-      return `${char?.role || d.slug} - ${d.field}`;
+      return `${char?.role || d.slug} - ${FIELD_LABELS[d.field] || d.field}`;
+    }
+    if (d.action === 'coherence-fix') {
+      const char = characters?.find(c => c.slug === d.slug);
+      return `${char?.role || d.slug} - fix ${d.field}`;
     }
     if (d.action === 'add-encounter') return `Encounter: ${d.slugA} x ${d.slugB}`;
     if (d.action === 'expand-lore') return `Lore: ${d.title}`;
@@ -415,6 +700,35 @@ export default function Dashboard({ characters, encounters, lore, showToast, onR
         </div>
       )}
 
+      {stats?.evals && (
+        <div>
+          <div style={sL}>Canonical Evals</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 10 }}>
+            <div style={{ ...crd, padding: '14px 16px' }}>
+              <div style={{ fontSize: 26, fontWeight: 600, color: stats.evals.ok ? 'var(--green)' : 'var(--accent)' }}>
+                {stats.evals.summary.total}
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--text-2)', marginTop: 4 }}>
+                canonical roster issues
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 8, lineHeight: 1.6 }}>
+                {stats.evals.summary.critical} critical, {stats.evals.summary.warning} warning. This is where slug, role, arcana, and tier drift shows up.
+              </div>
+            </div>
+            <div style={{ ...crd, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {stats.evals.items.length > 0 ? stats.evals.items.slice(0, 6).map((item, index) => (
+                <div key={`${item.code}-${item.slug}-${index}`} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                  <span style={{ padding: '1px 7px', borderRadius: 10, fontSize: 11, fontWeight: 600, background: item.severity === 'critical' ? '#fee2e2' : '#fff7ed', color: item.severity === 'critical' ? '#991b1b' : '#9a3412' }}>
+                    {item.severity}
+                  </span>
+                  <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.55 }}>{item.message}</div>
+                </div>
+              )) : <div style={{ fontSize: 13, color: 'var(--text-2)' }}>No canonical mismatches detected.</div>}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
           <div style={sL}>Agent Actions</div>
@@ -466,12 +780,46 @@ export default function Dashboard({ characters, encounters, lore, showToast, onR
             );
           })}
         </div>
+
+        <div style={{ ...crd, padding: '14px 16px', marginTop: 10, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+            <div>
+              <div style={{ fontWeight: 600, fontSize: 13 }}>Targeted Update</div>
+              <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.5, marginTop: 4 }}>
+                Pick the exact character and field to rewrite. This runs locally so you can steer a single update instead of letting the agent choose.
+              </div>
+            </div>
+            {mode !== 'local' && <div style={{ fontSize: 12, color: 'var(--text-3)' }}>Targeted updates currently run locally only.</div>}
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 10 }}>
+            <select value={targetSlug} onChange={e => setTargetSlug(e.target.value)} style={sel}>
+              {characters.map(char => <option key={char.slug} value={char.slug}>{char.role}</option>)}
+            </select>
+            <select value={targetField} onChange={e => setTargetField(e.target.value)} style={sel}>
+              {TARGETED_FIELDS.map(field => <option key={field.value} value={field.value}>{field.label}</option>)}
+            </select>
+          </div>
+
+          <textarea
+            value={targetInstructions}
+            onChange={e => setTargetInstructions(e.target.value)}
+            placeholder="Optional steering, e.g. keep the same voice, only fix location references, make the quote less ornamental"
+            style={{ minHeight: 84, resize: 'vertical', fontSize: 12.5, lineHeight: 1.5, padding: '10px 12px', borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text)', outline: 'none' }}
+          />
+
+          <div>
+            <button className="btn btn-primary btn-sm" onClick={handleTargetedRun} disabled={mode !== 'local' || !!running}>
+              {running === 'targeted-update' ? <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Spinner /> Running...</span> : 'Run targeted update >'}
+            </button>
+          </div>
+        </div>
       </div>
 
       {lastRun && (
         <div style={{ background: lastRun.error ? 'var(--red-soft)' : 'var(--surface-2)', border: `1px solid ${lastRun.error ? '#f5c6c2' : 'var(--border)'}`, borderRadius: 'var(--radius)', padding: '14px 16px' }}>
           <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', color: lastRun.error ? 'var(--red)' : 'var(--text-3)', marginBottom: 6 }}>
-            {lastRun.error ? 'Error' : lastRun.dispatched ? `Dispatched - ${ACTIONS.find(a => a.id === lastRun.action)?.label}` : `Agent ran - ${ACTIONS.find(a => a.id === lastRun.action)?.label}`}
+            {lastRun.error ? 'Error' : lastRun.dispatched ? `Dispatched - ${actionLabel(lastRun.action)}` : `Agent ran - ${actionLabel(lastRun.action)}`}
           </div>
           {lastRun.dispatched ? (
             <div style={{ fontSize: 13, color: 'var(--text-2)', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -534,6 +882,9 @@ export default function Dashboard({ characters, encounters, lore, showToast, onR
           onApprove={() => approveDraft(modalDraft.id)}
           onReject={() => rejectDraft(modalDraft.id)}
           onClose={() => setModalDraft(null)}
+          onFixIssue={draftCoherenceFix}
+          onFixRelation={fixRelation}
+          busyIssueKey={busyIssueKey}
         />
       )}
 

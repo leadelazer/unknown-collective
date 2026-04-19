@@ -1,17 +1,27 @@
 // Shared agent logic — used by both studio/server.js (local) and studio/scripts/run-agent.js (GitHub Actions).
 // Pure functions only: no file I/O, no API calls.
 
+import { choosePatchField, getFieldLabel, normalizeTargetField } from '../shared/content-config.js';
+
 export const WRITING_GUIDELINES = `## Voice & Tone (MANDATORY — read before writing anything)
 
-You are NOT writing fantasy, mythology, or self-help. You are writing about real-seeming people who happen to exist across centuries in Munich. The voice is:
+You are NOT writing fantasy, mythology, or self-help. You are writing about real-seeming people who happen to exist across centuries in an unnamed Central European city. The voice is:
 - Journalistic, dry, observational. Like a case file or a quiet documentary.
-- Specific. Concrete nouns, actual places in Munich, physical details. "flour on his hands" not "blessed with ancient gifts."
+- Specific. Concrete nouns, physical details. "flour on his hands" not "blessed with ancient gifts."
 - Short sentences. Blunt. Then occasionally a longer one that lands.
 - No superlatives. No "bestowed," "empowered," "imbued," "ancient wisdom." No "remarkable," "extraordinary," "profound."
 - No fantasy language. No "mystical forces," "arcane powers," "sacred bonds," "ethereal." These are people, not wizards.
 - Avoid cliché pairings: "light and shadow," "chaos and order," "past and present."
 
 BANNED WORDS: bestowed, imbued, empowered, ethereal, mystical, sacred, ancient wisdom, tapestry, enigmatic, realm, vessel, beacon, harbinger, profound, remarkable, transcend, celestial, luminous, destiny, fate (as a force), divine, arcane, eldritch, whisper (as metaphor for vague influence).
+
+LOCATION RULE (MANDATORY — applies to every field without exception):
+The city is NEVER named. Do NOT write "Munich," "München," "Eisbach," "Marienplatz," "Isar," "Hofbräuhaus," "Englischer Garten," or any other real city landmark, street, river, or district name. Use abstract spatial or architectural language:
+- NOT "the Eisbach" → YES "the mill stream," "the culverted channel," "the river crossing"
+- NOT "Marienplatz" → YES "the central square," "the old market"
+- NOT "Schwabing" → YES "the northern district," "the quarter above the river"
+- NOT "the Isar" → YES "the river," "the eastern bank"
+BEFORE SUBMITTING: scan every sentence in your output. If any real place name appears, replace it. This check is not optional.
 
 ### Bio rules
 4-5 paragraphs, blank line between each. Structure:
@@ -35,13 +45,13 @@ The cost. The blind spot. What this energy looks like when it curdles. Mirror th
 
 ### Encounter rules
 Witness/historian perspective — as if reconstructed from a municipal record or overheard testimony.
-2-4 paragraphs. Name a specific place in Munich, a season, a physical object. The encounter should feel like an event, not a mood.
+2-4 paragraphs. Use a district type, an architectural feature, a season, a physical object — never a named real location. The encounter should feel like an event, not a mood.
 
 ### Lore rules
 Scholar tone. Present evidence, acknowledge gaps. "There are three accounts of…" not "In the mists of time…"
 Do not invent facts that contradict existing bios. Where facts are ambiguous, name the ambiguity.
 
-Setting: Munich. Characters exist across centuries but are not immortal in a fantasy sense — the Collective persists, members come and go across eras.`;
+Setting: An unnamed Central European city. Characters exist across centuries but are not immortal in a fantasy sense — the Collective persists, members come and go across eras.`;
 
 // Hidden architecture: what each arcana actually means as a mechanism.
 // Agents use this to ground talisman/shadow in the card's logic, not just the character's personality.
@@ -70,6 +80,19 @@ export const ARCANA_NOTES = {
   'The World':       'Integration; wholeness as a state, not an end. Talisman: the ability to hold contradictions without needing to resolve them. Shadow: the completeness that closes off what comes next.',
 };
 
+const PROMPT_GUIDELINES = `Voice: journalistic, dry, specific, non-fantastical. Short sentences. No superlatives.
+Location rule: never name the city or any real landmark, district, river, or street. Replace real place names with abstract terms such as the river, the central square, the old market, the northern district, the river crossing.
+Banned language: no mystical, sacred, ethereal, arcane, destiny, tapestry, remarkable, profound, or similar inflated phrasing.
+Bio: 4-5 paragraphs. Talisman and shadow: 3-5 sentences each. Encounters: 2-4 paragraphs, witness or historian tone. Lore: scholar tone, cite uncertainty instead of inventing certainty.
+Before submitting, scan for banned words and real place names, then replace them.`;
+
+function snippet(text, maxChars) {
+  if (!text) return '(none)';
+  const normalized = String(text).replace(/\s+/g, ' ').trim();
+  if (normalized.length <= maxChars) return normalized;
+  return normalized.slice(0, Math.max(0, maxChars - 1)).trimEnd() + '…';
+}
+
 function bioParagraphCount(bio) {
   if (!bio || !bio.trim()) return 0;
   return bio.trim().split(/\n\n+/).filter(Boolean).length;
@@ -83,6 +106,11 @@ function gapScore(issues) {
     if (issue === 'shadow') return score + 5;
     if (issue === 'talisman-thin') return score + 3;
     if (issue === 'shadow-thin') return score + 3;
+    if (issue === 'flower') return score + 3;
+    if (issue === 'flower-meaning') return score + 2;
+    if (issue === 'palette') return score + 2;
+    if (issue === 'relation-notes') return score + 3;
+    if (issue === 'relation-notes-incomplete') return score + 2;
     if (issue.startsWith('broken-relations')) return score + 1;
     return score;
   }, 0);
@@ -103,6 +131,9 @@ export function computeGaps(chars) {
     const shadowLength = c.shadow?.trim().length || 0;
     const bioLength = c.bio?.trim().length || 0;
     const paragraphs = bioParagraphCount(c.bio);
+    const relationSlugs = (c.relations || []).filter(Boolean);
+    const relationNotes = Array.isArray(c.relationNotes) ? c.relationNotes : [];
+    const validRelationNotes = relationNotes.filter(note => note?.slug && note?.note?.trim());
 
     if (talismanLength < 30) issues.push('talisman');
     else if (talismanLength < 340) issues.push('talisman-thin');
@@ -114,6 +145,15 @@ export function computeGaps(chars) {
     else {
       if (paragraphs < 4) issues.push('bio-structure');
       if (bioLength < 900) issues.push('bio-thin');
+    }
+
+    if (!c.flower?.trim()) issues.push('flower');
+    if (!c.flowerMeaning?.trim()) issues.push('flower-meaning');
+    if (!Array.isArray(c.palette) || c.palette.filter(Boolean).length < 3) issues.push('palette');
+
+    if (relationSlugs.length > 0) {
+      if (validRelationNotes.length === 0) issues.push('relation-notes');
+      else if (validRelationNotes.length < relationSlugs.length) issues.push('relation-notes-incomplete');
     }
 
     const broken = (c.relations || []).filter(r => !allSlugs.has(r));
@@ -161,43 +201,48 @@ export function buildAgentPrompt(action, chars, gaps, encounters, loreTitles = '
   }
 
   if (action === 'add-encounter') {
-    const existingIds = new Set(encounters.map(e => [e.slugA, e.slugB].sort().join('--')));
     const seen = new Set();
     const pairs = [];
     for (const c of chars) {
       for (const rel of (c.relations || [])) {
         const id = [c.slug, rel].sort().join('--');
-        if (!existingIds.has(id) && !seen.has(id) && chars.find(x => x.slug === rel)) {
+        if (!seen.has(id) && chars.find(x => x.slug === rel)) {
           seen.add(id);
-          pairs.push({ slugA: c.slug, slugB: rel });
+          const existing = encounters.find(e => [e.slugA, e.slugB].sort().join('--') === id);
+          pairs.push({ slugA: c.slug, slugB: rel, existing });
         }
       }
     }
     const pairLines = pairs.map(p => {
       const a = chars.find(c => c.slug === p.slugA);
       const b = chars.find(c => c.slug === p.slugB);
-      return `  ${a?.role} (${p.slugA}) + ${b?.role} (${p.slugB})`;
+      const status = p.existing
+        ? `existing encounter: ${snippet(p.existing.title || p.existing.body, 90)}`
+        : 'no encounter file yet';
+      return `  ${a?.role} (${p.slugA}) + ${b?.role} (${p.slugB}) — ${status}`;
     }).join('\n');
     const charSummaries = chars.map(c =>
-      `${c.role} (${c.slug}, ${c.arcana}): ${c.essence || ''} [${(c.keywords || []).join(', ')}]`
+      `${c.role} (${c.slug}, ${c.arcana}): ${snippet(c.essence, 90)} [${(c.keywords || []).join(', ')}]`
     ).join('\n');
 
     return `You are writing an encounter for The Unknown Collective — 22 people in Munich who persist across centuries. These encounters should read like reconstructed incidents from a municipal archive, not fantasy set-pieces.
 
-## Pairs with a relation but no encounter yet:
+## Related pairs and current encounter state:
 ${pairLines}
 
 ## All characters:
 ${charSummaries}
 
-${WRITING_GUIDELINES}
+${PROMPT_GUIDELINES}
 
 ## Task
-Choose the pair whose tension would produce the most interesting incident. Not "archetypal resonance" — an actual event. A meeting, an argument, a transaction, a silence.
+Choose the pair whose record most needs another incident. That can mean a missing encounter, or an existing encounter thread that should be extended with a later event. Not "archetypal resonance" — an actual event. A meeting, an argument, a transaction, a silence.
 
-The title should name what happened, not who was involved. Good: "What Was Agreed at the Eisbach, November 1923." Bad: "The Curator and the Oracle — A Meeting of Minds."
+If the pair already has an encounter, do not retell it. Add a new layer: another date, another disagreement, a consequence, a correction, a later exchange.
 
-Before writing, re-read the BANNED WORDS list. Strip any word from that list before submitting.
+The title should name what happened, not who was involved. Good: "What Was Agreed at the Old Crossing, November 1923." Bad: "The Curator and the Oracle — A Meeting of Minds."
+
+Before writing, re-read the BANNED WORDS list and the LOCATION RULE. Strip any banned word or real place name before submitting.
 
 Respond in this exact format:
 
@@ -206,7 +251,7 @@ One sentence: why this pair.
 </choice>
 
 <draft>
-[2-4 paragraphs. Name a specific Munich location, a season or year, a physical object. Witness/historian perspective. Short sentences. No mythology.]
+[2-4 paragraphs. Use a district type, an architectural feature, a season, a physical object — NO real place names. Witness/historian perspective. Short sentences. No mythology.]
 </draft>`;
   }
 
@@ -221,7 +266,7 @@ One sentence: why this pair.
       }
     }
     const charLines = chars.map(c =>
-      `${c.role} (${c.slug}, ${c.arcana}, ${c.tier}): keywords=[${(c.keywords || []).join(',')}] relations=[${(c.relations || []).join(',')}]`
+      `${c.slug} | ${c.arcana} | ${c.tier} | keywords=[${(c.keywords || []).join(',')}] | relations=[${(c.relations || []).join(',')}]`
     ).join('\n');
 
     return `You are auditing The Unknown Collective database for coherence. Be precise and factual — flag specific problems with file references, not vague observations.
@@ -232,7 +277,7 @@ ${broken.length ? broken.join('\n') : '(none)'}
 ## All characters:
 ${charLines}
 
-${WRITING_GUIDELINES}
+${PROMPT_GUIDELINES}
 
 ## Task
 Write a coherence report. Check:
@@ -240,6 +285,9 @@ Write a coherence report. Check:
 2. Keywords — do they align with the tarot arcana meaning, or are they generic filler?
 3. Tier assignments — does the character's role match their tier definition?
 4. Tone — flag any existing text that violates the voice rules (fantasy language, banned words, generic phrasing)
+
+For every actionable issue, make it machine-readable. Each bullet must begin with metadata in this exact pattern:
+- kind=<broken-relation|keywords|tone|tier> slug=<slug or none> related=<slug or none> field=<keywords|essence|bio|talisman-shadow|none> :: [clear explanation]
 
 Respond in this exact format:
 
@@ -249,13 +297,13 @@ Brief summary: how many issues, severity.
 
 <draft>
 ## Broken Relations
-[list each issue with both slugs]
+- kind=broken-relation slug=slug-a related=slug-b field=none :: [issue]
 
 ## Keyword Audit
-[per-character: are keywords derived from arcana meaning or just generic? flag mismatches]
+- kind=keywords slug=slug field=keywords :: [only include characters that need revision]
 
 ## Tone Violations
-[flag specific phrases from existing content that use banned words or fantasy language]
+- kind=tone slug=slug field=keywords|essence|bio|talisman-shadow :: [issue]
 
 ## Recommendations
 [prioritized list of specific fixes, most impactful first]
@@ -264,20 +312,20 @@ Brief summary: how many issues, severity.
 
   if (action === 'expand-lore') {
     const charSummaries = chars.map(c =>
-      `${c.role} (${c.slug}, ${c.arcana}, ${c.tier}): ${c.essence || ''}`
+      `${c.role} (${c.slug}, ${c.arcana}, ${c.tier}): ${snippet(c.essence, 90)}`
     ).join('\n');
 
     return `You are expanding world lore for The Unknown Collective — 22 people in Munich who persist across centuries. Lore entries should read like academic footnotes or municipal history — not fantasy worldbuilding.
 
-## Existing lore entries: ${loreTitles}
+## Existing lore entries: ${snippet(loreTitles, 500)}
 
 ## All characters:
 ${charSummaries}
 
-${WRITING_GUIDELINES}
+${PROMPT_GUIDELINES}
 
 ## Task
-Identify a gap — something multiple characters' bios imply but that has no standalone entry yet. Good topics: a specific Munich location that keeps appearing, how induction into the Collective actually works, what The Bind is in practical terms, a recurring event or ritual, the tier structure's origin.
+Identify a gap — something multiple characters' bios imply but that has no standalone entry yet. Good topics: a recurring district or building type that keeps appearing, how induction into the Collective actually works, what The Bind is in practical terms, a recurring event or ritual, the tier structure's origin.
 
 Write like a researcher presenting findings. Cite which characters' records support each claim. Acknowledge contradictions instead of smoothing them over.
 
@@ -334,25 +382,58 @@ REASON: <one sentence — what the archetype demands that the missing field shou
 }
 
 // Phase 2: write the content with full character context loaded
-export function buildWritingPrompt(char, field, relatedChars, architectureEntry = null) {
-  const arcanaNote = architectureEntry || ARCANA_NOTES[char.arcana] || '(no archetype note available)';
+export function buildWritingPrompt(char, field, relatedChars, architectureEntry = null, instructions = '') {
+  field = normalizeTargetField(field);
+  const arcanaNote = snippet(architectureEntry || ARCANA_NOTES[char.arcana] || '(no archetype note available)', 1200);
+
+  const relationNotes = Array.isArray(char.relationNotes) ? char.relationNotes : [];
 
   const existingContent = field === 'talisman-shadow'
-    ? `Current Talisman: ${char.talisman && char.talisman.trim().length > 30 ? char.talisman : '(missing)'}
-Current Shadow: ${char.shadow && char.shadow.trim().length > 30 ? char.shadow : '(missing)'}`
-    : `Current Bio: ${char.bio && char.bio.trim().length > 50 ? char.bio : '(missing or thin)'}`;
+    ? `Current Talisman: ${char.talisman && char.talisman.trim().length > 30 ? snippet(char.talisman, 320) : '(missing)'}
+Current Shadow: ${char.shadow && char.shadow.trim().length > 30 ? snippet(char.shadow, 320) : '(missing)'}`
+    : field === 'talisman'
+      ? `Current Talisman: ${char.talisman && char.talisman.trim().length > 30 ? snippet(char.talisman, 320) : '(missing)'}`
+      : field === 'shadow'
+        ? `Current Shadow: ${char.shadow && char.shadow.trim().length > 30 ? snippet(char.shadow, 320) : '(missing)'}`
+        : field === 'artifact'
+          ? `Current Artifact: ${char.artifact ? snippet(char.artifact, 220) : '(missing)'}`
+          : field === 'quote'
+            ? `Current Quote: ${char.quote ? snippet(char.quote, 220) : '(missing)'}`
+            : field === 'essence'
+              ? `Current Essence: ${char.essence ? snippet(char.essence, 120) : '(missing)'}`
+              : field === 'floriography-palette'
+                ? `Current Flower: ${char.flower || '(missing)'}
+Current Flower Meaning: ${char.flowerMeaning || '(missing)'}
+Current Palette: ${Array.isArray(char.palette) && char.palette.length > 0 ? char.palette.join(', ') : '(missing)'}`
+                : field === 'relation-notes'
+                  ? `Current Relation Notes:\n${relationNotes.length > 0 ? relationNotes.map(note => `- ${note.slug}: ${note.note || '(missing note)'}`).join('\n') : '(missing)'}`
+                  : `Current Bio: ${char.bio && char.bio.trim().length > 50 ? snippet(char.bio, 700) : '(missing or thin)'}`;
 
   const relatedSection = relatedChars.length > 0
     ? relatedChars.map(r => `### ${r.role} (${r.slug})
-Essence: ${r.essence || '(none)'}
-Bio: ${r.bio ? r.bio.slice(0, 400) + (r.bio.length > 400 ? '…' : '') : '(none)'}`).join('\n\n')
+Essence: ${snippet(r.essence, 90)}
+Bio: ${snippet(r.bio, 180)}`).join('\n\n')
     : '(none)';
 
   const taskDesc = field === 'talisman-shadow'
     ? `Write BOTH ## Talisman and ## Shadow sections. Start immediately with "## Talisman". No preamble. No XML. Just the markdown.`
-    : `Write a bio: 4-5 paragraphs, blank line between each. No section headers. No preamble. Start with the first paragraph.`;
+    : field === 'talisman'
+      ? `Write EXACTLY this structure:\n\n## Talisman\n\n[3-5 sentences]\n\nNo Shadow section. No preamble.`
+      : field === 'shadow'
+        ? `Write EXACTLY this structure:\n\n## Shadow\n\n[3-5 sentences]\n\nNo Talisman section. No preamble.`
+        : field === 'artifact'
+          ? `Write one artifact line only. One sentence. Concrete object, no bullet, no heading, no quotation marks.`
+          : field === 'quote'
+            ? `Write one quote line only. First person singular. One sentence. No quotation marks. No attribution.`
+            : field === 'essence'
+              ? `Write 1-2 sentence fragments only. Atmospheric, not explanatory. Max 18 words total. No heading.`
+              : field === 'floriography-palette'
+                ? `Write EXACTLY this markdown structure:\n\n## Flower\n[one flower name]\n\n## Flower Meaning\n[a short floriography phrase, 2-8 words]\n\n## Palette\n[#HEX]\n[#HEX]\n[#HEX]\n\nUse exactly three hex colors.`
+                : field === 'relation-notes'
+                  ? `Write EXACTLY this markdown structure:\n\n## Relation Notes\n- related-slug: One sentence.\n\nUse every relation slug exactly once: ${(char.relations || []).join(', ') || '(none)'}. Each note must be 10-20 words, dry and specific.`
+                  : `Write a bio: 4-5 paragraphs, blank line between each. No section headers. No preamble. Start with the first paragraph.`;
 
-  return `You are writing ${field === 'talisman-shadow' ? 'talisman and shadow sections' : 'a bio'} for ${char.role} in The Unknown Collective — 22 real-seeming people in Munich, not a fantasy guild.
+  return `You are writing ${getFieldLabel(field).toLowerCase()} for ${char.role} in The Unknown Collective — 22 real-seeming people in an unnamed Central European city, not a fantasy guild.
 
 ## Character
 Role: ${char.role}
@@ -362,8 +443,14 @@ Keywords: ${(char.keywords || []).join(', ')}
 Essence: ${char.essence || '(none)'}
 Artifact: ${char.artifact || '(none)'}
 Quote: ${char.quote || '(none)'}
+Hue: ${char.hue || '(none)'}
+Flower: ${char.flower || '(missing)'}
+Flower Meaning: ${char.flowerMeaning || '(missing)'}
+Palette: ${Array.isArray(char.palette) && char.palette.length > 0 ? char.palette.join(', ') : '(missing)'}
 Relations: ${(char.relations || []).join(', ') || 'none'}
 ${existingContent}
+
+${instructions ? `## Update Request\n${instructions.trim()}\n` : ''}
 
 ## Archetype logic (use this as the hidden architecture for what you write)
 ${arcanaNote}
@@ -371,12 +458,62 @@ ${arcanaNote}
 ## Related characters (for context and consistency)
 ${relatedSection}
 
-${WRITING_GUIDELINES}
+${PROMPT_GUIDELINES}
 
 ## Task
 ${taskDesc}
 
-Ground every sentence in the archetype logic above. Translate it into concrete behavioral or perceptual effects in Munich. Do not describe the archetype — embody it in specific, dry detail.`;
+Ground every sentence in the archetype logic above. Translate it into concrete behavioral or perceptual effects in the city. Do not describe the archetype — embody it in specific, dry detail.`;
+}
+
+export { choosePatchField, getFieldLabel, normalizeTargetField };
+
+export function buildCoherenceFixPrompt(char, issueText, relatedChars = [], architectureEntry = null, preferredField = null) {
+  const arcanaNote = snippet(architectureEntry || ARCANA_NOTES[char.arcana] || '(no archetype note available)', 900);
+  const relatedSection = relatedChars.length > 0
+    ? relatedChars.map(r => `${r.role} (${r.slug}): ${snippet(r.essence, 80)}`).join('\n')
+    : '(none)';
+  const preferredLine = preferredField
+    ? `Preferred target field: ${preferredField}. Use that unless another single field is clearly a better fit.`
+    : 'Choose the smallest single field change that resolves the issue. Prefer keywords, then essence, then bio, then talisman-shadow.';
+
+  return `You are fixing one specific coherence issue for The Unknown Collective.
+
+## Character
+Role: ${char.role}
+Slug: ${char.slug}
+Arcana: ${char.arcana}
+Tier: ${char.tier}
+Keywords: ${(char.keywords || []).join(', ') || '(none)'}
+Essence: ${snippet(char.essence, 180)}
+Quote: ${snippet(char.quote, 180)}
+
+## Archetype logic
+${arcanaNote}
+
+## Related characters
+${relatedSection}
+
+## Reported issue
+${issueText}
+
+${PROMPT_GUIDELINES}
+
+## Task
+${preferredLine}
+
+Return exactly this format:
+
+<choice slug="${char.slug}" field="keywords|essence|bio|talisman-shadow">
+One sentence: why this field is the smallest correct fix.
+</choice>
+
+<draft>
+If field=keywords: exactly 3 comma-separated keywords, lowercase, no bullets.
+If field=essence: 1-2 short sentence fragments only.
+If field=bio: 4-5 paragraphs, blank lines between them.
+If field=talisman-shadow: write both sections, starting with ## Talisman.
+</draft>`;
 }
 
 // Parse the Phase 1 selection response

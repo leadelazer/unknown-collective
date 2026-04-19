@@ -327,8 +327,8 @@ export const CHARACTERS = [
     essence: "Old blood. The tea was bitter.",
     detail: true,
     bio: bios["duchess"],
-    talisman: "The Duchess's card embodies the qualities of leadership, vision, and ambition. Those who hold her card may find themselves inspired to take charge, envision grand plans, and pursue their ambitions unapologetically. The card imbues a sense of elegance and grandeur that can uplift spirits and ignite passions.",
-    shadow: "However, such strong qualities come with their pitfalls. The holder might be inclined towards obstinacy, uncompromising in their vision to the point of blindness towards others' input. The pursuit of grandeur may lead to neglect of the mundane, causing discord in everyday matters. Furthermore, the card can incite vanity and a desire for approval, distracting from authentic achievements.",
+    talisman: "When you carry The Duchess's card, you find connections to the past are easier to grasp. You notice how others share similar struggles, and their histories parallel your own obstacles. Conversations become structured. Instead of wandering topics, they align with existing frameworks. Old principles rise to the surface, giving you clarity in decision-making. You feel increasingly confident that your path has been taken before.",
+    shadow: "In the absence of awareness, you cling to rigid traditions. New ideas feel threatening, and you dismiss them outright. You stop listening to others. Their contributions seem trivial against the weight of the established order. A stubborn streak takes hold, blinding you to alternative solutions. You may forget to look beyond the walls you have built, causing you to overlook simpler, everyday truths.",
     relations: [
           "curator",
           "florist"
@@ -608,8 +608,8 @@ export const CHARACTERS = [
     essence: "A heavy soul. A light scale.",
     detail: true,
     bio: bios["obsidian-count"],
-    talisman: "The Obsidian Count embodies the principles of justice and fairness. His presence brings clarity and order to chaos, providing a framework for understanding and interpreting complex situations. Those who carry his card may find themselves drawn toward principled action — a capacity to see the true shape of a problem beneath its surface complications.",
-    shadow: "His shadow challenges the rigidity of law, revealing the need for empathy and understanding when dealing with moral dilemmas. It reminds us that the world is not black and white, and that understanding its shades of grey can lead to a more compassionate approach. Principle without mercy becomes its own form of harm.",
+    talisman: "When you carry the card of The Obsidian Count, your perception sharpens. You become attuned to the unspoken debts in conversations. Arguments you used to avoid start feeling like they have a point. You sit down when others leave, ready to tackle complexities. You find clarity in disputes, identifying the root causes of tension, and feel a newfound ability to articulate fairness.",
+    shadow: "With the shadow of The Obsidian Count, you risk losing sight of the human element. You start to view interactions solely through a lens of penalties and rewards. Compassion wanes as you measure others' actions only by their outcomes. You stop asking whether the silence is comfortable for anyone else. Conversations transform into a ledger, where every infraction is noted without context.",
     relations: [
           "merchant-prince",
           "curator",
@@ -713,7 +713,7 @@ export const CHARACTERS = [
           "weavers",
           "curator",
           "obsidian-count",
-          "timekeeper"
+          "veilwalker"
     ],
     relationNotes: [
           {
@@ -729,8 +729,8 @@ export const CHARACTERS = [
                 "note": "He cited the Bind in a ruling once. The argument was not accepted."
           },
           {
-                "slug": "timekeeper",
-                "note": "The Bind arrived before the Timekeeper last winter. Nothing was exchanged."
+                "slug": "veilwalker",
+                "note": "The Bind arrived before the veilwalker last winter. Nothing was exchanged."
           }
     ],
     artifact: "A shuttle of dark wood, still threaded. No one moves it. No one is sure who placed it there.",
@@ -909,7 +909,7 @@ export const CHARACTERS = [
     relations: [
           "ferryman",
           "curator",
-          "timekeeper"
+          "veilwalker"
     ],
     relationNotes: [
           {
@@ -921,8 +921,8 @@ export const CHARACTERS = [
                 "note": "He replaced the reading room lamps twice without billing. The Curator noted it; no payment was made."
           },
           {
-                "slug": "timekeeper",
-                "note": "The Timekeeper adjusts the hour when the lamp is lit. The Lightkeeper does not know this."
+                "slug": "veilwalker",
+                "note": "The veilwalker adjusts the hour when the lamp is lit. The Lightkeeper does not know this."
           }
     ],
     artifact: "A lamplighter's pole, its brass tip still warm. He has never explained why.",
@@ -1080,8 +1080,8 @@ export const CHARACTERS = [
     arcana: "The World",
     role: "The Veilwalker",
     tier: "guides",
-    slug: "timekeeper",
-    img: "/assets/echos/timekeeper.png",
+    slug: "veilwalker",
+    img: "/assets/echos/veilwalker.png",
     hue: "#3A3A55",
     flower: "Laurel",
     flowerMeaning: "glory, accomplishment",
@@ -1097,9 +1097,9 @@ export const CHARACTERS = [
     ],
     essence: "Tick. Tock. It is later now.",
     detail: true,
-    bio: bios["timekeeper"],
-    talisman: "The Timekeeper's talisman emanates wisdom and transcendence. Holders may find themselves attuned to the subtle energies that flow through existence — perceiving hidden threads that connect all things, glimpsing the world's interconnectedness. The gift is not power over time but presence within it: an ability to see the whole arc and to move within it with grace.",
-    shadow: "The shadow of the Timekeeper urges caution in venturing too far into the void — the danger of becoming lost in the enigma of the unknown, drifting between worlds without grounding or purpose. The bearer risks mistaking detachment for wisdom, and observation for participation. To watch the world from too great a distance is to miss the life within it.",
+    bio: bios["veilwalker"],
+    talisman: "The veilwalker's talisman emanates wisdom and transcendence. Holders may find themselves attuned to the subtle energies that flow through existence — perceiving hidden threads that connect all things, glimpsing the world's interconnectedness. The gift is not power over time but presence within it: an ability to see the whole arc and to move within it with grace.",
+    shadow: "The shadow of the veilwalker urges caution in venturing too far into the void — the danger of becoming lost in the enigma of the unknown, drifting between worlds without grounding or purpose. The bearer risks mistaking detachment for wisdom, and observation for participation. To watch the world from too great a distance is to miss the life within it.",
     relations: [
           "ferryman",
           "lightkeeper",
@@ -1109,19 +1109,19 @@ export const CHARACTERS = [
     relationNotes: [
           {
                 "slug": "ferryman",
-                "note": "The Ferryman's last crossing aligns with the Timekeeper's late count. One of them adjusts for the other."
+                "note": "The Ferryman's last crossing aligns with the veilwalker's late count. One of them adjusts for the other."
           },
           {
                 "slug": "lightkeeper",
-                "note": "The lamp timing has shifted three minutes over four years. The Timekeeper has not mentioned it."
+                "note": "The lamp timing has shifted three minutes over four years. The veilwalker has not mentioned it."
           },
           {
                 "slug": "curator",
-                "note": "The Curator found a clock in the archive that runs seven minutes fast. The Timekeeper wound it."
+                "note": "The Curator found a clock in the archive that runs seven minutes fast. The veilwalker wound it."
           },
           {
                 "slug": "the-bind",
-                "note": "The Bind took a record the Timekeeper had marked completed. The record was not returned."
+                "note": "The Bind took a record the veilwalker had marked completed. The record was not returned."
           }
     ],
     quote: "Nothing ends. It only changes what it is becoming.",

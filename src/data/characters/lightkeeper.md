@@ -14,14 +14,14 @@ essence: One match. A dark street. Watch.
 detail: true
 artifact: "A lamplighter's pole, its brass tip still warm. He has never explained why."
 quote: I do not make promises about what comes next. I just keep the light on so you can find your way to it.
-relations: [ferryman, curator, timekeeper]
+relations: [ferryman, curator, veilwalker]
 relationNotes:
   - slug: ferryman
     note: The lamp at the river crossing marks the last hour of crossings. The Ferryman has never once been late.
   - slug: curator
     note: He replaced the reading room lamps twice without billing. The Curator noted it; no payment was made.
-  - slug: timekeeper
-    note: The Timekeeper adjusts the hour when the lamp is lit. The Lightkeeper does not know this.
+  - slug: veilwalker
+    note: The veilwalker adjusts the hour when the lamp is lit. The Lightkeeper does not know this.
 stories: []
 storyLabel: null
 ---

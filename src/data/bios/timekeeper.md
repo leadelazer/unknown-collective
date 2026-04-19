@@ -1,4 +1,4 @@
-The Timekeeper has always walked the boundary between what is and what was — a figure whose age is difficult to determine and whose arrival in the Collective no one can reliably date. She appears in the records intermittently, always in the margins.
+The veilwalker has always walked the boundary between what is and what was — a figure whose age is difficult to determine and whose arrival in the Collective no one can reliably date. She appears in the records intermittently, always in the margins.
 
 She holds a deep understanding of the balance between existence and the unknown — not as philosophy but as practice. She moves through the city's history the way water moves through rock: not forcing anything, but present at every transformation.
 

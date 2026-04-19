@@ -1,10 +1,14 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CHARACTERS } from '../data/characters.js';
+import { ENCOUNTERS } from '../data/encounters.js';
+import { resolveCharacterPalette } from '../data/paletteSystem.js';
 import { TIERS, ROMAN } from '../data/tiers.js';
 import Nav from '../components/Nav.jsx';
 import Footer from '../components/Footer.jsx';
 import TextureBackdrop from '../components/TextureBackdrop.jsx';
 import DecoRule from '../components/DecoRule.jsx';
+import EncounterPanel from '../components/EncounterPanel.jsx';
 import { PortraitPlaceholder } from './Collective.jsx';
 import styles from './Character.module.css';
 
@@ -21,7 +25,6 @@ export default function Character() {
   );
 
   const tier = TIERS[c.tier];
-
   return (
     <div className={styles.page}>
       <TextureBackdrop />
@@ -36,6 +39,10 @@ export default function Character() {
 }
 
 function DetailedCharacter({ c, tier, navigate }) {
+  const palette = resolveCharacterPalette(c);
+  const [activeEncounter, setActiveEncounter] = useState(null);
+  const charEncounters = ENCOUNTERS.filter(e => e.participants.includes(c.slug));
+
   return (
     <>
       <section className={styles.hero}>
@@ -64,9 +71,9 @@ function DetailedCharacter({ c, tier, navigate }) {
               ))}
             </div>
 
-            {c.palette?.length > 0 && (
+            {palette.length > 0 && (
               <div className={styles.palette}>
-                {c.palette.map((hex, i) => (
+                {palette.map((hex, i) => (
                   <span key={i} className={styles.paletteSwatch} style={{ background: hex }} title={hex} />
                 ))}
               </div>
@@ -117,7 +124,7 @@ function DetailedCharacter({ c, tier, navigate }) {
         </section>
       )}
 
-      {(c.flower || c.palette?.length > 0) && (
+      {c.flower && (
         <section className={styles.floriography}>
           {c.flower && (
             <div className={styles.floriographyText}>
@@ -126,16 +133,6 @@ function DetailedCharacter({ c, tier, navigate }) {
               {c.flowerMeaning && (
                 <p className={`${styles.floriographyMeaning} t-body`}>{c.flowerMeaning}</p>
               )}
-            </div>
-          )}
-          {c.palette?.length > 0 && (
-            <div className={styles.floriographyPalette}>
-              <p className={`${styles.floriographyLabel} t-deco`}>Palette</p>
-              <div className={styles.palette}>
-                {c.palette.map((hex, i) => (
-                  <span key={i} className={styles.paletteSwatch} style={{ background: hex }} title={hex} />
-                ))}
-              </div>
             </div>
           )}
         </section>
@@ -195,11 +192,36 @@ function DetailedCharacter({ c, tier, navigate }) {
 
           <div className={styles.encountersBlock}>
             <p className={`${styles.lowerLabel} t-deco`}>Encounters</p>
-            <p className={`${styles.encountersEmpty} t-body`}>No encounters recorded for this member yet.</p>
+            {charEncounters.length > 0 ? (
+              <ul className={styles.encounterList}>
+                {charEncounters.map(enc => (
+                  <li key={enc.id}>
+                    <button
+                      className={`${styles.encounterItem} t-body`}
+                      onClick={() => setActiveEncounter(enc)}
+                    >
+                      <span className={styles.encounterTitle}>{enc.title}</span>
+                      <span className={`${styles.encounterMeta} t-deco`}>
+                        {enc.participants
+                          .filter(s => s !== c.slug)
+                          .map(s => CHARACTERS.find(x => x.slug === s)?.role || s)
+                          .join(' · ')}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className={`${styles.encountersEmpty} t-body`}>No encounters recorded for this member yet.</p>
+            )}
           </div>
 
         </div>
       </section>
+
+      {activeEncounter && (
+        <EncounterPanel encounter={activeEncounter} onClose={() => setActiveEncounter(null)} />
+      )}
 
       {c.stories?.length > 1 && (
         <section className={styles.storyStrip}>

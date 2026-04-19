@@ -14,7 +14,7 @@ essence: The end. It was always coming.
 detail: true
 artifact: A shuttle of dark wood, still threaded. No one moves it. No one is sure who placed it there.
 quote: null
-relations: [weavers, curator, obsidian-count, timekeeper]
+relations: [weavers, curator, obsidian-count, veilwalker]
 relationNotes:
   - slug: weavers
     note: The Weavers made the first binding. The Bind does not record this as debt.
@@ -22,8 +22,8 @@ relationNotes:
     note: The Curator holds one written account of the Bind's origin. The file is sealed.
   - slug: obsidian-count
     note: He cited the Bind in a ruling once. The argument was not accepted.
-  - slug: timekeeper
-    note: The Bind arrived before the Timekeeper last winter. Nothing was exchanged.
+  - slug: veilwalker
+    note: The Bind arrived before the veilwalker last winter. Nothing was exchanged.
 stories: []
 storyLabel: null
 ---

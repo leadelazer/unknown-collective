@@ -84,6 +84,21 @@
   margin-top: var(--space-4);
 }
 
+.tierPaletteLabel {
+  margin-top: var(--space-6);
+  font-size: 10px;
+  letter-spacing: 0.34em;
+  color: var(--color-gold-hi);
+}
+
+.tierPaletteNote {
+  margin-top: var(--space-3);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--color-paper-2);
+  max-width: 360px;
+}
+
 /* ── Tier character grid ── */
 .tierChars {
   display: grid;
@@ -118,17 +133,30 @@
   object-fit: cover;
 }
 
-.charArcana {
-  font-size: 9px;
-  color: var(--color-gold);
-  letter-spacing: 0.25em;
+.charPalette {
+  display: flex;
+  gap: 6px;
   margin-top: var(--space-3);
+  opacity: 0.58;
+  transition: opacity var(--transition-fast);
+}
+
+.charBtn:hover .charPalette {
+  opacity: 0.8;
+}
+
+.charPaletteSwatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-paper) 18%, transparent);
+  box-shadow: 0 0 0 1px rgba(7, 10, 9, 0.5) inset;
 }
 
 .charRole {
   font-size: 18px;
   color: var(--color-paper);
-  margin-top: 2px;
+  margin-top: 8px;
 }
 
 @media (max-width: 1024px) {

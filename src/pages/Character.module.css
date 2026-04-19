@@ -68,8 +68,6 @@
   color: var(--color-gold-hi);
 }
 
-.details {}
-
 .detailEyebrow {
   font-size: var(--text-xs);
   color: var(--color-gold);
@@ -315,11 +313,6 @@
   margin-bottom: var(--space-5);
 }
 
-.artifactBlock {}
-.relationsBlock {}
-
-.encountersBlock {}
-
 .encountersEmpty {
   font-size: 14px;
   color: var(--color-muted);
@@ -327,6 +320,45 @@
   line-height: 1.7;
   padding: var(--space-6);
   border: 1px dashed color-mix(in srgb, var(--color-gold) 22%, transparent);
+}
+
+.encounterList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.encounterItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: var(--space-4) var(--space-4);
+  border-left: 2px solid color-mix(in srgb, var(--color-gold) 28%, transparent);
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.encounterItem:hover {
+  border-left-color: var(--color-gold);
+  background: color-mix(in srgb, var(--color-gold) 5%, transparent);
+}
+
+.encounterTitle {
+  font-size: 14px;
+  color: var(--color-paper-2);
+  line-height: 1.4;
+  font-family: var(--font-body);
+}
+
+.encounterMeta {
+  font-size: var(--text-xs);
+  color: var(--color-gold);
+  letter-spacing: 0.25em;
 }
 
 .artifactTitle {
@@ -367,7 +399,6 @@
   text-align: left;
   transition: border-color var(--transition-fast);
 }
-
 
 .relationImg {
   width: 72px;

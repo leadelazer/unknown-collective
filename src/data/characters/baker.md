@@ -6,8 +6,8 @@ name: null
 tier: grounded
 slug: baker
 hue: "#A88655"
-flower: "Asphodel"
-flowerMeaning: "my regrets follow you to the grave"
+flower: Asphodel
+flowerMeaning: my regrets follow you to the grave
 palette: ["#A88655", "#705A38", "#D4C4A0"]
 keywords: [suspension, sacrifice, letting go]
 essence: Hot bread. The world is wrong.

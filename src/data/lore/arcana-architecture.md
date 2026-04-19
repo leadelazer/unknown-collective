@@ -17,7 +17,7 @@
 **Shadow logic:** Without the drag of consequence, the carrier skips steps. Commitments dissolve mid-sentence. Others experience the carrier as unreliable not because of malice but because nothing sticks — each moment replaces the last with equal weight, and the carrier cannot understand why anyone would hold them to Tuesday's promise on a Thursday.
 
 **Archetypal tensions:**
-- timekeeper: The Fool begins without reference to sequence; the World is the completed sequence. One has no history, the other is nothing but history.
+- veilwalker: The Fool begins without reference to sequence; the World is the completed sequence. One has no history, the other is nothing but history.
 - obsidian-count: Justice requires precedent and evidence; the Fool has neither. Justice cannot weigh what hasn't happened yet.
 - baker: The Hanged Man is voluntary suspension — the Fool is involuntary motion. One chooses to stop; the other cannot.
 
@@ -551,16 +551,16 @@ Justification: The white lily in Victorian floriography means restored purity an
 
 ---
 
-## 21. The Veilwalker (Timekeeper) — The World
-**Slug:** `timekeeper`
+## 21. The Veilwalker (veilwalker) — The World
+**Slug:** `veilwalker`
 
 **Arcana mechanism:** The World is the mechanism of completed integration — the structural state in which all components of a system are present, functional, and in relationship with each other. Not perfection, but wholeness: every card has been played, every position has been occupied, and the cycle is ready to begin again. The mechanism is closure that enables reopening.
 
-**UC mapping:** The Veilwalker moves between layers of time — tick, tock, it is later now. The role enacts the World by being the person who has traversed the entire sequence and exists at the point where ending and beginning are the same threshold. The Timekeeper does not keep time; the Timekeeper is the evidence that time has been kept — that the full cycle has been witnessed.
+**UC mapping:** The Veilwalker moves between layers of time — tick, tock, it is later now. The role enacts the World by being the person who has traversed the entire sequence and exists at the point where ending and beginning are the same threshold. The veilwalker does not keep time; the veilwalker is the evidence that time has been kept — that the full cycle has been witnessed.
 
 **Talisman logic:** The carrier experiences completion. Projects, phases, and periods of life that lacked resolution reach a natural closing point. The carrier does not force closure; they recognize it when it arrives. The scattered pieces of long-running situations arrange themselves into a legible pattern, and the carrier can see the whole from within it.
 
-**Shadow logic:** The carrier refuses to begin again. The completed state becomes a trap — the World's shadow is the person who has finished and cannot tolerate the prospect of returning to the Fool's position. Completion becomes stasis. The Timekeeper's shadow is the clock that has struck midnight and stopped, preferring to remain at the end rather than restart.
+**Shadow logic:** The carrier refuses to begin again. The completed state becomes a trap — the World's shadow is the person who has finished and cannot tolerate the prospect of returning to the Fool's position. Completion becomes stasis. The veilwalker's shadow is the clock that has struck midnight and stopped, preferring to remain at the end rather than restart.
 
 **Archetypal tensions:**
 - florist: The Fool is zero; the World is twenty-one. One is empty potential; the other is full actualization. They are the same point on the circle, seen from opposite directions.
@@ -579,7 +579,7 @@ Justification: Laurel in Victorian floriography means glory and the accomplishme
 
 ## Cross-archetype dynamics
 
-The five tiers cluster distinct archetypal modes. **Grounded** (Gardener, Weavers, Baker, Cook, Tailor, Brewer) collects the arcana of material process — growth, binding, suspension, calibration, distortion, exposure — all mechanisms that require physical substrate and operate through transformation of matter. **Custodians** (Florist, Mapmaker, Mirrormaker, Keymaker) hold the cycle's infrastructure: the entry point, the record of change, the diagnostic instrument, and the means of release. **Guardians** (Shieldbearer, Firefighter, Ferryman, Doorwarden) are the arcana of sustained position under pressure — all four require the holder to remain where others leave. **Luminaries** (Curator, Oracle, Merchant Prince, Duchess, Obsidian Count) are structural authorities: the arranger, the threshold keeper, the boundary setter, the transmitter, and the weigher — each exercises power over how information or resources flow. **Guides** (The Bind, Lightkeeper, Timekeeper) are the arcana of termination and orientation — the force that ends, the signal that persists, and the witness to the completed cycle.
+The five tiers cluster distinct archetypal modes. **Grounded** (Gardener, Weavers, Baker, Cook, Tailor, Brewer) collects the arcana of material process — growth, binding, suspension, calibration, distortion, exposure — all mechanisms that require physical substrate and operate through transformation of matter. **Custodians** (Florist, Mapmaker, Mirrormaker, Keymaker) hold the cycle's infrastructure: the entry point, the record of change, the diagnostic instrument, and the means of release. **Guardians** (Shieldbearer, Firefighter, Ferryman, Doorwarden) are the arcana of sustained position under pressure — all four require the holder to remain where others leave. **Luminaries** (Curator, Oracle, Merchant Prince, Duchess, Obsidian Count) are structural authorities: the arranger, the threshold keeper, the boundary setter, the transmitter, and the weigher — each exercises power over how information or resources flow. **Guides** (The Bind, Lightkeeper, veilwalker) are the arcana of termination and orientation — the force that ends, the signal that persists, and the witness to the completed cycle.
 
 The most generative narrative tensions run between paired arcana that share a mechanism but apply it in opposite directions: Empress/Death (growth/termination), Lovers/Hermit (binding/severing), Sun/Moon (exposure/concealment), Tower/Hierophant (destruction/preservation of institutions). These four pairs are the load-bearing walls of the Collective's internal architecture.
 

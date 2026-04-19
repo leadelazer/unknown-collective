@@ -206,6 +206,14 @@ fs.writeFileSync(charsOut, finalCharsOutput);
 console.log(`✓ Synced ${charFiles.length} characters → characters.js`);
 console.log(`✓ Synced ${Object.keys(bios).length} bios → bios.js`);
 
+// ─── Sync encounters ───────────────────────────────────────────────────────────
+
+try {
+  execSync('node src/data/sync-encounters.js', { cwd: path.join(__dirname, '../..'), encoding: 'utf8', stdio: 'inherit' });
+} catch (e) {
+  console.error('Warning: encounter sync failed:', e.message);
+}
+
 // ─── Sync chronicle ────────────────────────────────────────────────────────────
 
 const chronicleDir = path.join(__dirname, 'chronicle');

@@ -5,7 +5,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { computeGaps, buildAgentPrompt, buildWritingPrompt, parseDraftOutput } from './agent-core.js';
+import { computeGaps, buildAgentPrompt, buildWritingPrompt, parseDraftOutput, choosePatchField } from './agent-core.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA = path.join(__dirname, '../../src/data');
@@ -131,7 +131,7 @@ async function main() {
     if (!gaps.length) throw new Error('No weak or missing character content found to patch');
     const top = gaps[0];
     const char = chars.find(c => c.slug === top.slug);
-    const field = top.issues.some(issue => issue.startsWith('talisman') || issue.startsWith('shadow')) ? 'talisman-shadow' : 'bio';
+    const field = choosePatchField(top.issues);
     const relatedChars = (char.relations || []).map(r => chars.find(c => c.slug === r)).filter(Boolean);
 
     console.log(`Auto-selected patch target: ${char.slug} (${field})`);

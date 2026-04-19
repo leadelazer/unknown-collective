@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { TIERS, ROMAN } from '../data/tiers.js';
+import { TIERS } from '../data/tiers.js';
 import { CHARACTERS } from '../data/characters.js';
+import { getTierChroma, resolveCharacterPalette } from '../data/paletteSystem.js';
 import Nav from '../components/Nav.jsx';
 import Footer from '../components/Footer.jsx';
 import TextureBackdrop from '../components/TextureBackdrop.jsx';
@@ -12,6 +13,7 @@ export default function Tiers() {
   const navigate = useNavigate();
   const byTier = Object.entries(TIERS).map(([key, t]) => ({
     key, ...t,
+    chroma: getTierChroma(key),
     chars: CHARACTERS.filter(c => c.tier === key),
   }));
 
@@ -40,10 +42,15 @@ export default function Tiers() {
               <h2 className={`${styles.tierName} t-display`}>{t.name}</h2>
               <p className={`${styles.tierGist} t-body`}> –  {t.gist}</p>
               <p className={`${styles.tierBlurb} t-body`}>{t.blurb}</p>
+              <p className={`${styles.tierPaletteLabel} t-deco`}>{t.chroma.title}</p>
+              <p className={`${styles.tierPaletteNote} t-body`}>{t.chroma.description}</p>
             </div>
 
             <div className={styles.tierChars}>
-              {t.chars.map(c => (
+              {t.chars.map(c => {
+                const palette = resolveCharacterPalette(c);
+
+                return (
                 <button key={c.slug} className={styles.charBtn} onClick={() => navigate(`/character/${c.slug}`)}>
                   <div className={styles.charImg}>
                     {c.img
@@ -51,10 +58,19 @@ export default function Tiers() {
                       : <PortraitPlaceholder role={c.role} hue={c.hue} />
                     }
                   </div>
-                  <p className={`${styles.charArcana} t-deco`}>{ROMAN[c.n]} · {c.arcana.toUpperCase()}</p>
+                  <div className={styles.charPalette} aria-label={`${c.role} palette`}>
+                    {palette.map((hex, index) => (
+                      <span
+                        key={`${c.slug}-${hex}-${index}`}
+                        className={styles.charPaletteSwatch}
+                        style={{ background: hex }}
+                        title={hex}
+                      />
+                    ))}
+                  </div>
                   <p className={`${styles.charRole} t-display`}>{c.role}</p>
                 </button>
-              ))}
+              );})}
             </div>
           </div>
         ))}

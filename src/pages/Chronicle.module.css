@@ -79,6 +79,33 @@
   border: var(--border-gold-mid);
 }
 
+.agentImgFallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--color-gold-hi) 20%, transparent), transparent 55%),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-gold-hi) 10%, var(--color-ink-card)), var(--color-ink));
+}
+
+.agentMonogram {
+  font-size: 18px;
+  color: var(--color-paper);
+  letter-spacing: 0.18em;
+  padding-left: 0.18em;
+}
+
+.agentLabel {
+  font-size: 7px;
+  color: var(--color-gold-hi);
+  letter-spacing: 0.22em;
+  text-align: center;
+  max-width: 52px;
+  line-height: 1.4;
+}
+
 .echoBody {}
 
 .echoMeta {
@@ -107,7 +134,7 @@
 }
 
 .echoText {
-  font-size: 17px;
+  font-size: var(--text-base);
   line-height: 1.7;
   color: var(--color-paper-2);
   margin-top: var(--space-3);

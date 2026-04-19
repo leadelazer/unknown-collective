@@ -6,8 +6,8 @@ name: Leopold von Hohenberg
 tier: luminaries
 slug: obsidian-count
 hue: "#2B2B3A"
-flower: "Black-Eyed Susan"
-flowerMeaning: "justice"
+flower: Black-Eyed Susan
+flowerMeaning: justice
 palette: ["#2B2B3A", "#4A4A5E", "#8A8A9A"]
 keywords: [fairness, truth, cause and effect]
 essence: A heavy soul. A light scale.
@@ -19,17 +19,17 @@ relationNotes:
   - slug: merchant-prince
     note: They reached a settlement in a warehouse dispute. No clerk was present.
   - slug: curator
-    note: He left a legal annotation in one of the archive's catalogues. The Curator did not remove it.
+    note: "He left a legal annotation in one of the archive's catalogues. The Curator did not remove it."
   - slug: the-bind
-    note: The Bind complicated the Count's clearest case. He still considers the ruling unresolved.
+    note: "The Bind complicated the Count's clearest case. He still considers the ruling unresolved."
 stories: []
 storyLabel: null
 ---
 
 ## Talisman
 
-The Obsidian Count embodies the principles of justice and fairness. His presence brings clarity and order to chaos, providing a framework for understanding and interpreting complex situations. Those who carry his card may find themselves drawn toward principled action — a capacity to see the true shape of a problem beneath its surface complications.
+When you carry the card of The Obsidian Count, your perception sharpens. You become attuned to the unspoken debts in conversations. Arguments you used to avoid start feeling like they have a point. You sit down when others leave, ready to tackle complexities. You find clarity in disputes, identifying the root causes of tension, and feel a newfound ability to articulate fairness.
 
 ## Shadow
 
-His shadow challenges the rigidity of law, revealing the need for empathy and understanding when dealing with moral dilemmas. It reminds us that the world is not black and white, and that understanding its shades of grey can lead to a more compassionate approach. Principle without mercy becomes its own form of harm.
+With the shadow of The Obsidian Count, you risk losing sight of the human element. You start to view interactions solely through a lens of penalties and rewards. Compassion wanes as you measure others' actions only by their outcomes. You stop asking whether the silence is comfortable for anyone else. Conversations transform into a ledger, where every infraction is noted without context.
