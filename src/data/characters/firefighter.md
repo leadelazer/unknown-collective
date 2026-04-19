@@ -6,6 +6,9 @@ name: null
 tier: guardians
 slug: firefighter
 hue: "#B25A2F"
+flower: "Borage"
+flowerMeaning: "courage"
+palette: ["#B25A2F", "#7A3A1E", "#E8A870"]
 keywords: [courage, patience, compassion]
 essence: Hot smoke. A brave, stupid run.
 detail: true

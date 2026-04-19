@@ -6,6 +6,9 @@ name: Greta Frederike von Waldeck
 tier: luminaries
 slug: oracle
 hue: "#8B6B7A"
+flower: "Moonflower"
+flowerMeaning: "night-blooming"
+palette: ["#8B6B7A", "#C5B8C8", "#3A2A35"]
 keywords: [intuition, mystery, inner voice]
 essence: She watched. The truth was worse.
 detail: true

@@ -6,6 +6,9 @@ name: Leopold von Hohenberg
 tier: luminaries
 slug: obsidian-count
 hue: "#2B2B3A"
+flower: "Black-Eyed Susan"
+flowerMeaning: "justice"
+palette: ["#2B2B3A", "#4A4A5E", "#8A8A9A"]
 keywords: [fairness, truth, cause and effect]
 essence: A heavy soul. A light scale.
 detail: true

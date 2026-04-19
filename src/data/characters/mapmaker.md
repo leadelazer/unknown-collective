@@ -6,6 +6,9 @@ name: Niklas Grunewald
 tier: custodians
 slug: mapmaker
 hue: "#8C6E3A"
+flower: "Snowdrop"
+flowerMeaning: "hope, consolation in adversity"
+palette: ["#8C6E3A", "#C4A65E", "#4A3A22"]
 keywords: [cycles, change, fate]
 essence: Streets change. The ink is dry.
 detail: true

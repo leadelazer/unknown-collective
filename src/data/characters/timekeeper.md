@@ -6,6 +6,9 @@ name: null
 tier: guides
 slug: timekeeper
 hue: "#3A3A55"
+flower: "Laurel"
+flowerMeaning: "glory, accomplishment"
+palette: ["#3A3A55", "#5A5A7A", "#1E1E30"]
 keywords: [completion, integration, travel]
 essence: Tick. Tock. It is later now.
 detail: true

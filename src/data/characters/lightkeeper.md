@@ -6,6 +6,9 @@ name: null
 tier: guides
 slug: lightkeeper
 hue: "#C8A45A"
+flower: "Star of Bethlehem"
+flowerMeaning: "hope, purity"
+palette: ["#C8A45A", "#F0DFA0", "#5A4A2A"]
 keywords: [hope, faith, renewal]
 essence: One match. A dark street. Watch.
 detail: true

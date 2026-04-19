@@ -6,6 +6,9 @@ name: null
 tier: guides
 slug: the-bind
 hue: "#3A2F3A"
+flower: "Cypress"
+flowerMeaning: "mourning, death"
+palette: ["#3A2F3A", "#1E1A1E", "#6A5A6A"]
 keywords: [endings, transformation, transition]
 essence: The end. It was always coming.
 detail: true

@@ -6,6 +6,9 @@ name: Freddy Azibo
 tier: luminaries
 slug: curator
 hue: "#D4B66E"
+flower: "Foxglove"
+flowerMeaning: "insincerity"
+palette: ["#D4B66E", "#1A2744", "#8B7340"]
 keywords: [manifestation, resourcefulness, inspired action]
 essence: Cold archives. He knew the odds.
 detail: true

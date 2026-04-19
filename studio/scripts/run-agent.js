@@ -5,7 +5,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { computeGaps, buildAgentPrompt, parseDraftOutput } from './agent-core.js';
+import { computeGaps, buildAgentPrompt, buildWritingPrompt, parseDraftOutput } from './agent-core.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA = path.join(__dirname, '../../src/data');
@@ -123,37 +123,74 @@ async function main() {
 
   console.log(`Loaded ${chars.length} characters, ${gaps.length} gaps, ${encounters.length} encounters`);
 
-  const prompt = buildAgentPrompt(action, chars, gaps, encounters, loreTitles);
-  console.log('Calling GitHub Models...');
-  const rawOutput = await callGitHubModels(prompt, model);
-
-  const parsed = parseDraftOutput(rawOutput);
-  if (!parsed) {
-    console.error('Agent output did not match expected format:\n', rawOutput);
-    process.exit(1);
-  }
-
-  const { attrs, reasoning, content } = parsed;
-  console.log(`Agent chose: ${JSON.stringify(attrs)}`);
-  console.log(`Reasoning: ${reasoning}`);
-
   const ts = new Date().toISOString().slice(0, 10);
   let draftId, draftFm;
+  let content;
 
   if (action === 'patch-fields') {
-    const field = (content.includes('## Talisman') || content.includes('## Shadow')) ? 'talisman-shadow' : 'bio';
-    draftId = `${attrs.slug}-${field}-${ts}`;
-    draftFm = { action, slug: attrs.slug, field, reasoning };
+    if (!gaps.length) throw new Error('No weak or missing character content found to patch');
+    const top = gaps[0];
+    const char = chars.find(c => c.slug === top.slug);
+    const field = top.issues.some(issue => issue.startsWith('talisman') || issue.startsWith('shadow')) ? 'talisman-shadow' : 'bio';
+    const relatedChars = (char.relations || []).map(r => chars.find(c => c.slug === r)).filter(Boolean);
+
+    console.log(`Auto-selected patch target: ${char.slug} (${field})`);
+    console.log('Calling GitHub Models...');
+    content = await callGitHubModels(buildWritingPrompt(char, field, relatedChars), model);
+
+    draftId = `${char.slug}-${field}-${ts}`;
+    draftFm = {
+      action,
+      slug: char.slug,
+      field,
+      reasoning: `auto-selected: highest-priority weak content (${top.issues.join(', ')})`,
+    };
   } else if (action === 'add-encounter') {
+    const prompt = buildAgentPrompt(action, chars, gaps, encounters, loreTitles);
+    console.log('Calling GitHub Models...');
+    const rawOutput = await callGitHubModels(prompt, model);
+    const parsed = parseDraftOutput(rawOutput);
+    if (!parsed) {
+      console.error('Agent output did not match expected format:\n', rawOutput);
+      process.exit(1);
+    }
+    const { attrs, reasoning } = parsed;
+    content = parsed.content;
+    console.log(`Agent chose: ${JSON.stringify(attrs)}`);
+    console.log(`Reasoning: ${reasoning}`);
     draftId = `encounter-${[attrs.slugA, attrs.slugB].sort().join('--')}-${ts}`;
     draftFm = { action, slugA: attrs.slugA, slugB: attrs.slugB, title: attrs.title, reasoning };
   } else if (action === 'expand-lore') {
+    const prompt = buildAgentPrompt(action, chars, gaps, encounters, loreTitles);
+    console.log('Calling GitHub Models...');
+    const rawOutput = await callGitHubModels(prompt, model);
+    const parsed = parseDraftOutput(rawOutput);
+    if (!parsed) {
+      console.error('Agent output did not match expected format:\n', rawOutput);
+      process.exit(1);
+    }
+    const { attrs, reasoning } = parsed;
+    content = parsed.content;
+    console.log(`Agent chose: ${JSON.stringify(attrs)}`);
+    console.log(`Reasoning: ${reasoning}`);
     const loreSlug = (attrs.title || 'lore').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
     draftId = `lore-${loreSlug}-${ts}`;
-    draftFm = { action, title: attrs.title, reasoning };
+    draftFm = { action, title: attrs.title, targetId: loreSlug, reasoning };
   } else {
+    const prompt = buildAgentPrompt(action, chars, gaps, encounters, loreTitles);
+    console.log('Calling GitHub Models...');
+    const rawOutput = await callGitHubModels(prompt, model);
+    const parsed = parseDraftOutput(rawOutput);
+    if (!parsed) {
+      console.error('Agent output did not match expected format:\n', rawOutput);
+      process.exit(1);
+    }
+    const { attrs, reasoning } = parsed;
+    content = parsed.content;
+    console.log(`Agent chose: ${JSON.stringify(attrs)}`);
+    console.log(`Reasoning: ${reasoning}`);
     draftId = `coherence-${ts}`;
-    draftFm = { action: 'coherence-check', title: attrs.title || 'Coherence Report', reasoning };
+    draftFm = { action: 'coherence-check', title: attrs.title || 'Coherence Report', targetId: `coherence-report-${ts}`, reasoning };
   }
 
   let front = '---\n';

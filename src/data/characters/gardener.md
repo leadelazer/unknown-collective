@@ -6,6 +6,9 @@ name: Carla
 tier: grounded
 slug: gardener
 hue: "#6B8E4E"
+flower: "Red Poppy"
+flowerMeaning: "consolation, fertility"
+palette: ["#6B8E4E", "#3A5A2A", "#C4A35E"]
 keywords: [fertility, abundance, nurturing]
 essence: Dirt under nails. Things grew anyway.
 detail: true

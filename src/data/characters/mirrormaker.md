@@ -6,6 +6,9 @@ name: Valentin Klarblick
 tier: custodians
 slug: mirrormaker
 hue: "#5A3A3A"
+flower: "Belladonna"
+flowerMeaning: "silence, dangerous beauty"
+palette: ["#5A3A3A", "#8A5555", "#2A1A1A"]
 keywords: [materialism, bondage, darkness]
 essence: Look close. You look like hell.
 detail: true

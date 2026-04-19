@@ -6,6 +6,9 @@ name: Heinrich and Matilda Weber
 tier: grounded
 slug: weavers
 hue: "#A37B4E"
+flower: "Honeysuckle"
+flowerMeaning: "devoted affection"
+palette: ["#A37B4E", "#D4B88A", "#5A3A28"]
 keywords: [harmony, relationships, choice]
 essence: Four hands. One cloth. No exits.
 detail: true

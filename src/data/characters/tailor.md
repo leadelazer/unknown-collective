@@ -6,6 +6,9 @@ name: Elijah Noman
 tier: grounded
 slug: tailor
 hue: "#4A5A7A"
+flower: "Evening Primrose"
+flowerMeaning: "inconstancy"
+palette: ["#4A5A7A", "#7A8AAA", "#2A2E40"]
 keywords: [illusion, subconscious, intuition]
 essence: Fine silk. A very tight squeeze.
 detail: true

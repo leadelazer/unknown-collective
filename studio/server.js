@@ -7,7 +7,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
-import { computeGaps, buildAgentPrompt, parseDraftOutput } from './scripts/agent-core.js';
+import { computeGaps, computeContentRatings, buildAgentPrompt, parseDraftOutput, buildWritingPrompt } from './scripts/agent-core.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA = path.join(__dirname, '../src/data');
@@ -292,23 +292,40 @@ app.post('/api/sync', (req, res) => {
 
 // ─── GitHub Models ────────────────────────────────────────────────────────────
 
-async function callGitHubModels(prompt, model = 'gpt-4o-mini') {
+async function callGitHubModels(prompt, model = 'gpt-4o-mini', maxTokens = 2000) {
   let token = process.env.GITHUB_TOKEN;
   if (!token) {
     try { token = execSync('gh auth token', { encoding: 'utf8' }).trim(); }
-    catch { throw new Error('Not authenticated with GitHub. Run: gh auth login'); }
+    catch (e) {
+      throw new Error(
+        'GitHub authentication required.\n\n' +
+        'Option 1: gh CLI (recommended)\n' +
+        '  1. Run: gh auth login\n' +
+        '  2. Approve the device flow in your browser\n' +
+        '  3. Restart Studio (npm run dev)\n\n' +
+        'Option 2: Direct token (for testing)\n' +
+        '  Export your PAT: export GITHUB_TOKEN="ghp_..."\n' +
+        '  Then restart Studio.\n\n' +
+        'Error details: ' + e.message
+      );
+    }
   }
   const r = await fetch('https://models.inference.ai.azure.com/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
     body: JSON.stringify({
-      model, max_tokens: 1500,
+      model, max_tokens: maxTokens,
       messages: [
-        { role: 'system', content: 'You are a literary content writer working on a fictional world. Follow all formatting instructions exactly. Output only what is asked — no preamble or commentary outside the specified tags.' },
+        { role: 'system', content: 'You write like a journalist covering strange municipal history — dry, specific, observational. Short sentences. Physical details. No fantasy language, no superlatives, no self-help tone. You are documenting real-seeming people, not mythological figures. Follow all formatting instructions exactly. Output only what is asked — no preamble or commentary outside the specified tags.' },
         { role: 'user', content: prompt },
       ],
     }),
   });
+  const contentType = r.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    const text = await r.text();
+    throw new Error(`GitHub Models API returned a non-JSON response (HTTP ${r.status}). Your token may be invalid or lack model access.\n\nResponse preview: ${text.slice(0, 120)}`);
+  }
   const d = await r.json();
   if (!r.ok) throw new Error(d.error?.message || `GitHub Models error ${r.status}`);
   return d.choices[0]?.message?.content || '';
@@ -329,8 +346,10 @@ app.get('/api/gaps', (req, res) => {
   const chars = fs.readdirSync(CHARS_DIR).filter(f => f.endsWith('.md'))
     .map(f => readChar(path.basename(f, '.md'))).filter(Boolean)
     .sort((a, b) => (a.n ?? 99) - (b.n ?? 99));
+  const gaps = computeGaps(chars);
   res.json({
-    gaps: computeGaps(chars),
+    gaps,
+    ratings: computeContentRatings(chars),
     total: chars.length,
     encounterCount: readEncounters().length,
     loreCount: readLore().length,
@@ -345,7 +364,7 @@ app.get('/api/drafts', (req, res) => {
     const raw = fs.readFileSync(path.join(DRAFTS_DIR, f), 'utf8');
     const { fm, body } = parseFrontmatter(raw);
     const stat = fs.statSync(path.join(DRAFTS_DIR, f));
-    return { id, ...fm, preview: body.slice(0, 200), created: stat.mtimeMs };
+    return { id, ...fm, content: body, created: stat.mtimeMs };
   }).sort((a, b) => b.created - a.created);
   res.json(drafts);
 });
@@ -375,7 +394,7 @@ app.post('/api/drafts/:id/approve', (req, res) => {
       const id = [fm.slugA, fm.slugB].sort().join('--');
       fs.writeFileSync(path.join(ENCOUNTERS_DIR, `${id}.md`), `---\ntitle: ${yamlStr(fm.title || id)}\n---\n\n${body}`, 'utf8');
     } else if (fm.action === 'expand-lore' || fm.action === 'coherence-check') {
-      const loreId = req.params.id;
+      const loreId = fm.targetId || req.params.id;
       fs.writeFileSync(path.join(LORE_DIR, `${loreId}.md`), `---\ntitle: ${yamlStr(fm.title || loreId)}\n---\n\n${body}`, 'utf8');
     }
     fs.unlinkSync(file);
@@ -398,37 +417,72 @@ app.post('/api/agent/run', async (req, res) => {
     const loreTitles = fs.readdirSync(LORE_DIR).filter(f => f.endsWith('.md'))
       .map(f => path.basename(f, '.md')).join(', ') || '(none yet)';
 
-    const prompt = buildAgentPrompt(action, chars, gaps, encounters, loreTitles);
-    const rawOutput = await callGitHubModels(prompt, model);
-
-    const parsed = parseDraftOutput(rawOutput);
-    if (!parsed) return res.status(422).json({ error: 'Agent output did not match expected format', raw: rawOutput });
-
-    const { attrs, reasoning, content } = parsed;
     const ts = new Date().toISOString().slice(0, 10);
-    let draftId, draftFm;
+    let draftId, draftFm, content;
 
     if (action === 'patch-fields') {
-      const field = (content.includes('## Talisman') || content.includes('## Shadow')) ? 'talisman-shadow' : 'bio';
-      draftId = `${attrs.slug}-${field}-${ts}`;
-      draftFm = { action, slug: attrs.slug, field, reasoning };
+      // Phase 1: deterministically pick the highest-priority gap (no AI call — models hallucinate slugs)
+      if (!gaps.length) return res.status(422).json({ error: 'No gaps to patch' });
+      const top = gaps[0];
+      const selection = {
+        slug: top.slug,
+        field: top.issues.includes('talisman') || top.issues.includes('shadow') ? 'talisman-shadow' : 'bio',
+        reason: `auto-selected: highest-priority gap (${top.issues.filter(i => !i.startsWith('broken')).join(', ')})`
+      };
+
+      // Phase 2: load full context and write
+      const char = chars.find(c => c.slug === selection.slug);
+      const relatedChars = (char.relations || []).map(r => chars.find(c => c.slug === r)).filter(Boolean);
+      // Load the full Opus architecture entry for this character
+      let architectureEntry = null;
+      try {
+        const archPath = path.join(LORE_DIR, 'arcana-architecture.md');
+        if (fs.existsSync(archPath)) {
+          const archDoc = fs.readFileSync(archPath, 'utf8');
+          const match = archDoc.match(new RegExp(`## \\d+\.\\s+${char.role.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')}[\\s\\S]*?(?=\n---\n## |$)`));
+          if (match) architectureEntry = match[0].trim();
+        }
+      } catch { /* ignore — falls back to ARCANA_NOTES */ }
+      content = await callGitHubModels(buildWritingPrompt(char, selection.field, relatedChars, architectureEntry), model, 2000);
+
+      draftId = `${char.slug}-${selection.field}-${ts}`;
+      draftFm = { action, slug: char.slug, field: selection.field, reasoning: selection.reason };
     } else if (action === 'add-encounter') {
+      const prompt = buildAgentPrompt(action, chars, gaps, encounters, loreTitles);
+      const rawOutput = await callGitHubModels(prompt, model);
+      const parsed = parseDraftOutput(rawOutput);
+      if (!parsed) return res.status(422).json({ error: 'Agent output did not match expected format', raw: rawOutput });
+      const { attrs, reasoning } = parsed;
+      content = parsed.content;
       draftId = `encounter-${[attrs.slugA, attrs.slugB].sort().join('--')}-${ts}`;
       draftFm = { action, slugA: attrs.slugA, slugB: attrs.slugB, title: attrs.title, reasoning };
     } else if (action === 'expand-lore') {
+      const prompt = buildAgentPrompt(action, chars, gaps, encounters, loreTitles);
+      const rawOutput = await callGitHubModels(prompt, model);
+      const parsed = parseDraftOutput(rawOutput);
+      if (!parsed) return res.status(422).json({ error: 'Agent output did not match expected format', raw: rawOutput });
+      const { attrs, reasoning } = parsed;
+      content = parsed.content;
       const loreSlug = (attrs.title || 'lore').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
       draftId = `lore-${loreSlug}-${ts}`;
-      draftFm = { action, title: attrs.title, reasoning };
+      draftFm = { action, title: attrs.title, targetId: loreSlug, reasoning };
     } else {
+      // coherence-check
+      const prompt = buildAgentPrompt(action, chars, gaps, encounters, loreTitles);
+      const rawOutput = await callGitHubModels(prompt, model);
+      const parsed = parseDraftOutput(rawOutput);
+      if (!parsed) return res.status(422).json({ error: 'Agent output did not match expected format', raw: rawOutput });
+      const { attrs, reasoning } = parsed;
+      content = parsed.content;
       draftId = `coherence-${ts}`;
-      draftFm = { action: 'coherence-check', title: attrs.title || 'Coherence Report', reasoning };
+      draftFm = { action: 'coherence-check', title: attrs.title || 'Coherence Report', targetId: `coherence-report-${ts}`, reasoning };
     }
 
     let front = '---\n';
     for (const [k, v] of Object.entries(draftFm)) front += `${k}: ${yamlStr(v)}\n`;
     front += '---\n';
     fs.writeFileSync(path.join(DRAFTS_DIR, `${draftId}.md`), front + '\n' + content, 'utf8');
-    res.json({ ok: true, draftId, reasoning, preview: content.slice(0, 300) });
+    res.json({ ok: true, draftId, reasoning: draftFm.reasoning, content });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

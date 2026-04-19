@@ -63,7 +63,7 @@ export const CHARACTERS = [
           "resourcefulness",
           "inspired action"
     ],
-    essence: "Cold archives. He knew the floods.",
+    essence: "Cold archives. He knew the odds.",
     detail: true,
     bio: bios["curator"],
     talisman: "Freddy's story is an inspiration for those who hold his card. It's a tale of perseverance and unexpected alliances, underpinned by relentless pursuit of knowledge. This card represents the power of wisdom and the importance of being open to unconventional paths. The holder of the Magician card might find themselves in unexpected intellectual pursuits or forming alliances that challenge their preconceived notions. A newfound curiosity and a knack for problem-solving may surface, bolstered by a deepening understanding of the intricate threads that weave together the fabric of your own reality.",
@@ -258,6 +258,8 @@ export const CHARACTERS = [
     essence: "The road is hard. I'll lead.",
     detail: true,
     bio: bios["shieldbearer"],
+    talisman: "Those who carry the Shieldbearer’s card may find their will sharpened to a single point, their path forward uncluttered by doubt. It is not brute force that moves you, but the quiet certainty of a river carving stone – slow, inevitable. The talisman lends itself to those moments when the body trembles but the hand remains steady, when the weight of resistance only firms your grip on the reins. It is for crossing bridges others deem broken, for holding the line when the line is all that remains.",
+    shadow: "The danger lies in mistaking the chariot for the road, the shield for the self. You may wake to find your hands fused to the reins, your shoulders permanently braced against an impact that never comes. Control, when unchecked, becomes its own prison—the armor grows inward, the wheels grind their own tracks deeper. There are paths that require surrender, battles where the shield must be laid down. The Shadow is the moment you realize you’ve been marching in circles, your determination now the very thing that blinds you.",
   },
   {
     n: 8,

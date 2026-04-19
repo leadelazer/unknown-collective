@@ -6,6 +6,9 @@ name: Elara Neumann
 tier: guardians
 slug: doorwarden
 hue: "#6E3A2B"
+flower: "Thistle"
+flowerMeaning: "austerity, defiance"
+palette: ["#6E3A2B", "#A85A3A", "#3A2218"]
 keywords: [upheaval, chaos, revelation]
 essence: The wall broke. He stayed put.
 detail: true

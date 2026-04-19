@@ -6,6 +6,9 @@ name: Luise von Wittelsbach
 tier: luminaries
 slug: duchess
 hue: "#55406B"
+flower: "Purple Hyacinth"
+flowerMeaning: "sorrow, forgiveness"
+palette: ["#55406B", "#8A6FA0", "#2A1E35"]
 keywords: [tradition, morality, spiritual wisdom]
 essence: Old blood. The tea was bitter.
 detail: true

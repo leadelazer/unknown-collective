@@ -6,6 +6,9 @@ name: null
 tier: guardians
 slug: ferryman
 hue: "#4A4A5A"
+flower: "Lavender"
+flowerMeaning: "distrust, solitude"
+palette: ["#4A4A5A", "#2E2E3A", "#7A7A8E"]
 keywords: [introspection, inner guidance, solitude]
 essence: "A boat on black water. Don't talk."
 detail: true

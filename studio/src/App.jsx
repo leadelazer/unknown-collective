@@ -132,7 +132,7 @@ export default function App() {
             allCharacters={characters}
             onSave={async (data) => {
               const r = await fetch(`${API}/characters/${selected.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-              if (r.ok) { showToast('Saved'); await loadAll(); }
+              if (r.ok) { showToast('Saved'); }
               else showToast('Save failed', 'error');
             }}
             onNavigate={slug => setSelected({ type: 'character', id: slug })}
@@ -145,7 +145,7 @@ export default function App() {
             allCharacters={characters}
             onSave={async (data) => {
               const r = await fetch(`${API}/encounters/${selected.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-              if (r.ok) { showToast('Saved'); await loadAll(); }
+              if (r.ok) { showToast('Saved'); }
               else showToast('Save failed', 'error');
             }}
             onDelete={async () => {
@@ -160,7 +160,7 @@ export default function App() {
             loreId={selected.id}
             onSave={async (data) => {
               const r = await fetch(`${API}/lore/${selected.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-              if (r.ok) { showToast('Saved'); await loadAll(); }
+              if (r.ok) { showToast('Saved'); }
               else showToast('Save failed', 'error');
             }}
             onDelete={async () => {

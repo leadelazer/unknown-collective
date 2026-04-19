@@ -6,6 +6,9 @@ name: "Amelia O'Sullivan"
 tier: custodians
 slug: florist
 hue: "#B8935A"
+flower: Lily of the Valley
+flowerMeaning: return of happiness
+palette: ["#B8935A", "#E8D5A3", "#6B5A3A"]
 keywords: [innocence, spontaneity, potential]
 essence: New shoes. A bouquet like a threat.
 detail: true

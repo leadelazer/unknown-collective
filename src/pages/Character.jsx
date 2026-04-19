@@ -52,7 +52,7 @@ function DetailedCharacter({ c, tier, navigate }) {
 
           <div className={styles.details}>
             <p className={`${styles.detailEyebrow} t-deco`}>
-              {c.arcana} · Tier of the {tier.short}
+              {c.flower ? `${c.flower} · ${c.flowerMeaning}` : `Tier of the ${tier.short}`}
             </p>
             <h1 className={`${styles.detailName} t-display`}>{c.role}</h1>
             {c.name && <p className={`${styles.detailPersonName} t-display`}>{c.name}</p>}
@@ -64,6 +64,14 @@ function DetailedCharacter({ c, tier, navigate }) {
                 <span key={k} className={`${styles.keyword} t-deco`}>{k}</span>
               ))}
             </div>
+
+            {c.palette?.length > 0 && (
+              <div className={styles.palette}>
+                {c.palette.map((hex, i) => (
+                  <span key={i} className={styles.paletteSwatch} style={{ background: hex }} title={hex} />
+                ))}
+              </div>
+            )}
 
             <p className={`${styles.essence} t-body`}>{c.essence}</p>
             {c.bio && (
@@ -94,6 +102,9 @@ function DetailedCharacter({ c, tier, navigate }) {
           <div className={styles.talismanGrid}>
             {c.talisman && (
               <div>
+                {c.flower && (
+                  <p className={`${styles.talismanFlower} t-deco`}>{c.flower}</p>
+                )}
                 <p className={`${styles.talismanLabel} t-deco`}>Talisman Qualities</p>
                 <h3 className={`${styles.talismanTitle} t-display`}>When Held</h3>
                 <p className={`${styles.talismanText} t-body`}>{c.talisman}</p>
@@ -112,7 +123,7 @@ function DetailedCharacter({ c, tier, navigate }) {
 
       <section className={styles.extras}>
         <div className={styles.extrasGrid}>
-          <div>
+          <div style={{ borderLeft: `2px solid ${c.hue}55`, paddingLeft: 'var(--space-5)' }}>
             <p className={`${styles.extrasLabel} t-deco`}>Artifact &amp; Sign</p>
             <h3 className={`${styles.artifactTitle} t-display`}>
               Carried by the {c.role.replace('The ', '').toLowerCase()}
@@ -145,7 +156,10 @@ function DetailedCharacter({ c, tier, navigate }) {
                         : <div className={styles.relationImg} style={{ background: r.hue + '44' }} />
                       }
                       <div>
-                        <span className={`${styles.relationArcana} t-deco`}>{r.arcana}</span>
+                        <span className={`${styles.relationArcana} t-deco`}>{r.flower || r.arcana}</span>
+                        {r.flowerMeaning && (
+                          <span className={`${styles.relationFlowerMeaning} t-body`}>{r.flowerMeaning}</span>
+                        )}
                         <span className={`${styles.relationRole} t-display`}>{r.role}</span>
                         {r.name && <span className={`${styles.relationPersonName} t-body`}>{r.name}</span>}
                       </div>
@@ -196,7 +210,7 @@ function StubCharacter({ c, tier, navigate }) {
 
         <div className={styles.details}>
           <p className={`${styles.detailEyebrow} t-deco`}>
-            {c.arcana} · Tier of the {tier.short}
+            {c.flower ? `${c.flower} · ${c.flowerMeaning}` : `Tier of the ${tier.short}`}
           </p>
           <h1 className={`${styles.detailName} t-display`}>{c.role}</h1>
           <div className={styles.ruleWrap}><DecoRule /></div>

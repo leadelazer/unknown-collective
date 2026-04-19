@@ -6,6 +6,9 @@ name: null
 tier: grounded
 slug: cook
 hue: "#8B7355"
+flower: "Chamomile"
+flowerMeaning: "patience in adversity"
+palette: ["#8B7355", "#B8A07A", "#5A4A35"]
 keywords: [balance, patience, purpose]
 essence: Sharp salt. Two pinches of regret.
 detail: true

@@ -6,6 +6,9 @@ name: null
 tier: custodians
 slug: keymaker
 hue: "#8A6F3A"
+flower: "White Lily"
+flowerMeaning: "purity, restored innocence"
+palette: ["#8A6F3A", "#C4A05A", "#4A3A22"]
 keywords: [rebirth, inner calling, absolution]
 essence: "A lock. A turn. You're free."
 detail: true

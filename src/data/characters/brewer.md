@@ -6,6 +6,9 @@ name: null
 tier: grounded
 slug: brewer
 hue: "#C89040"
+flower: "Sunflower"
+flowerMeaning: "adoration, loyalty"
+palette: ["#C89040", "#F0C060", "#8A6A28"]
 keywords: [joy, celebration, energy]
 essence: Long nights. The gin is clean.
 detail: true

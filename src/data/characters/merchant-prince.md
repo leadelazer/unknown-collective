@@ -6,6 +6,9 @@ name: null
 tier: luminaries
 slug: merchant-prince
 hue: "#7A2F2F"
+flower: "Dark Crimson Rose"
+flowerMeaning: "mourning"
+palette: ["#7A2F2F", "#4A1A1A", "#C4956A"]
 keywords: [authority, structure, regulation]
 essence: The city owes. He keeps count.
 detail: true
