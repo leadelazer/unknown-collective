@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-A React + Vite web app showcasing "The Unknown Collective" — 22 archetypal characters in Munich, each mapped to a Major Arcana tarot card. The site displays character profiles with biographical details, talisman/shadow card meanings, artifacts, and interconnected relationships.
+A React + Vite web app showcasing "The Unknown Collective" — 22 archetypal characters in an unnamed Central European city inspired by Munich, each mapped to a Major Arcana tarot card. The site displays character profiles with biographical details, talisman/shadow card meanings, artifacts, and interconnected relationships.
 
 **Repo root:** `unknown-collective/`  
 **Dev server:** `npm run dev` (runs on `http://localhost:5173`)  
@@ -86,9 +86,10 @@ Each entry in `src/data/characters.js` follows this schema:
    - `Name` → `name`
    - `Talisman` → `talisman`
    - `Shadow` → `shadow`
-   - `Short Description` → `essence` (1-2 sentences, poetic)
+  - `Short Description` → `essence` (1-2 sentences, poetic)
    - `Profile` / extended text → `bios/<slug>.md`
-4. **Write bio** to `src/data/bios/<slug>.md` — 4-5 paragraphs, 2-4 sentences each
+  - Replace named Munich references with abstract place types before writing
+4. **Write bio** to `src/data/bios/<slug>.md` — 4-5 paragraphs, 2-4 sentences each, with no named real Munich locations
 5. **Run** `npm run sync-bios` to regenerate `bios.js`
 6. **Update** `characters.js` with talisman, shadow, relations, artifact, quote, hue
 7. **Verify** in browser at `/character/<slug>`

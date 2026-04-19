@@ -4,7 +4,7 @@
 
 ---
 
-You are building the hidden architecture for a creative project called **The Unknown Collective** — 22 archetypal figures in Munich, each mapped to a Major Arcana tarot card. This architecture file is a reference document used only by AI agents writing character content. It never renders in the public-facing website.
+You are building the hidden architecture for a creative project called **The Unknown Collective** — 22 archetypal figures in an unnamed Central European city inspired by Munich, each mapped to a Major Arcana tarot card. This architecture file is a reference document used only by AI agents writing character content. It never renders in the public-facing website.
 
 Your task: produce a structured document that defines, for each of the 22 characters:
 
@@ -21,6 +21,7 @@ Your task: produce a structured document that defines, for each of the 22 charac
 ## Writing constraints
 
 - **Dry, specific, non-mystical.** This is architectural documentation, not spiritual guidance. Write like a researcher charting a system, not a tarot reader interpreting cards.
+- **No named real-world locations.** Use generic place types only: market square, riverbank, royal residence, English-style park, registry office. Munich is reference material, not text to be reproduced.
 - **The talismans and shadows must be translatable to prose.** An agent writing a talisman section should be able to read your "talisman logic" entry and produce 3-5 dry, concrete sentences. Give them the mechanism, not the mood.
 - **Flowers are not random.** Victorian floriography is a real system. Use it precisely. A flower chosen for visual prettiness is useless here.
 - **Tensions are structural, not narrative.** The Fool and The World are in tension because one is pure beginning and the other is completed integration — not because their characters would "clash at a dinner party."
@@ -60,12 +61,12 @@ Your task: produce a structured document that defines, for each of the 22 charac
 - **Florist**: Floriographic dictionary, annotated in three hands
 - **Curator**: Index of forgotten correspondences, bound in indigo
 - **Oracle**: Field notebook, Lake Starnberg, 1889
-- **Mapmaker**: Brass surveying compass, Isar course 1719
+- **Mapmaker**: Brass surveying compass, river course 1719
 - **Baker**: Sourdough starter in a clay crock (predates the Collective)
 - **Mirrormaker**: Obsidian hand mirror, surface never entirely still
 - **Obsidian Count**: Legal text, margins dense with annotations in dark blue ink
 - **Doorwarden**: Lockpicks, hand-forged, Indian yellow leather case
-- **Firefighter**: Fire axe, scorch marks of Munich Residenz fire 1750
+- **Firefighter**: Fire axe, scorch marks of a royal residence fire, 1750
 - **Keymaker**: Folded diagram of a cabinet that doesn't yet exist, labelled with future dates
 - **Lightkeeper**: Lamplighter's pole, brass tip still warm
 - **Tailor**: Needle case of polished bone, threads in colors not in any dye catalogue
