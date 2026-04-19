@@ -177,7 +177,6 @@ function DetailedCharacter({ c, tier, navigate }) {
                       }
                       <div>
                         <span className={`${styles.relationRole} t-display`}>{r.role}</span>
-                        {r.name && <span className={`${styles.relationPersonName} t-body`}>{r.name}</span>}
                         {(() => {
                           const note = description || c.relationNotes?.find(n => n.slug === slug)?.note;
                           return note ? <span className={`${styles.relationNote} t-body`}>{note}</span> : null;
