@@ -15,6 +15,13 @@ detail: true
 artifact: A small bottle of the gin, unlabelled. Given only on certain evenings. Never explained.
 quote: There will be time for all of it. But not until the glass is empty.
 relations: [gardener, cook, baker]
+relationNotes:
+  - slug: gardener
+    note: She brings botanicals to the still-room gate on Saturday mornings. The Brewer settles the account monthly.
+  - slug: cook
+    note: Kitchen scraps go to the distillery for stock. The arrangement has never been written down.
+  - slug: baker
+    note: The spent grain crosses the alley to the bakehouse. Neither party has ever discussed the arrangement.
 stories: []
 storyLabel: null
 ---

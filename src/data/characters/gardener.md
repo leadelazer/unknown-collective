@@ -15,6 +15,15 @@ detail: true
 artifact: null
 quote: null
 relations: [oracle, weavers, baker, brewer]
+relationNotes:
+  - slug: oracle
+    note: The Gardener leaves the gate unlatched on certain mornings. The Oracle is the only one who uses it.
+  - slug: weavers
+    note: The Weavers bought dried flowers from her stall three seasons running. The orders were identical each time.
+  - slug: baker
+    note: She delivers grain to the bakehouse every autumn. They do not converse.
+  - slug: brewer
+    note: He collects the botanical trimmings she leaves at the supply entrance each Saturday.
 stories: []
 storyLabel: null
 ---

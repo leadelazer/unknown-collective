@@ -15,6 +15,15 @@ detail: true
 artifact: null
 quote: Nothing ends. It only changes what it is becoming.
 relations: [ferryman, lightkeeper, curator, the-bind]
+relationNotes:
+  - slug: ferryman
+    note: The Ferryman's last crossing aligns with the Timekeeper's late count. One of them adjusts for the other.
+  - slug: lightkeeper
+    note: The lamp timing has shifted three minutes over four years. The Timekeeper has not mentioned it.
+  - slug: curator
+    note: The Curator found a clock in the archive that runs seven minutes fast. The Timekeeper wound it.
+  - slug: the-bind
+    note: The Bind took a record the Timekeeper had marked completed. The record was not returned.
 stories: []
 storyLabel: null
 ---

@@ -15,6 +15,13 @@ detail: true
 artifact: Index of forgotten correspondences, bound in indigo.
 quote: Every city keeps a second library. Mine is the one that reads you back.
 relations: [oracle, duchess, merchant-prince]
+relationNotes:
+  - slug: oracle
+    note: She came to the archive twice in a winter. Both times she left without speaking.
+  - slug: duchess
+    note: They have exchanged letters continuously for eleven years. The subject has never been fully resolved.
+  - slug: merchant-prince
+    note: The Merchant Prince funds two shelves of the archive. The Curator has not acknowledged this publicly.
 stories:
   - src: /assets/stories/friends.png
     title: Two scholars

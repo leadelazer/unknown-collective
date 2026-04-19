@@ -15,6 +15,15 @@ detail: true
 artifact: A shuttle of dark wood, still threaded. No one moves it. No one is sure who placed it there.
 quote: null
 relations: [weavers, curator, obsidian-count, timekeeper]
+relationNotes:
+  - slug: weavers
+    note: The Weavers made the first binding. The Bind does not record this as debt.
+  - slug: curator
+    note: The Curator holds one written account of the Bind's origin. The file is sealed.
+  - slug: obsidian-count
+    note: He cited the Bind in a ruling once. The argument was not accepted.
+  - slug: timekeeper
+    note: The Bind arrived before the Timekeeper last winter. Nothing was exchanged.
 stories: []
 storyLabel: null
 ---

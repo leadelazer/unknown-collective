@@ -15,6 +15,13 @@ detail: true
 artifact: A field notebook, Lake Starnberg, 1889.
 quote: I do not see the future. I see what the present is trying to be.
 relations: [curator, tailor, mapmaker]
+relationNotes:
+  - slug: curator
+    note: He once filed a letter she wrote to herself. She did not retrieve it.
+  - slug: tailor
+    note: He stitched the lining of her coat after she described, without knowing it, exactly what she needed.
+  - slug: mapmaker
+    note: He showed her a proof once — a street that appeared only on certain years. She corrected one detail. He kept the correction.
 stories:
   - src: /assets/stories/frederike-young.png
     title: Frederike, age nineteen

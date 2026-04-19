@@ -15,6 +15,15 @@ detail: true
 artifact: "A folded diagram, left on the Curator's desk, showing a schematic of a cabinet that does not yet exist. The tags in its drawers are labelled with future dates."
 quote: Try again. But ask differently.
 relations: [the-bind, duchess, doorwarden, mapmaker]
+relationNotes:
+  - slug: the-bind
+    note: A key was found threaded into the Bind's shuttle. The Keymaker was not asked about it.
+  - slug: duchess
+    note: She made the key for the Duchess's east correspondence box. A copy exists; it was never requested.
+  - slug: doorwarden
+    note: The Doorwarden orders duplicate blanks every quarter. The Keymaker does not ask what they unlock.
+  - slug: mapmaker
+    note: He left an access schematic on her workbench for a survey he could not otherwise complete.
 stories: []
 storyLabel: null
 ---

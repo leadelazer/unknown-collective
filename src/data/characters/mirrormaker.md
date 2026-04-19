@@ -15,6 +15,13 @@ detail: true
 artifact: An obsidian hand mirror, its surface never entirely still. Valentin claims it shows the viewer what they most need to see, not what they came to look at.
 quote: Everyone who sits before my mirror is disappointed. Most of them come back.
 relations: [obsidian-count, duchess, oracle]
+relationNotes:
+  - slug: obsidian-count
+    note: The Count sat before the mirror once and did not speak for a quarter hour. He paid double.
+  - slug: duchess
+    note: He made her mirror. She keeps it covered except when she is alone.
+  - slug: oracle
+    note: She stood in his shop for twenty minutes, then bought nothing. She returned the following week.
 stories: []
 storyLabel: null
 ---

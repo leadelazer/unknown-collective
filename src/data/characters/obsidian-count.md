@@ -15,6 +15,13 @@ detail: true
 artifact: "A legal text bound in black leather, its margins dense with Leopold's annotations in dark blue ink — a lifetime of adjustments to a law he has never quite accepted as sufficient."
 quote: The law is not justice. It is the closest we have managed to come.
 relations: [merchant-prince, curator, the-bind]
+relationNotes:
+  - slug: merchant-prince
+    note: They reached a settlement in a warehouse dispute. No clerk was present.
+  - slug: curator
+    note: He left a legal annotation in one of the archive's catalogues. The Curator did not remove it.
+  - slug: the-bind
+    note: The Bind complicated the Count's clearest case. He still considers the ruling unresolved.
 stories: []
 storyLabel: null
 ---

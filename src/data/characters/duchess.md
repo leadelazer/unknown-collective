@@ -15,6 +15,11 @@ detail: true
 artifact: Correspondence with Freddy, bound in silk ribbon.
 quote: Every city rewrites itself daily. My role is to remember which truths survive the revision.
 relations: [curator, florist]
+relationNotes:
+  - slug: curator
+    note: Eleven years of correspondence, kept in a silk-ribboned bundle in her writing room.
+  - slug: florist
+    note: She sent flowers to a funeral the Florist had already arranged. The order was identical.
 stories: []
 storyLabel: null
 ---

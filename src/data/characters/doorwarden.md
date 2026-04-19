@@ -15,6 +15,13 @@ detail: true
 artifact: A set of lockpicks, hand-forged, kept in a case of Indian yellow leather. Elara does not use them often. She rarely needs to.
 quote: I do not break doors down. I wait for them to understand that they have already opened.
 relations: [keymaker, mapmaker, merchant-prince]
+relationNotes:
+  - slug: keymaker
+    note: She provides the blanks. The Doorwarden copies what is needed and keeps no record.
+  - slug: mapmaker
+    note: He recorded this building's threshold in three surveys. The Doorwarden moved the mark each time.
+  - slug: merchant-prince
+    note: The Merchant Prince had the north entrance sealed. Elara received no instruction, only the bill.
 stories: []
 storyLabel: null
 ---
