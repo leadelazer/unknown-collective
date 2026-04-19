@@ -12,7 +12,7 @@ palette: ["#8B6B7A", "#C5B8C8", "#3A2A35"]
 keywords: [intuition, mystery, inner voice]
 essence: She watched. The truth was worse.
 detail: true
-artifact: A field notebook, Lake Starnberg, 1889.
+artifact: A field notebook, the lake, 1889.
 quote: I do not see the future. I see what the present is trying to be.
 relations: [curator, tailor, mapmaker]
 stories:
@@ -20,7 +20,7 @@ stories:
     title: Frederike, age nineteen
     caption: The year she left Hessen.
   - src: /assets/stories/lake.png
-    title: Lake Starnberg, twilight
+    title: The lake at twilight
     caption: Where the Oracle keeps her summers.
   - src: /assets/stories/lohengrin.png
     title: The Lohengrin

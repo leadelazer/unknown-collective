@@ -62,7 +62,7 @@ Justification: Foxglove's floriographic meaning of insincerity captures the Magi
 
 **Arcana mechanism:** The High Priestess is the mechanism of threshold — the boundary between what is conscious and what is not yet admitted. She does not create knowledge; she sits at the gate of it. The mechanism is delay and filtration: some things are not ready to be known, and the High Priestess is the structural reason why.
 
-**UC mapping:** An oracle does not advise. An oracle reports what is already present but unacknowledged. The Oracle of the Collective sits at Lake Starnberg with a field notebook, recording what surfaces — not interpreting, not guiding, only witnessing and transcribing. The role is custodianship of the liminal, not prophecy.
+**UC mapping:** An oracle does not advise. An oracle reports what is already present but unacknowledged. The Oracle of the Collective sits at a lake outside the city with a field notebook, recording what surfaces — not interpreting, not guiding, only witnessing and transcribing. The role is custodianship of the liminal, not prophecy.
 
 **Talisman logic:** The carrier's peripheral awareness increases. Information that was always available but filtered out — body signals, room dynamics, the thing no one is saying — becomes perceptible. The carrier does not gain new data; they lose the habit of ignoring existing data. Silence becomes legible.
 
@@ -270,7 +270,7 @@ Justification: Lavender in Victorian floriography carries the meaning of distrus
 
 **Arcana mechanism:** The Wheel of Fortune is the mechanism of cyclical change — not random chance but patterned recurrence. What goes up comes down, and the Wheel is the structural reason it does so reliably. The mechanism is rotation: no position is permanent, and anyone currently at the top has been at the bottom and will be again. The Wheel doesn't care about individuals; it cares about the pattern.
 
-**UC mapping:** A mapmaker records the shape of things that change. Streets change; the ink is dry. The role enacts the Wheel by being the person who documents cycles — the Isar course in 1719 is not the Isar course today, and the map is evidence of the shift. The Mapmaker doesn't control change; he proves it happened.
+**UC mapping:** A mapmaker records the shape of things that change. Streets change; the ink is dry. The role enacts the Wheel by being the person who documents cycles — the river's course in 1719 is not the river's course today, and the map is evidence of the shift. The Mapmaker doesn't control change; he proves it happened.
 
 **Talisman logic:** The carrier gains temporal perspective. Current crises lose urgency because the carrier perceives them as phases rather than states. Planning improves because the carrier can identify where in a cycle they currently sit. Timing sharpens — the carrier begins to recognize turns before they complete.
 
