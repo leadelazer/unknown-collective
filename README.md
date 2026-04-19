@@ -42,12 +42,24 @@ The studio exists because off-the-shelf tools weren't the right fit. World-build
 
 ---
 
+## Origins and Tools
+
+The character portraits were generated in 2020 using early Midjourney models — before the project had a name or a structure. Those images were the original creative spark: something about the faces produced by that specific moment in image generation demanded a world around them. The project is in some ways an attempt to catch up to that first impression.
+
+The current workflow lives almost entirely in VS Code, using GitHub Copilot agents that oscillate between GPT and Claude models depending on the task. The site design itself was produced as a concept test with Claude's design tool — one session, treated as a starting point rather than a specification. For ongoing concept work and for improving the texture and detail of the original portraits, ChatGPT remains a constant tool alongside everything else.
+
+The project spans five years of AI tooling, which is long enough to have watched the capabilities shift underneath the same creative problem several times.
+
+---
+
 ## Stack
 
 - **Frontend:** React 18, Vite, CSS Modules, GitHub Pages
 - **Content database:** Markdown + YAML frontmatter, custom sync pipeline
 - **Studio:** Node.js, Express, React
 - **Models:** OpenAI (GPT-4.1, GPT-4o-mini), Anthropic (Claude Sonnet)
+- **Images:** Midjourney (2020), ChatGPT image generation (texture refinement)
+- **Environment:** VS Code + GitHub Copilot agents
 
 ---
 
