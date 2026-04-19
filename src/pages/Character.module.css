@@ -218,7 +218,7 @@
 }
 
 .talismanText {
-  font-size: 17px;
+  font-size: var(--text-base);
   color: var(--color-paper-2);
   line-height: 1.7;
   margin-top: var(--space-4);
@@ -238,7 +238,7 @@
 }
 
 .shadowText {
-  font-size: 17px;
+  font-size: var(--text-base);
   color: var(--color-paper-2);
   line-height: 1.7;
   margin-top: var(--space-4);
@@ -367,7 +367,7 @@
 }
 
 .artifactText {
-  font-size: 17px;
+  font-size: var(--text-base);
   color: var(--color-paper-2);
   line-height: 1.7;
   margin-top: var(--space-4);

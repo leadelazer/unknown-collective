@@ -33,6 +33,22 @@ export const CHRONICLE = [
     "text": "The Baker's bio was too close to generic atmosphere, so I anchored the rewrite in labor: the winter arrival, the oven lit before dawn, the insistence on slow fermentation. The useful evidence was already in his arcana and keywords, which point toward suspension practiced by hand rather than grand symbolism. I kept the starter as an unresolved object because the character sharpens when he refuses explanation instead of offering lore on command. When pressed on the missing context, he gave nothing direct back except the implication that waiting was the point."
   },
   {
+    "id": "duchess--merchant-prince-encounter-20260419-210102",
+    "type": "agent-note",
+    "model": "gpt-4o-mini",
+    "action": "add-encounter",
+    "field": "encounter",
+    "slug": "\"\"",
+    "slugA": "merchant-prince",
+    "slugB": "duchess",
+    "title": "The Reluctant Transaction at the Central Square, March 1932",
+    "targetId": "\"\"",
+    "date": "\"2026-04-19T21:01:02.001Z\"",
+    "dateStr": "\"19 Apr MMXXVI · 21:01\"",
+    "persona": "\"\"",
+    "text": "This encounter offers a critical look at the transactional dynamics between authority and tradition in a time of economic strain. The tension arises from the Merchant Prince's rigid control over the marketplace juxtaposed with the Duchess's attempt to uphold moral values amidst the chaos—their meeting represents a clash of perspectives as societal norms shift. The title, \"The Reluctant Transaction at the Central Square,\" encapsulates both the physical setting and the undercurrents of necessity and resistance inherent in their exchange. The Merchant Prince's remark about the city's debts reinforces the weight of his authority in their complex relationship."
+  },
+  {
     "id": "curator-florist--florist-curator-encounter-20260419-200336",
     "type": "agent-note",
     "model": "gpt-4o-mini",

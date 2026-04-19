@@ -56,5 +56,15 @@ export const ENCOUNTERS = [
     ],
     "body": "On a damp afternoon in early April, The Curator and The Oracle met in a shared space near the central square. The air carried the scent of wet stone and decaying leaves. A modest café stood at the corner, patrons huddled beneath its awning, sheltered from the drizzle. They leaned over their cups, overhearing snippets of the conversation. \n\nThe Curator unfolded blueprints on the table. He traced the outlines of proposed exhibition spaces and public squares. His voice was measured, emphasizing the need for oversight and structure. The Oracle, arms crossed, offered glances that hinted at skepticism. She believed space should adapt organically, free from rigid plans. Tensions rose as they exchanged quiet barbs, dissecting each other's philosophies on community and space.\n\nNearby, The Gardener observed from a distance, pausing in her tasks. She could see the potential for conflict brewing, as The Curator's plans often overlooked the significance of nature within the urban fabric. The sound of distant traffic mixed with the soft plummet of rain, a reminder of the ever-changing environment surrounding them.\n\nIn the end, the discussion dissipated into murmurs, both parties retreating into silence. No agreements reached on how the riverbanks might be used. The atmosphere was thick with unfulfilled potential, leaving behind the promise of further disputes to come.",
     "hasContent": true
+  },
+  {
+    "id": "duchess--merchant-prince",
+    "title": "The Reluctant Transaction at the Central Square, March 1932",
+    "participants": [
+      "duchess",
+      "merchant-prince"
+    ],
+    "body": "On a gray afternoon in early March, the central square was crowded. Market stalls filled with cloth and food, buzzing with merchant chatter. The scent of baked goods mingled with the faint hint of damp earth. The Duchess approached the Merchant Prince, her steps sure yet cautious. \n\nThey stood near a fountain, its chipped stone weathered by years of use. He wore a tailored dark coat, meticulously clean but lacking warmth. She clutched a small velvet pouch, fingers tapping nervously against the fabric. Words were exchanged, low and tense. The Merchant Prince leaned closer, voice firm, while the Duchess maintained her composure. This was no casual meeting. \n\nOnlookers observed the exchange with keen interest. They stood just outside the circle of influence, captivated by the tension. One could feel the faint pulse of their unease, what lay beneath polished surfaces. Each was aware of the stakes: tradition versus innovation, family ties clashing with commercial logic. \n\nEventually, they parted ways, the pouch remaining securely in the Duchess' grasp. The square resumed its hum, but the air lingered with an unspoken agreement, a deal not yet sealed. Solutions waited, but for now, they remained unspoken and at odds.",
+    "hasContent": true
   }
 ];
