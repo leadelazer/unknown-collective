@@ -6,7 +6,6 @@
 .backdrop {
   position: absolute;
   inset: 0;
-  background-image: url('/assets/textures/dark-leaf-pattern.jpg');
   background-size: 800px;
   background-repeat: repeat;
   mix-blend-mode: screen;

@@ -45,7 +45,7 @@ jobs:
         env:
           # Set base path to repo name for GitHub Pages subdirectory hosting.
           # Override with '/' if using a custom domain.
-          VITE_BASE: ${{ vars.VITE_BASE || '/' }}
+          VITE_BASE: ${{ vars.VITE_BASE || '/unknown-collective/' }}
 
       - uses: actions/upload-pages-artifact@v3
         with:

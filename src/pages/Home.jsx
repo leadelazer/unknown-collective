@@ -8,6 +8,7 @@ import Footer from '../components/Footer.jsx';
 import TextureBackdrop from '../components/TextureBackdrop.jsx';
 import DecoRule from '../components/DecoRule.jsx';
 import DecoCorner from '../components/DecoCorner.jsx';
+import { assetUrl } from '../utils/assetUrl.js';
 import styles from './Home.module.css';
 
 export default function Home() {
@@ -102,7 +103,7 @@ function FeaturedPortraits({ navigate }) {
           onClick={() => navigate(`/character/${c.slug}`)}
         >
           <div className={styles.portraitFrame} />
-          <div className={styles.portraitImage} style={{ backgroundImage: `url(${c.img})` }} />
+          <div className={styles.portraitImage} style={{ backgroundImage: `url(${assetUrl(c.img)})` }} />
           <div className={`${styles.portraitNum} t-deco`}>{ROMAN[c.n]}</div>
           <div className={styles.portraitCaption}>
             <span className={`${styles.portraitArcana} t-deco`}>{c.arcana}</span>

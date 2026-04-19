@@ -6,6 +6,7 @@ import Footer from '../components/Footer.jsx';
 import TextureBackdrop from '../components/TextureBackdrop.jsx';
 import DecoRule from '../components/DecoRule.jsx';
 import { PortraitPlaceholder } from './Collective.jsx';
+import { assetUrl } from '../utils/assetUrl.js';
 import styles from './Character.module.css';
 
 export default function Character() {
@@ -45,7 +46,7 @@ function DetailedCharacter({ c, tier, navigate }) {
 
         <div className={styles.heroGrid}>
           <div className={styles.portraitWrap}>
-            <div className={styles.portrait} style={{ backgroundImage: `url(${c.img})` }} />
+            <div className={styles.portrait} style={{ backgroundImage: `url(${assetUrl(c.img)})` }} />
             <div className={`${styles.romanBadge} t-deco`}>{ROMAN[c.n]}</div>
           </div>
 
@@ -119,7 +120,7 @@ function DetailedCharacter({ c, tier, navigate }) {
             <p className={`${styles.artifactText} t-body`}>{c.artifact}</p>
             {c.stories?.[0] && (
               <img
-                src={c.stories[0].src}
+                src={assetUrl(c.stories[0].src)}
                 alt={c.stories[0].title}
                 className={styles.artifactImg}
               />
@@ -140,7 +141,7 @@ function DetailedCharacter({ c, tier, navigate }) {
                       onClick={() => navigate(`/character/${slug}`)}
                     >
                       {r.img
-                        ? <img src={r.img} alt={r.role} className={styles.relationImg} />
+                        ? <img src={assetUrl(r.img)} alt={r.role} className={styles.relationImg} />
                         : <div className={styles.relationImg} style={{ background: r.hue + '44' }} />
                       }
                       <div>
@@ -163,7 +164,7 @@ function DetailedCharacter({ c, tier, navigate }) {
           <div className={styles.storyGrid}>
             {c.stories.map(s => (
               <div key={s.title} className={styles.storyItem}>
-                <div className={styles.storyImage} style={{ backgroundImage: `url(${s.src})` }} />
+                <div className={styles.storyImage} style={{ backgroundImage: `url(${assetUrl(s.src)})` }} />
                 <p className={`${styles.storyTitle} t-display`}>{s.title}</p>
                 <p className={`${styles.storyCaption} t-body`}>{s.caption}</p>
               </div>
@@ -186,7 +187,7 @@ function StubCharacter({ c, tier, navigate }) {
         <div className={styles.portraitWrap}>
           <div
             className={styles.portrait}
-            style={c.img ? { backgroundImage: `url(${c.img})` } : { background: 'var(--color-ink-card)' }}
+            style={c.img ? { backgroundImage: `url(${assetUrl(c.img)})` } : { background: 'var(--color-ink-card)' }}
           >
             {!c.img && <PortraitPlaceholder role={c.role} hue={c.hue} />}
           </div>
