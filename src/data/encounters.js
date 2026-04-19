@@ -3,14 +3,25 @@
 
 export const ENCOUNTERS = [
   {
+    "id": "baker--cook--brewer",
+    "title": "The Ritual of the Market Courtyard",
+    "participants": [
+      "baker",
+      "cook",
+      "brewer"
+    ],
+    "body": "In the hour before the first bell, the market courtyard becomes a machine of three parts. An archivist from the lower registry, observing from a second-story window, recorded the synchronization of 1925. There was no conversation, only the overlapping sounds of labor that had become a shared vocabulary.\n\nThe Baker was the first to move, his hands white with flour as he carried the day's first trays across the damp stones. The Cook was already there, tending a pot that had been simmering since the previous evening; he took the dough without a word and offered a ladle of stock in return.\n\nFinally, the Brewer emerged from the alley, dragging the heavy sacks of spent grain. He left them by the Baker's door and took the bundles of herbs the Cook had set aside. It was a closed loop, a perfect economy of needs where no coin ever changed hands. The city woke to the smell of bread and woodsmoke, unaware of the silent treaty that made it possible.",
+    "hasContent": true
+  },
+  {
     "id": "curator--duchess",
-    "title": "curator & duchess",
+    "title": "The Archivist’s Silence",
     "participants": [
       "curator",
       "duchess"
     ],
-    "body": "",
-    "hasContent": false
+    "body": "In the dim light of the East Wing, the Duchess sat as she did every Tuesday, her silk gloves resting on a table that had seen better centuries. The Curator approached, his footsteps muffled by the indigo carpet. He carried a single, ribbon-bound bundle of letters.\n\nThey did not speak at first. The silence between them was a physical thing, built of eleven years of correspondence and a dozen shared secrets that had never been uttered aloud. \n\n\"The 1884 registry is complete,\" Freddy said finally, his voice like dry paper.\n\nLuise looked up, her expression unreadable behind the veil of her position. \"And the mention of the summer garden?\"\n\n\"Omitted,\" he replied. \"As we discussed.\"\n\nShe nodded once, a gesture that was both a dismissal and a deep acknowledgement. In the Collective, some truths were preserved by being written down, and others by being systematically erased. Theirs was the latter kind of trust.",
+    "hasContent": true
   },
   {
     "id": "curator--florist--gardener--oracle",
@@ -65,6 +76,26 @@ export const ENCOUNTERS = [
       "merchant-prince"
     ],
     "body": "On a gray afternoon in early March, the central square was crowded. Market stalls filled with cloth and food, buzzing with merchant chatter. The scent of baked goods mingled with the faint hint of damp earth. The Duchess approached the Merchant Prince, her steps sure yet cautious. \n\nThey stood near a fountain, its chipped stone weathered by years of use. He wore a tailored dark coat, meticulously clean but lacking warmth. She clutched a small velvet pouch, fingers tapping nervously against the fabric. Words were exchanged, low and tense. The Merchant Prince leaned closer, voice firm, while the Duchess maintained her composure. This was no casual meeting. \n\nOnlookers observed the exchange with keen interest. They stood just outside the circle of influence, captivated by the tension. One could feel the faint pulse of their unease, what lay beneath polished surfaces. Each was aware of the stakes: tradition versus innovation, family ties clashing with commercial logic. \n\nEventually, they parted ways, the pouch remaining securely in the Duchess' grasp. The square resumed its hum, but the air lingered with an unspoken agreement, a deal not yet sealed. Solutions waited, but for now, they remained unspoken and at odds.",
+    "hasContent": true
+  },
+  {
+    "id": "firefighter--mapmaker",
+    "title": "The Smoldering Chart",
+    "participants": [
+      "firefighter",
+      "mapmaker"
+    ],
+    "body": "Niklas laid the map across the charred workbench, the edges curling in the heat that still radiated from the walls. The Firefighter stood over him, his face streaked with soot and his breathing still heavy from the long night.\n\n\"The old exchange is gone,\" the Firefighter said, pointing a scarred finger at the center of the district. \"And the three houses behind the fountain. The wind turned east at midnight.\"\n\nThe Mapmaker dipped his pen into the indigo ink. \"I had just finished the elevations for those houses.\"\n\n\"Then you have a record of what they were,\" the Firefighter replied, his voice gruff. \"But this is what they are now.\"\n\nHe watched as Niklas began to draw the new reality—the blank spaces where the fire had eaten the history of the street. It was a grim collaboration: one man witnessing the destruction, the other ensuring that the city's memory remained accurate, even when that accuracy was painful.",
+    "hasContent": true
+  },
+  {
+    "id": "mirrormaker--tailor",
+    "title": "The Gilded Mirror",
+    "participants": [
+      "mirrormaker",
+      "tailor"
+    ],
+    "body": "Valentin held the obsidian glass steady while Elijah adjusted the pin in the client's lapel. It was a delicate dance performed in the narrow shop where the smell of cedar wood and expensive wool hung heavy in the air.\n\n\"The shoulder is still lying to us,\" Valentin murmured, his eyes fixed on the reflection, not the man.\n\nElijah sighed, his fingers tracing the seam of the dark velvet. \"It is not the shoulder that lies, Valentin. It is the heart beneath it. He wants to look like a man who has never known debt.\"\n\n\"Then we must give him the debt-free shoulder,\" the Mirrormaker replied. \"Even if it only lasts as long as the coat is buttoned.\"\n\nThey worked in silence for another hour, the Tailor shaping the illusion and the Mirrormaker verifying the truth of it. By the time the sun dipped below the city’s skyline, the man in the mirror was exactly who he wanted to be, even if the man in the shop was still afraid.",
     "hasContent": true
   }
 ];

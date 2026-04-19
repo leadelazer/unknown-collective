@@ -252,6 +252,19 @@ export const CHARACTERS = [
                 "note": "He collects the botanical trimmings she leaves at the supply entrance each Saturday."
           }
     ],
+    stories: [
+          {
+                "src": "/assets/stories/clara-sketched-by-frederike.png",
+                "title": "Carla, sketched by Frederike",
+                "caption": "A summer afternoon by the lake, 1892."
+          },
+          {
+                "src": "/assets/stories/floral-friends-maybe.png",
+                "title": "The Florist and the Gardener",
+                "caption": "Outside the glasshouse."
+          }
+    ],
+    storyLabel: "Botanical Sketches",
   },
   {
     n: 4,
@@ -1074,57 +1087,6 @@ export const CHARACTERS = [
     ],
     artifact: "A folded diagram, left on the Curator's desk, showing a schematic of a cabinet that does not yet exist. The tags in its drawers are labelled with future dates.",
     quote: "Try again. But ask differently.",
-  },
-  {
-    n: 21,
-    arcana: "The World",
-    role: "The Veilwalker",
-    tier: "guides",
-    slug: "veilwalker",
-    img: "/assets/echos/veilwalker.png",
-    hue: "#3A3A55",
-    flower: "Laurel",
-    flowerMeaning: "glory, accomplishment",
-    palette: [
-          "#3A3A55",
-          "#5A5A7A",
-          "#1E1E30"
-    ],
-    keywords: [
-          "completion",
-          "integration",
-          "travel"
-    ],
-    essence: "Tick. Tock. It is later now.",
-    detail: true,
-    bio: bios["veilwalker"],
-    talisman: "The veilwalker's talisman emanates wisdom and transcendence. Holders may find themselves attuned to the subtle energies that flow through existence — perceiving hidden threads that connect all things, glimpsing the world's interconnectedness. The gift is not power over time but presence within it: an ability to see the whole arc and to move within it with grace.",
-    shadow: "The shadow of the veilwalker urges caution in venturing too far into the void — the danger of becoming lost in the enigma of the unknown, drifting between worlds without grounding or purpose. The bearer risks mistaking detachment for wisdom, and observation for participation. To watch the world from too great a distance is to miss the life within it.",
-    relations: [
-          "ferryman",
-          "lightkeeper",
-          "curator",
-          "the-bind"
-    ],
-    relationNotes: [
-          {
-                "slug": "ferryman",
-                "note": "The Ferryman's last crossing aligns with the veilwalker's late count. One of them adjusts for the other."
-          },
-          {
-                "slug": "lightkeeper",
-                "note": "The lamp timing has shifted three minutes over four years. The veilwalker has not mentioned it."
-          },
-          {
-                "slug": "curator",
-                "note": "The Curator found a clock in the archive that runs seven minutes fast. The veilwalker wound it."
-          },
-          {
-                "slug": "the-bind",
-                "note": "The Bind took a record the veilwalker had marked completed. The record was not returned."
-          }
-    ],
-    quote: "Nothing ends. It only changes what it is becoming.",
   },
   {
     n: 21,

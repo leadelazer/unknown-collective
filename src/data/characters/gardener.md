@@ -24,8 +24,14 @@ relationNotes:
     note: She delivers grain to the bakehouse every autumn. They do not converse.
   - slug: brewer
     note: He collects the botanical trimmings she leaves at the supply entrance each Saturday.
-stories: []
-storyLabel: null
+stories:
+  - src: /assets/stories/clara-sketched-by-frederike.png
+    title: Carla, sketched by Frederike
+    caption: A summer afternoon by the lake, 1892.
+  - src: /assets/stories/floral-friends-maybe.png
+    title: The Florist and the Gardener
+    caption: Outside the glasshouse.
+storyLabel: Botanical Sketches
 ---
 
 ## Talisman
