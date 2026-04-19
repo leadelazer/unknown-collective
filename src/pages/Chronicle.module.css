@@ -53,6 +53,16 @@
   position: relative;
 }
 
+.fieldNoteBadge {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-4);
+  font-size: 7px;
+  letter-spacing: 0.35em;
+  color: var(--color-muted);
+  opacity: 0.7;
+}
+
 .echoPortrait {}
 
 .echoImg {
