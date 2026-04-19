@@ -1,4 +1,4 @@
-The Lightkeeper arrived in Munich in 1879, the year the city began installing its first electric street lamps. He appeared without much ceremony, taking up a position maintaining the older gas lanterns in the districts where the new light had not yet reached — and where, it was said, it somehow never quite arrived.
+The Lightkeeper arrived in the city in 1879, the year it began installing its first electric street lamps. He appeared without much ceremony, taking up a position maintaining the older gas lanterns in the districts where the new light had not yet reached — and where, it was said, it somehow never quite arrived.
 
 He was unhurried in everything. He moved through the evening streets with a lamplighter's pole and a quiet that was not unfriendliness but self-containment — the composure of someone who had learned long ago that darkness was not the problem people assumed it was.
 

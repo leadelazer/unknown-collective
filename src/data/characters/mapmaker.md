@@ -12,7 +12,7 @@ palette: ["#8C6E3A", "#C4A65E", "#4A3A22"]
 keywords: [cycles, change, fate]
 essence: Streets change. The ink is dry.
 detail: true
-artifact: A brass surveying compass, its casing engraved with the course of the Isar as it ran in 1719. The cerulean smudge on its dial face has never fully faded.
+artifact: A brass surveying compass, its casing engraved with the course of the river as it ran in 1719. The cerulean smudge on its dial face has never fully faded.
 quote: The city believes itself permanent. Every map I make proves it wrong.
 relations: [duchess, curator, oracle, keymaker, doorwarden, ferryman]
 relationNotes:

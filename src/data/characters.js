@@ -181,7 +181,7 @@ export const CHARACTERS = [
                 "note": "He showed her a proof once — a street that appeared only on certain years. She corrected one detail. He kept the correction."
           }
     ],
-    artifact: "A field notebook, Lake Starnberg, 1889.",
+    artifact: "A field notebook, the lake, 1889.",
     quote: "I do not see the future. I see what the present is trying to be.",
     stories: [
           {
@@ -191,7 +191,7 @@ export const CHARACTERS = [
           },
           {
                 "src": "/assets/stories/lake.png",
-                "title": "Lake Starnberg, twilight",
+                "title": "The lake at twilight",
                 "caption": "Where the Oracle keeps her summers."
           },
           {
@@ -473,7 +473,7 @@ export const CHARACTERS = [
                 "note": "He helped carry the cold frames from the garden wall the night of the lower-district fire. Nothing was said."
           }
     ],
-    artifact: "A fire axe, its handle worn smooth from use, its blade still bearing the scorch marks of the Munich Residenz fire of 1750. The axe is both tool and testimony — the instrument that broke open the Collective's hall door and let the survivors out into the night air.",
+    artifact: "A fire axe, its handle worn smooth from use, its blade still bearing the scorch marks of the fire at the royal residence in 1750. The axe is both tool and testimony — the instrument that broke open the Collective's hall door and let the survivors out into the night air.",
     quote: "I do not fight fire because I am unafraid of it. I fight it because I know what it takes.",
   },
   {
@@ -499,7 +499,7 @@ export const CHARACTERS = [
     essence: "A boat on black water. Don't talk.",
     detail: true,
     bio: bios["ferryman"],
-    talisman: "The Ferryman's worn oar, smoothed by the ceaseless caress of the Isar's currents, is the physical embodiment of his life lived in rhythm with the river. Those who carry this talisman might find themselves infused with the calm and steadiness that come from understanding the unchanging truth of change itself. They may discover an enhanced ability to navigate life's tumultuous currents, to remain poised amidst the whirlpools of chaos, and to guide others safely through tempestuous times. This talisman could impart the Ferryman's wisdom of the waters, his silent strength against the storm, and the patience of a soul that knows when to resist and when to go with the flow.",
+    talisman: "The Ferryman's worn oar, smoothed by the ceaseless caress of the river's currents, is the physical embodiment of his life lived in rhythm with the river. Those who carry this talisman might find themselves infused with the calm and steadiness that come from understanding the unchanging truth of change itself. They may discover an enhanced ability to navigate life's tumultuous currents, to remain poised amidst the whirlpools of chaos, and to guide others safely through tempestuous times. This talisman could impart the Ferryman's wisdom of the waters, his silent strength against the storm, and the patience of a soul that knows when to resist and when to go with the flow.",
     shadow: "The shadow side of the Ferryman suggests a struggle with the unpredictable tides of life, indicating resistance to the ever-changing currents. This shadow card presents an invitation to confront and integrate fear of uncertainty. It encourages bearers to venture into the unknown areas of their personal journey, despite the discomfort it may bring.",
     relations: [
           "mapmaker",
@@ -581,7 +581,7 @@ export const CHARACTERS = [
                 "note": "The river crossing appears on every map. The Ferryman's route appears on none of them."
           }
     ],
-    artifact: "A brass surveying compass, its casing engraved with the course of the Isar as it ran in 1719. The cerulean smudge on its dial face has never fully faded.",
+    artifact: "A brass surveying compass, its casing engraved with the course of the river as it ran in 1719. The cerulean smudge on its dial face has never fully faded.",
     quote: "The city believes itself permanent. Every map I make proves it wrong.",
   },
   {

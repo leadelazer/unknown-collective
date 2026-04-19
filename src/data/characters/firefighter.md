@@ -12,7 +12,7 @@ palette: ["#B25A2F", "#7A3A1E", "#E8A870"]
 keywords: [courage, patience, compassion]
 essence: Hot smoke. A brave, stupid run.
 detail: true
-artifact: "A fire axe, its handle worn smooth from use, its blade still bearing the scorch marks of the Munich Residenz fire of 1750. The axe is both tool and testimony — the instrument that broke open the Collective's hall door and let the survivors out into the night air."
+artifact: "A fire axe, its handle worn smooth from use, its blade still bearing the scorch marks of the fire at the royal residence in 1750. The axe is both tool and testimony — the instrument that broke open the Collective's hall door and let the survivors out into the night air."
 quote: I do not fight fire because I am unafraid of it. I fight it because I know what it takes.
 relations: [florist, mapmaker, keymaker, curator, gardener]
 relationNotes:
