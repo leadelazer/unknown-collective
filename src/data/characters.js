@@ -13,6 +13,13 @@ export const CHARACTERS = [
     slug: "florist",
     img: "/assets/echos/florist.png",
     hue: "#B8935A",
+    flower: "Lily of the Valley",
+    flowerMeaning: "return of happiness",
+    palette: [
+          "#B8935A",
+          "#E8D5A3",
+          "#6B5A3A"
+    ],
     keywords: [
           "innocence",
           "spontaneity",
@@ -27,6 +34,20 @@ export const CHARACTERS = [
           "curator",
           "gardener",
           "weavers"
+    ],
+    relationNotes: [
+          {
+                "slug": "curator",
+                "note": "He catalogued her dictionary once. She never asked him to."
+          },
+          {
+                "slug": "gardener",
+                "note": "They share a supplier. Nothing more has ever needed to be said."
+          },
+          {
+                "slug": "weavers",
+                "note": "The cloth and the flower arrived at the same ceremony. The occasion is not recorded."
+          }
     ],
     artifact: "Floriographic dictionary, annotated in three hands.",
     quote: "A yellow tulip says you are sunshine. A striped carnation says I cannot be with you. I sell both in the same week.",
@@ -58,6 +79,13 @@ export const CHARACTERS = [
     slug: "curator",
     img: "/assets/echos/curator.png",
     hue: "#D4B66E",
+    flower: "Foxglove",
+    flowerMeaning: "insincerity",
+    palette: [
+          "#D4B66E",
+          "#1A2744",
+          "#8B7340"
+    ],
     keywords: [
           "manifestation",
           "resourcefulness",
@@ -103,6 +131,13 @@ export const CHARACTERS = [
     slug: "oracle",
     img: "/assets/echos/oracle.png",
     hue: "#8B6B7A",
+    flower: "Moonflower",
+    flowerMeaning: "night-blooming",
+    palette: [
+          "#8B6B7A",
+          "#C5B8C8",
+          "#3A2A35"
+    ],
     keywords: [
           "intuition",
           "mystery",
@@ -148,6 +183,13 @@ export const CHARACTERS = [
     slug: "gardener",
     img: "/assets/echos/gardener.png",
     hue: "#6B8E4E",
+    flower: "Red Poppy",
+    flowerMeaning: "consolation, fertility",
+    palette: [
+          "#6B8E4E",
+          "#3A5A2A",
+          "#C4A35E"
+    ],
     keywords: [
           "fertility",
           "abundance",
@@ -173,6 +215,13 @@ export const CHARACTERS = [
     slug: "merchant-prince",
     img: "/assets/echos/merchant-prince.png",
     hue: "#7A2F2F",
+    flower: "Dark Crimson Rose",
+    flowerMeaning: "mourning",
+    palette: [
+          "#7A2F2F",
+          "#4A1A1A",
+          "#C4956A"
+    ],
     keywords: [
           "authority",
           "structure",
@@ -199,6 +248,13 @@ export const CHARACTERS = [
     slug: "duchess",
     img: "/assets/echos/duchess.png",
     hue: "#55406B",
+    flower: "Purple Hyacinth",
+    flowerMeaning: "sorrow, forgiveness",
+    palette: [
+          "#55406B",
+          "#8A6FA0",
+          "#2A1E35"
+    ],
     keywords: [
           "tradition",
           "morality",
@@ -225,6 +281,13 @@ export const CHARACTERS = [
     slug: "weavers",
     img: "/assets/echos/weavers.png",
     hue: "#A37B4E",
+    flower: "Honeysuckle",
+    flowerMeaning: "devoted affection",
+    palette: [
+          "#A37B4E",
+          "#D4B88A",
+          "#5A3A28"
+    ],
     keywords: [
           "harmony",
           "relationships",
@@ -250,6 +313,13 @@ export const CHARACTERS = [
     slug: "shieldbearer",
     img: "/assets/echos/shieldbearer.png",
     hue: "#3F5A6E",
+    flower: "Gladiolus",
+    flowerMeaning: "strength of character",
+    palette: [
+          "#3F5A6E",
+          "#2A3A4A",
+          "#7A9AAE"
+    ],
     keywords: [
           "determination",
           "control",
@@ -269,6 +339,13 @@ export const CHARACTERS = [
     slug: "firefighter",
     img: "/assets/echos/firefighter.png",
     hue: "#B25A2F",
+    flower: "Borage",
+    flowerMeaning: "courage",
+    palette: [
+          "#B25A2F",
+          "#7A3A1E",
+          "#E8A870"
+    ],
     keywords: [
           "courage",
           "patience",
@@ -297,6 +374,13 @@ export const CHARACTERS = [
     slug: "ferryman",
     img: "/assets/echos/ferryman.png",
     hue: "#4A4A5A",
+    flower: "Lavender",
+    flowerMeaning: "distrust, solitude",
+    palette: [
+          "#4A4A5A",
+          "#2E2E3A",
+          "#7A7A8E"
+    ],
     keywords: [
           "introspection",
           "inner guidance",
@@ -322,6 +406,13 @@ export const CHARACTERS = [
     slug: "mapmaker",
     img: "/assets/echos/mapmaker.png",
     hue: "#8C6E3A",
+    flower: "Snowdrop",
+    flowerMeaning: "hope, consolation in adversity",
+    palette: [
+          "#8C6E3A",
+          "#C4A65E",
+          "#4A3A22"
+    ],
     keywords: [
           "cycles",
           "change",
@@ -352,6 +443,13 @@ export const CHARACTERS = [
     slug: "obsidian-count",
     img: "/assets/echos/obsidian-count.png",
     hue: "#2B2B3A",
+    flower: "Black-Eyed Susan",
+    flowerMeaning: "justice",
+    palette: [
+          "#2B2B3A",
+          "#4A4A5E",
+          "#8A8A9A"
+    ],
     keywords: [
           "fairness",
           "truth",
@@ -378,6 +476,13 @@ export const CHARACTERS = [
     slug: "baker",
     img: "/assets/echos/baker.png",
     hue: "#A88655",
+    flower: "Asphodel",
+    flowerMeaning: "my regrets follow you to the grave",
+    palette: [
+          "#A88655",
+          "#705A38",
+          "#D4C4A0"
+    ],
     keywords: [
           "suspension",
           "sacrifice",
@@ -405,6 +510,13 @@ export const CHARACTERS = [
     slug: "the-bind",
     img: "/assets/echos/the-bind.png",
     hue: "#3A2F3A",
+    flower: "Cypress",
+    flowerMeaning: "mourning, death",
+    palette: [
+          "#3A2F3A",
+          "#1E1A1E",
+          "#6A5A6A"
+    ],
     keywords: [
           "endings",
           "transformation",
@@ -431,6 +543,13 @@ export const CHARACTERS = [
     slug: "cook",
     img: "/assets/echos/cook.png",
     hue: "#8B7355",
+    flower: "Chamomile",
+    flowerMeaning: "patience in adversity",
+    palette: [
+          "#8B7355",
+          "#B8A07A",
+          "#5A4A35"
+    ],
     keywords: [
           "balance",
           "patience",
@@ -457,6 +576,13 @@ export const CHARACTERS = [
     slug: "mirrormaker",
     img: "/assets/echos/mirrormaker.png",
     hue: "#5A3A3A",
+    flower: "Belladonna",
+    flowerMeaning: "silence, dangerous beauty",
+    palette: [
+          "#5A3A3A",
+          "#8A5555",
+          "#2A1A1A"
+    ],
     keywords: [
           "materialism",
           "bondage",
@@ -484,6 +610,13 @@ export const CHARACTERS = [
     slug: "doorwarden",
     img: "/assets/echos/doorwarden.png",
     hue: "#6E3A2B",
+    flower: "Thistle",
+    flowerMeaning: "austerity, defiance",
+    palette: [
+          "#6E3A2B",
+          "#A85A3A",
+          "#3A2218"
+    ],
     keywords: [
           "upheaval",
           "chaos",
@@ -510,6 +643,13 @@ export const CHARACTERS = [
     slug: "lightkeeper",
     img: "/assets/echos/lightkeeper.png",
     hue: "#C8A45A",
+    flower: "Star of Bethlehem",
+    flowerMeaning: "hope, purity",
+    palette: [
+          "#C8A45A",
+          "#F0DFA0",
+          "#5A4A2A"
+    ],
     keywords: [
           "hope",
           "faith",
@@ -537,6 +677,13 @@ export const CHARACTERS = [
     slug: "tailor",
     img: "/assets/echos/tailor.png",
     hue: "#4A5A7A",
+    flower: "Evening Primrose",
+    flowerMeaning: "inconstancy",
+    palette: [
+          "#4A5A7A",
+          "#7A8AAA",
+          "#2A2E40"
+    ],
     keywords: [
           "illusion",
           "subconscious",
@@ -563,6 +710,13 @@ export const CHARACTERS = [
     slug: "brewer",
     img: "/assets/echos/brewer.png",
     hue: "#C89040",
+    flower: "Sunflower",
+    flowerMeaning: "adoration, loyalty",
+    palette: [
+          "#C89040",
+          "#F0C060",
+          "#8A6A28"
+    ],
     keywords: [
           "joy",
           "celebration",
@@ -589,6 +743,13 @@ export const CHARACTERS = [
     slug: "keymaker",
     img: "/assets/echos/keymaker.png",
     hue: "#8A6F3A",
+    flower: "White Lily",
+    flowerMeaning: "purity, restored innocence",
+    palette: [
+          "#8A6F3A",
+          "#C4A05A",
+          "#4A3A22"
+    ],
     keywords: [
           "rebirth",
           "inner calling",
@@ -616,6 +777,13 @@ export const CHARACTERS = [
     slug: "timekeeper",
     img: "/assets/echos/timekeeper.png",
     hue: "#3A3A55",
+    flower: "Laurel",
+    flowerMeaning: "glory, accomplishment",
+    palette: [
+          "#3A3A55",
+          "#5A5A7A",
+          "#1E1E30"
+    ],
     keywords: [
           "completion",
           "integration",

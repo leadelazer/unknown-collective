@@ -1,55 +1,108 @@
-# Sonnet Follow-up Prompt: Apply Fields + Update Agents
-# Run AFTER reviewing the Opus output (lore/arcana-architecture.md).
-# This is a Copilot/Sonnet task — give it the Opus output + this prompt.
+# Sonnet Prompt: Abstract Location References Across Source Content
+# Give this prompt directly to an editing agent.
 
----
+Read `/Users/lea-mariedelazer/Projects/UC Experiment/agents.md` first for project rules.
 
-You are updating **The Unknown Collective** project after receiving an arcana architecture document from a previous analysis pass.
+Then perform this task:
 
-## Your tasks
+The Unknown Collective uses an unnamed Central European city as its setting. Munich can be a hidden blueprint for atmosphere only, but the published/source text must not mention real cities, districts, landmarks, streets, rivers, parks, royal buildings, regions, or other identifiable place names.
 
-### Task 1 — Save the architecture document
-Save the full Opus output to:
-```
-unknown-collective/src/data/lore/arcana-architecture.md
-```
-This file is a reference for AI agents. It must not be edited manually after saving — it's the source of truth for arcana-to-character mapping.
+Your job is to make a focused abstraction pass across the source markdown content and replace location-specific references with dry, believable generic equivalents.
 
-### Task 2 — Apply flower + palette to character files
-For each of the 22 characters, add these fields to the YAML frontmatter in `src/data/characters/<slug>.md`:
+Edit only source files here:
 
-```yaml
-flower: "[Name from Opus output]"
-flowerMeaning: "[Floriographic meaning, brief]"
-palette: ["[hex1]", "[hex2]", "[hex3]"]
-```
+- `unknown-collective/src/data/characters/*.md`
+- `unknown-collective/src/data/bios/*.md`
+- `unknown-collective/src/data/encounters/*.md`
+- `unknown-collective/src/data/lore/*.md`
 
-Rules:
-- Do NOT remove `hue` — it stays as the primary accent color used in the existing UI
-- `palette[0]` should match or be close to `hue`
-- Add after the `hue` line
-- Run `node src/data/sync-all.js` after all files are updated
+Do not edit generated files directly:
 
-### Task 3 — Update agent prompts in studio/scripts/agent-core.js
-In `buildWritingPrompt()`, after the character data section, add a call that loads and injects the relevant entry from `arcana-architecture.md` for the character being written. The server.js `buildWritingPrompt` call should pass the architecture entry as a string parameter.
+- `unknown-collective/src/data/characters.js`
+- `unknown-collective/src/data/bios.js`
 
-Specifically:
-- In `server.js`, read `lore/arcana-architecture.md` once at the start of the `/api/agent/run` handler
-- Parse out the entry for the chosen character by matching `## [n]. [Role]`
-- Pass it to `buildWritingPrompt(char, field, relatedChars, architectureEntry)`
-- In `agent-core.js`, update `buildWritingPrompt` signature and add the entry to the prompt under a section called `## Architecture reference (use this, do not summarise it):`
+After edits, run:
 
-### Task 4 — Update frontend to hide arcana, show flower
-In `src/pages/Character.jsx`:
-- Replace `{c.arcana} · Tier of the {tier.short}` with `{c.flower} · {c.flowerMeaning}`
-- In the relations section, replace `{r.arcana}` with `{r.flower}`
-- Add a palette swatch strip: 3 small circles using `c.palette` colors, positioned below the character portrait or above the artifact line
-
-The `arcana` field stays in the data (agents use it). It just stops displaying in the UI.
-
-### Task 5 — Run sync
 ```bash
 cd unknown-collective && node src/data/sync-all.js
 ```
 
-Verify no errors. If sync produces errors, fix them before finishing.
+## Rewrite goal
+
+Remove real-world geographic specificity while preserving tone, historical texture, and narrative function.
+
+This is not a global find/replace task. Read each sentence in context and rewrite it so it still sounds intentional.
+
+## What must be removed or abstracted
+
+Remove or abstract references to:
+
+- city names: `Munich`, `Hamburg`, `London`, `Heidelberg`, `Salzburg`, `Starnberg`, etc.
+- districts or neighborhoods
+- street names
+- named rivers, lakes, parks, squares, and markets
+- named landmarks, palaces, churches, registries, state buildings, estates, or institutions when they point to a real place
+- regional or national labels when they make the setting too concrete, such as `Bavaria`, `Bavarian`, or similar place-bound identifiers
+
+## What to replace them with
+
+Use abstract but concrete place-types such as:
+
+- `the city`
+- `the river`
+- `the market`
+- `the square`
+- `the old park`
+- `an English-style park`
+- `the royal residence`
+- `the registry`
+- `the port city`
+- `the southern estates`
+- `the northern trade routes`
+- `a lakeside town`
+
+Do not flatten everything into vague mush. Keep the sentence grounded in class, trade, geography, or civic function.
+
+## Style constraints
+
+- Keep the existing restrained literary tone.
+- Do not add fantasy language.
+- Do not add explanation about why the place is unnamed.
+- Do not turn specific places into generic placeholders if a more textured abstraction is available.
+- Keep character relationships, chronology, and facts intact unless the fact itself depends on a named real place.
+- Preserve sentence rhythm where possible.
+
+## Examples of good abstraction
+
+- `Munich` -> `the city`
+- `off the Viktualienmarkt` -> `off the market`
+- `near the Isar` -> `near the river`
+- `the Munich Residenz fire` -> `the fire at the royal residence`
+- `Englischer Garten` -> `the English-style park`
+- `Maximilianstraße` -> `the grand avenue`
+- `arrived from Hamburg` -> `arrived from a northern port city`
+- `left London for Munich` -> `left one capital for another inland city`
+
+## Additional caution
+
+If a person name contains a territorial title tied to a real place, only change it if the reference reads as geographic exposition rather than character identity. Prefer minimal edits. For example, if a line says `Duchess Luise of Bavaria` and the territorial tag is not essential, reduce it to `Duchess Luise`.
+
+## Deliverable standard
+
+Make the pass across all relevant source content fields:
+
+- bio text
+- talisman text
+- shadow text
+- artifacts
+- quotes, if needed
+- encounter body text
+- lore body text
+
+Do not create a report file. Just make the edits in place.
+
+When finished:
+
+1. run `node src/data/sync-all.js`
+2. verify no obvious city/place-name references remain in the edited markdown sources
+3. give a short summary of the most important abstractions you made

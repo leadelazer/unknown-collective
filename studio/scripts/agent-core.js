@@ -3,18 +3,15 @@
 
 export const WRITING_GUIDELINES = `## Voice & Tone (MANDATORY — read before writing anything)
 
-You are NOT writing fantasy, mythology, or self-help. You are writing about real-seeming people who happen to exist across centuries in a Central European city inspired by Munich, but never named directly. The voice is:
+You are NOT writing fantasy, mythology, or self-help. You are writing about real-seeming people who happen to exist across centuries in Munich. The voice is:
 - Journalistic, dry, observational. Like a case file or a quiet documentary.
-- Specific. Concrete nouns, ordinary places, physical details. "flour on his hands" not "blessed with ancient gifts."
+- Specific. Concrete nouns, actual places in Munich, physical details. "flour on his hands" not "blessed with ancient gifts."
 - Short sentences. Blunt. Then occasionally a longer one that lands.
 - No superlatives. No "bestowed," "empowered," "imbued," "ancient wisdom." No "remarkable," "extraordinary," "profound."
 - No fantasy language. No "mystical forces," "arcane powers," "sacred bonds," "ethereal." These are people, not wizards.
 - Avoid cliché pairings: "light and shadow," "chaos and order," "past and present."
-- Do NOT name real Munich locations, districts, streets, rivers, parks, landmarks, or institutions. Use abstract equivalents instead: "market square," "river," "royal residence," "English-style park," "registry office."
 
 BANNED WORDS: bestowed, imbued, empowered, ethereal, mystical, sacred, ancient wisdom, tapestry, enigmatic, realm, vessel, beacon, harbinger, profound, remarkable, transcend, celestial, luminous, destiny, fate (as a force), divine, arcane, eldritch, whisper (as metaphor for vague influence).
-
-BANNED LOCATION REFERENCES: Munich, Viktualienmarkt, Englischer Garten, Eisbach, Isar, Residenz, Maximilianstraße, Starnberg, Marienplatz, Schwabing, Bavaria, Bavarian.
 
 ### Bio rules
 4-5 paragraphs, blank line between each. Structure:
@@ -38,34 +35,13 @@ The cost. The blind spot. What this energy looks like when it curdles. Mirror th
 
 ### Encounter rules
 Witness/historian perspective — as if reconstructed from a municipal record or overheard testimony.
-2-4 paragraphs. Name a specific kind of place in the city, a season, a physical object. The encounter should feel like an event, not a mood.
+2-4 paragraphs. Name a specific place in Munich, a season, a physical object. The encounter should feel like an event, not a mood.
 
 ### Lore rules
 Scholar tone. Present evidence, acknowledge gaps. "There are three accounts of…" not "In the mists of time…"
 Do not invent facts that contradict existing bios. Where facts are ambiguous, name the ambiguity.
 
-Setting: an unnamed Central European city. Munich is only a blueprint. Characters exist across centuries but are not immortal in a fantasy sense — the Collective persists, members come and go across eras.`;
-
-const BANNED_LOCATION_REFERENCES = [
-  'munich',
-  'viktualienmarkt',
-  'englischer garten',
-  'eisbach',
-  'isar',
-  'residenz',
-  'maximilianstraße',
-  'maximilianstrasse',
-  'starnberg',
-  'marienplatz',
-  'schwabing',
-  'bavaria',
-  'bavarian',
-];
-
-function hasSpecificLocationReference(text) {
-  const lower = (text || '').toLowerCase();
-  return BANNED_LOCATION_REFERENCES.some(term => lower.includes(term));
-}
+Setting: Munich. Characters exist across centuries but are not immortal in a fantasy sense — the Collective persists, members come and go across eras.`;
 
 // Hidden architecture: what each arcana actually means as a mechanism.
 // Agents use this to ground talisman/shadow in the card's logic, not just the character's personality.
@@ -107,7 +83,6 @@ function gapScore(issues) {
     if (issue === 'shadow') return score + 5;
     if (issue === 'talisman-thin') return score + 3;
     if (issue === 'shadow-thin') return score + 3;
-    if (issue === 'location-specific') return score + 4;
     if (issue.startsWith('broken-relations')) return score + 1;
     return score;
   }, 0);
@@ -139,10 +114,6 @@ export function computeGaps(chars) {
     else {
       if (paragraphs < 4) issues.push('bio-structure');
       if (bioLength < 900) issues.push('bio-thin');
-    }
-
-    if (hasSpecificLocationReference(c.bio) || hasSpecificLocationReference(c.talisman) || hasSpecificLocationReference(c.shadow) || hasSpecificLocationReference(c.artifact)) {
-      issues.push('location-specific');
     }
 
     const broken = (c.relations || []).filter(r => !allSlugs.has(r));
@@ -211,7 +182,7 @@ export function buildAgentPrompt(action, chars, gaps, encounters, loreTitles = '
       `${c.role} (${c.slug}, ${c.arcana}): ${c.essence || ''} [${(c.keywords || []).join(', ')}]`
     ).join('\n');
 
-    return `You are writing an encounter for The Unknown Collective — 22 people in an unnamed Central European city who persist across centuries. These encounters should read like reconstructed incidents from a municipal archive, not fantasy set-pieces.
+    return `You are writing an encounter for The Unknown Collective — 22 people in Munich who persist across centuries. These encounters should read like reconstructed incidents from a municipal archive, not fantasy set-pieces.
 
 ## Pairs with a relation but no encounter yet:
 ${pairLines}
@@ -224,9 +195,9 @@ ${WRITING_GUIDELINES}
 ## Task
 Choose the pair whose tension would produce the most interesting incident. Not "archetypal resonance" — an actual event. A meeting, an argument, a transaction, a silence.
 
-The title should name what happened, not who was involved. Good: "What Was Agreed by the River, November 1923." Bad: "The Curator and the Oracle — A Meeting of Minds."
+The title should name what happened, not who was involved. Good: "What Was Agreed at the Eisbach, November 1923." Bad: "The Curator and the Oracle — A Meeting of Minds."
 
-Before writing, re-read the BANNED WORDS list and the BANNED LOCATION REFERENCES list. Strip any of those terms before submitting.
+Before writing, re-read the BANNED WORDS list. Strip any word from that list before submitting.
 
 Respond in this exact format:
 
@@ -235,7 +206,7 @@ One sentence: why this pair.
 </choice>
 
 <draft>
-[2-4 paragraphs. Name a specific kind of place in the city, a season or year, a physical object. Witness/historian perspective. Short sentences. No mythology. No named real-world locations.]
+[2-4 paragraphs. Name a specific Munich location, a season or year, a physical object. Witness/historian perspective. Short sentences. No mythology.]
 </draft>`;
   }
 
@@ -269,7 +240,6 @@ Write a coherence report. Check:
 2. Keywords — do they align with the tarot arcana meaning, or are they generic filler?
 3. Tier assignments — does the character's role match their tier definition?
 4. Tone — flag any existing text that violates the voice rules (fantasy language, banned words, generic phrasing)
-5. Geographic specificity — flag any use of real Munich place names or direct city naming that should be abstracted
 
 Respond in this exact format:
 
@@ -287,9 +257,6 @@ Brief summary: how many issues, severity.
 ## Tone Violations
 [flag specific phrases from existing content that use banned words or fantasy language]
 
-## Location Specificity
-[flag specific phrases that name Munich or real local landmarks and suggest abstract replacements]
-
 ## Recommendations
 [prioritized list of specific fixes, most impactful first]
 </draft>`;
@@ -300,7 +267,7 @@ Brief summary: how many issues, severity.
       `${c.role} (${c.slug}, ${c.arcana}, ${c.tier}): ${c.essence || ''}`
     ).join('\n');
 
-    return `You are expanding world lore for The Unknown Collective — 22 people in an unnamed Central European city who persist across centuries. Lore entries should read like academic footnotes or municipal history — not fantasy worldbuilding.
+    return `You are expanding world lore for The Unknown Collective — 22 people in Munich who persist across centuries. Lore entries should read like academic footnotes or municipal history — not fantasy worldbuilding.
 
 ## Existing lore entries: ${loreTitles}
 
@@ -310,11 +277,11 @@ ${charSummaries}
 ${WRITING_GUIDELINES}
 
 ## Task
-Identify a gap — something multiple characters' bios imply but that has no standalone entry yet. Good topics: a recurring kind of place in the city, how induction into the Collective actually works, what The Bind is in practical terms, a recurring event or ritual, the tier structure's origin.
+Identify a gap — something multiple characters' bios imply but that has no standalone entry yet. Good topics: a specific Munich location that keeps appearing, how induction into the Collective actually works, what The Bind is in practical terms, a recurring event or ritual, the tier structure's origin.
 
 Write like a researcher presenting findings. Cite which characters' records support each claim. Acknowledge contradictions instead of smoothing them over.
 
-Before writing, re-read the BANNED WORDS list and the BANNED LOCATION REFERENCES list. No fantasy language. No named real-world locations.
+Before writing, re-read the BANNED WORDS list. No fantasy language.
 
 Respond in this exact format:
 
@@ -350,7 +317,7 @@ export function buildSelectionPrompt(gaps) {
   }).join('\n');
   const validSlugs = gaps.map(g => g.slug).join(', ');
 
-  return `You are auditing The Unknown Collective — 22 characters in an unnamed Central European city. These characters have missing or weak content:
+  return `You are auditing The Unknown Collective — 22 characters in Munich. These characters have missing content:
 
 ${gapLines}
 
@@ -385,7 +352,7 @@ Bio: ${r.bio ? r.bio.slice(0, 400) + (r.bio.length > 400 ? '…' : '') : '(none)
     ? `Write BOTH ## Talisman and ## Shadow sections. Start immediately with "## Talisman". No preamble. No XML. Just the markdown.`
     : `Write a bio: 4-5 paragraphs, blank line between each. No section headers. No preamble. Start with the first paragraph.`;
 
-  return `You are writing ${field === 'talisman-shadow' ? 'talisman and shadow sections' : 'a bio'} for ${char.role} in The Unknown Collective — 22 real-seeming people in an unnamed Central European city, not a fantasy guild.
+  return `You are writing ${field === 'talisman-shadow' ? 'talisman and shadow sections' : 'a bio'} for ${char.role} in The Unknown Collective — 22 real-seeming people in Munich, not a fantasy guild.
 
 ## Character
 Role: ${char.role}
@@ -409,7 +376,7 @@ ${WRITING_GUIDELINES}
 ## Task
 ${taskDesc}
 
-Ground every sentence in the archetype logic above. Translate it into concrete behavioral or perceptual effects in the city without naming real places. Do not describe the archetype — embody it in specific, dry detail. If existing text contains named Munich references, replace them with abstract equivalents rather than preserving them.`;
+Ground every sentence in the archetype logic above. Translate it into concrete behavioral or perceptual effects in Munich. Do not describe the archetype — embody it in specific, dry detail.`;
 }
 
 // Parse the Phase 1 selection response
