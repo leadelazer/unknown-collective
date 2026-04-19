@@ -21,7 +21,7 @@ storyLabel: null
 
 ## Talisman
 
-The Ferryman's worn oar, smoothed by the ceaseless caress of the Isar's currents, is the physical embodiment of his life lived in rhythm with the river. Those who carry this talisman might find themselves infused with the calm and steadiness that come from understanding the unchanging truth of change itself. They may discover an enhanced ability to navigate life's tumultuous currents, to remain poised amidst the whirlpools of chaos, and to guide others safely through tempestuous times. This talisman could impart the Ferryman's wisdom of the waters, his silent strength against the storm, and the patience of a soul that knows when to resist and when to go with the flow.
+The Ferryman's worn oar, smoothed by the ceaseless caress of the river's currents, is the physical embodiment of his life lived in rhythm with the river. Those who carry this talisman might find themselves infused with the calm and steadiness that come from understanding the unchanging truth of change itself. They may discover an enhanced ability to navigate life's tumultuous currents, to remain poised amidst the whirlpools of chaos, and to guide others safely through tempestuous times. This talisman could impart the Ferryman's wisdom of the waters, his silent strength against the storm, and the patience of a soul that knows when to resist and when to go with the flow.
 
 ## Shadow
 

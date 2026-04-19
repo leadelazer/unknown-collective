@@ -1,4 +1,4 @@
-The Baker arrived in Munich in 1690, during a winter that tested the city's patience. He came not as a merchant but as a craftsman — a man who woke before dawn and kept his own hours, indifferent to the tempo of the city around him.
+The Baker arrived in the city in 1690, during a winter that tested its patience. He came not as a merchant but as a craftsman — a man who woke before dawn and kept his own hours, indifferent to the tempo of the city around him.
 
 He had learned the old way. Slow fermentation. Stone-ground flour. A sourness in the dough that came not from shortcuts but from time itself. The city's mills ground faster and finer; his did not. People came anyway.
 
