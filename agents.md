@@ -60,20 +60,26 @@ unknown-collective/
     │   ├── Tiers.jsx / .module.css       ← Tier overview (5 tiers)
     │   ├── Manifesto.jsx / .module.css
     │   ├── Chronicle.jsx / .module.css   ← Questions/interactive section
+    │   ├── Encounters.jsx / .module.css  ← Encounter index page
+    │   ├── Encounter.jsx / .module.css   ← Single encounter detail page
     │   └── About.jsx / .module.css
     │
     └── data/
         ├── characters.js        ← Master array: CHARACTERS (22 entries, ordered n: 0–21)
         ├── bios.js              ← Generated: { slug: [...paragraphs] } — do not edit manually
+        ├── encounters.js        ← Generated: ENCOUNTERS array — do not edit manually
         ├── bios/                ← Source markdown: <slug>.md — edit these
         │   ├── florist.md
         │   ├── curator.md
-        │   ├── oracle.md
-        │   ├── duchess.md
         │   └── ... (22 total)
+        ├── encounters/          ← Source markdown: <id>.md — edit these
+        │   └── <slugA>--<slugB>[--<slugC>...].md
+        ├── sync-all.js          ← Master sync: runs all sub-syncs
         ├── sync-bios.js         ← Script: reads bios/*.md → writes bios.js
+        ├── sync-encounters.js   ← Script: reads encounters/*.md → writes encounters.js
+        ├── pick-encounter.js    ← Game script: random encounter generator (see below)
         ├── BIOS_WORKFLOW.md     ← Notes on bio sync process
-        ├── tiers.js             ← Tier metadata (grounded, custodians, guardians, luminaries, guides)
+        ├── tiers.js             ← Tier metadata
         └── questions.js         ← Chronicle page content
 ```
 
@@ -89,6 +95,8 @@ unknown-collective/
 | `/tiers` | Tiers | 5-tier overview |
 | `/manifesto` | Manifesto | |
 | `/chronicle` | Chronicle | Interactive questions |
+| `/encounters` | Encounters | Index of all recorded encounters |
+| `/encounter/:id` | Encounter | Single encounter; `:id` = filename without `.md` |
 | `/about` | About | |
 
 ---
@@ -96,25 +104,120 @@ unknown-collective/
 ## Data Flow
 
 ```
-Notion (source of truth)
-  ↓  notion-search / notion-fetch
-bios/<slug>.md          (human-readable source)
-  ↓  npm run sync-bios
-bios.js                 (generated, auto-import)
-  ↓  import { bios }
-characters.js           (references bios.<slug>)
-  ↓  import { CHARACTERS }
-Character.jsx           (renders DetailedCharacter or StubCharacter)
+bios/<slug>.md              (human-readable source)
+  ↓  node src/data/sync-all.js
+bios.js                     (generated, auto-import)
+encounters/<id>.md          (human-readable source, named <slugA>--<slugB>.md)
+  ↓  node src/data/sync-all.js
+encounters.js               (generated, ENCOUNTERS array)
+  ↓  import { ENCOUNTERS }
+Character.jsx               (renders encounter list + slide-over panel)
+Encounters.jsx              (index of all encounters)
+Encounter.jsx               (single encounter detail: /encounter/:id)
 ```
 
-**Never edit `bios.js` directly.** Edit the `.md` file, then run `npm run sync-bios`.
+**Never edit `bios.js` or `encounters.js` directly.** Edit source `.md` files, then run `node src/data/sync-all.js`.
+
+---
+
+## Encounter Filename Convention
+
+Files live in `src/data/encounters/`. Filename format:
+
+```
+<slug1>--<slug2>[--<slug3>--<slug4>--<slug5>].md
+```
+
+Rules:
+- Each segment separated by `--` is **a single character slug** (not a compound)
+- Slugs are sorted by character `n` (arcana number), ascending
+- 2–5 participants per encounter
+- Each `<slug>.md` file must exist in `characters/`
+
+Examples:
+```
+curator--florist.md
+curator--florist--oracle.md
+curator--florist--gardener--oracle.md   ← 4-person encounter
+```
+
+Wrong (old format, do not use):
+```
+curator-florist--florist-curator.md     ← compound segments, not canonical
+```
+
+---
+
+## Encounter `era` Field (Timeline Enforcement)
+
+Characters can carry an optional `era` field in their frontmatter (an integer year):
+
+```yaml
+era: 1923
+```
+
+This means the character arrived in the city / joined the Collective no earlier than that year. The `pick-encounter.js` script uses this to filter eligible participants for a given year.
+
+Characters **without** an `era` field are treated as timeless — always available (guides, eternal presences, etc.).
+
+When writing bios or encounters, do not place a character in a scene before their `era` year.
+
+---
+
+## Random Encounter Generator
+
+```bash
+node src/data/pick-encounter.js
+node src/data/pick-encounter.js --year 1930
+node src/data/pick-encounter.js --count 3 --year 1945
+node src/data/pick-encounter.js --type argument
+node src/data/pick-encounter.js --seed oracle,ferryman
+node src/data/pick-encounter.js --seed oracle,ferryman --write   # creates stub .md file
+```
+
+Available `--type` values: `argument`, `gathering`, `chance`, `negotiation`, `observation`, `reckoning`, `convergence`, `commission`
+
+The script outputs:
+- A canonical filename suggestion
+- The year, encounter type, setting, and central tension
+- A full writer prompt ready to paste into Claude Code or an agent
+
+---
+
+## Common Tasks
+
+**Add/update a character bio:**
+1. Edit `src/data/bios/<slug>.md`
+2. Run `node src/data/sync-all.js`
+3. Verify `bios.js` updated
+
+**Add a new encounter:**
+1. Run `node src/data/pick-encounter.js --write` to generate a stub (or create manually)
+2. Write the encounter body in the `.md` file
+3. Run `node src/data/sync-all.js`
+4. Encounter appears automatically on character pages and `/encounters`
+
+**Set a character's era (timeline):**
+- Add `era: <year>` to the character's `characters/<slug>.md` frontmatter
+- Re-run `node src/data/sync-all.js`
+
+**Add character portrait:**
+- Place at `public/assets/echos/<slug>.png`
+
+**Unlock full character detail page:**
+- Set `detail: true` in `characters/<slug>.md` frontmatter
+- Ensure bio, talisman, shadow, relations are populated
+- Run `node src/data/sync-all.js`
+
+**Add story images:**
+- Place in `public/assets/stories/`
+- Add `stories: [...]` and `storyLabel: '...'` to character frontmatter
 
 ---
 
 ## Character Slugs (all 22)
 
 | n | Arcana | Slug |
-|---|---|---|
 | 0 | The Fool | `florist` |
 | 1 | The Magician | `curator` |
 | 2 | The High Priestess | `oracle` |

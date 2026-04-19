@@ -2,7 +2,7 @@
 
 A literary world-building project and AI content pipeline experiment — 22 archetypal characters mapped to the Major Arcana, inhabiting an unnamed Central European city across centuries.
 
-**[→ View the live site](https://lea-mariedelazer.github.io/unknown-collective/)**
+**[→ View the live site](https://leadelazer.github.io/unknown-collective/)**
 
 ---
 

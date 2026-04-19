@@ -28,7 +28,7 @@ function normalizeModelKey(model) {
 }
 
 function getAgentAvatarPath(model) {
-  return assetUrl(`/assets/models/${normalizeModelKey(model)}.png`);
+  return assetUrl(`/assets/models/${normalizeModelKey(model)}.jpg`);
 }
 
 function getAgentLabel(model) {

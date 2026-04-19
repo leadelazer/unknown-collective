@@ -78,17 +78,12 @@ if (fs.existsSync(encountersDir)) {
     const { title, body } = parseMd(raw);
     const participants = parseParticipants(basename, validSlugs);
 
-    // Flag malformed filenames (segments that didn't resolve to known slugs)
-    const segments = basename.split('--');
-    const malformed = segments.some(seg => findSlugsInSegment(seg, validSlugs).join('-') !== seg && !validSlugs.has(seg));
-
     encounters.push({
       id: basename,
       title: title || basename,
       participants,
       body,
       hasContent: body.length > 0,
-      ...(malformed ? { malformedFilename: true } : {}),
     });
   }
 }
@@ -105,7 +100,4 @@ fs.writeFileSync(outputFile, output);
 console.log(`✓ Synced ${encounters.length} encounters to encounters.js`);
 if (encounters.some(e => !e.hasContent)) {
   console.warn(`  ⚠  ${encounters.filter(e => !e.hasContent).length} encounter(s) have no body content`);
-}
-if (encounters.some(e => e.malformedFilename)) {
-  console.warn(`  ⚠  ${encounters.filter(e => e.malformedFilename).length} encounter(s) have malformed filenames — see agents.md for naming convention`);
 }
