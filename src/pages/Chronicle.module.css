@@ -176,3 +176,35 @@
   color: var(--color-muted);
   margin-top: var(--space-4);
 }
+
+@media (max-width: 1024px) {
+  .title {
+    font-size: 60px;
+  }
+}
+
+@media (max-width: 640px) {
+  .title {
+    font-size: 38px;
+  }
+
+  .content {
+    padding: var(--space-10) var(--page-padding) var(--space-16);
+  }
+
+  .echo {
+    grid-template-columns: 1fr;
+  }
+
+  .echoPortrait {
+    display: none;
+  }
+
+  .summonRow {
+    flex-direction: column;
+  }
+
+  .summonBtn {
+    width: 100%;
+  }
+}

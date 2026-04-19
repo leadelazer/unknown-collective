@@ -179,7 +179,7 @@ export const CHARACTERS = [
   {
     n: 12, arcana: 'The Hanged Man', role: 'The Baker',
     tier: 'grounded', slug: 'baker',
-    img: null, hue: '#A88655',
+    img: '/assets/echos/baker.png', hue: '#A88655',
     keywords: ['suspension', 'sacrifice', 'letting go'],
     essence: 'Hot bread. The world is wrong.',
     detail: true,
@@ -274,7 +274,7 @@ export const CHARACTERS = [
   {
     n: 19, arcana: 'The Sun', role: 'The Brewer',
     tier: 'grounded', slug: 'brewer',
-    img: null, hue: '#C89040',
+    img: '/assets/echos/brewer.png', hue: '#C89040',
     keywords: ['joy', 'celebration', 'energy'],
     essence: 'Long nights. The gin is clean.',
     detail: true,

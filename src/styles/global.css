@@ -135,3 +135,16 @@ img {
   margin: 0 auto;
   padding: 0 var(--page-padding);
 }
+
+/* ── Responsive tokens ── */
+@media (max-width: 1024px) {
+  :root {
+    --page-padding: var(--space-8);
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --page-padding: var(--space-5);
+  }
+}

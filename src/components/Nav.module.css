@@ -61,3 +61,63 @@
   color: var(--color-muted);
   letter-spacing: 0.2em;
 }
+
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--color-paper);
+  padding: 8px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .nav {
+    flex-wrap: wrap;
+    position: relative;
+  }
+
+  .location {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background: color-mix(in srgb, var(--color-ink) 95%, transparent);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: var(--border-gold-faint);
+    padding: var(--space-3) var(--space-5) var(--space-5);
+    gap: 0;
+    z-index: 10;
+  }
+
+  .links.menuOpen {
+    display: flex;
+  }
+
+  .links li {
+    border-bottom: 1px solid color-mix(in srgb, var(--color-gold) 15%, transparent);
+  }
+
+  .links li:last-child {
+    border-bottom: none;
+  }
+
+  .link {
+    width: 100%;
+    padding: 14px 0;
+    font-size: var(--text-xs);
+  }
+}
