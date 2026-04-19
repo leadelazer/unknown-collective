@@ -9,7 +9,6 @@
 export function assetUrl(path) {
   if (!path) return path;
   const base = import.meta.env.BASE_URL ?? '/';
-  return base.endsWith('/')
-    ? base + path.replace(/^\//, '')
-    : base + path;
+  const normalized = path.replace(/^\//, '');
+  return base.endsWith('/') ? base + normalized : base + '/' + normalized;
 }
