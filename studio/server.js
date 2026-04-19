@@ -16,9 +16,10 @@ const BIOS_DIR = path.join(DATA, 'bios');
 const ENCOUNTERS_DIR = path.join(DATA, 'encounters');
 const LORE_DIR = path.join(DATA, 'lore');
 const DRAFTS_DIR = path.join(DATA, 'drafts');
+const CHRONICLE_DIR = path.join(DATA, 'chronicle');
 const UC_ROOT = path.join(__dirname, '..');
 
-[ENCOUNTERS_DIR, LORE_DIR, DRAFTS_DIR].forEach(d => fs.mkdirSync(d, { recursive: true }));
+[ENCOUNTERS_DIR, LORE_DIR, DRAFTS_DIR, CHRONICLE_DIR].forEach(d => fs.mkdirSync(d, { recursive: true }));
 
 const app = express();
 app.use(cors());
@@ -173,9 +174,63 @@ function readLore() {
     });
 }
 
-// ─── Routes ───────────────────────────────────────────────────────────────────
+// ─── Chronicle helpers ────────────────────────────────────────────────────────
 
-// List all characters (index)
+// Max tokens for a chronicle field note: 2–4 sentences fits comfortably in 300 tokens
+const CHRONICLE_NOTE_MAX_TOKENS = 300;
+
+function formatDateStr(d) {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const romanYears = { 2024: 'MMXXIV', 2025: 'MMXXV', 2026: 'MMXXVI', 2027: 'MMXXVII', 2028: 'MMXXVIII', 2029: 'MMXXIX', 2030: 'MMXXX' };
+  const day = d.getUTCDate();
+  const month = months[d.getUTCMonth()];
+  const year = romanYears[d.getUTCFullYear()] || String(d.getUTCFullYear());
+  const hh = String(d.getUTCHours()).padStart(2, '0');
+  const mm = String(d.getUTCMinutes()).padStart(2, '0');
+  return `${day} ${month} ${year} · ${hh}:${mm}`;
+}
+
+function formatFileDate(d) {
+  const YYYY = d.getUTCFullYear();
+  const MM = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const DD = String(d.getUTCDate()).padStart(2, '0');
+  const hh = String(d.getUTCHours()).padStart(2, '0');
+  const mm = String(d.getUTCMinutes()).padStart(2, '0');
+  const ss = String(d.getUTCSeconds()).padStart(2, '0');
+  return `${YYYY}${MM}${DD}-${hh}${mm}${ss}`;
+}
+
+function buildChroniclePrompt(char, field, draftContent) {
+  const fieldLabel = field === 'talisman-shadow' ? 'talisman and shadow' : field;
+  const gapDesc = field === 'talisman-shadow'
+    ? `talisman and shadow descriptions were missing`
+    : `${fieldLabel} was empty`;
+  const contentPreview = (draftContent || '').slice(0, 300);
+  const flowerLine = char.flower ? `\n- Flower: ${char.flower}${char.flowerMeaning ? ` (${char.flowerMeaning})` : ''}` : '';
+  return `You are writing a field note — a brief archival log entry made by the agent that just patched this character record.
+
+Voice: quiet archivist. Measured, specific, a little distant. Like a note left in a margin.
+Length: exactly 2–4 sentences.
+Do not use: "I explored", "I crafted", "I delved", "I created", "I generated", "I developed", "fascinating", "intricate", "tapestry", "nuanced".
+Do not mention: AI, language model, or prompt.
+Do not repeat the model name — it is in the frontmatter.
+Do not start with "I".
+
+Character context:
+- Name: ${char.name || char.role}
+- Role: ${char.role}
+- Arcana: ${char.arcana}
+- Keywords: ${(char.keywords || []).join(', ')}
+- Essence: ${char.essence || '(none)'}${flowerLine}
+
+Field patched: ${fieldLabel}
+Gap found: The ${char.role}'s ${gapDesc}.
+Draft begins: "${contentPreview}"
+
+Write only the field note body. No preamble, no sign-off, no quotation marks.`;
+}
+
+// ─── Routes ───────────────────────────────────────────────────────────────────
 app.get('/api/characters', (req, res) => {
   const chars = fs.readdirSync(CHARS_DIR).filter(f => f.endsWith('.md')).map(f => {
     const slug = path.basename(f, '.md');
@@ -375,15 +430,17 @@ app.delete('/api/drafts/:id', (req, res) => {
   res.json({ ok: true });
 });
 
-app.post('/api/drafts/:id/approve', (req, res) => {
+app.post('/api/drafts/:id/approve', async (req, res) => {
   const file = path.join(DRAFTS_DIR, `${req.params.id}.md`);
   if (!fs.existsSync(file)) return res.status(404).json({ error: 'Draft not found' });
   const raw = fs.readFileSync(file, 'utf8');
   const { fm, body } = parseFrontmatter(raw);
+  let charForChronicle = null;
   try {
     if (fm.action === 'patch-fields' && fm.slug) {
       const char = readChar(fm.slug);
       if (!char) return res.status(404).json({ error: `Character ${fm.slug} not found` });
+      charForChronicle = char;
       if (fm.field === 'talisman-shadow') {
         const sections = parseSections(body);
         writeChar(fm.slug, { ...char, talisman: sections.talisman || char.talisman, shadow: sections.shadow || char.shadow });
@@ -398,6 +455,44 @@ app.post('/api/drafts/:id/approve', (req, res) => {
       fs.writeFileSync(path.join(LORE_DIR, `${loreId}.md`), `---\ntitle: ${yamlStr(fm.title || loreId)}\n---\n\n${body}`, 'utf8');
     }
     fs.unlinkSync(file);
+
+    // Run sync-all to rebuild generated JS files
+    try {
+      execSync('node src/data/sync-all.js', { cwd: UC_ROOT, encoding: 'utf8' });
+    } catch (syncErr) {
+      console.error('sync-all failed after approve:', syncErr.message);
+    }
+
+    // Generate chronicle entry for patch-fields approvals (best-effort)
+    if (fm.action === 'patch-fields' && fm.slug && charForChronicle) {
+      try {
+        const field = fm.field || 'bio';
+        const model = fm.model || 'gpt-4o-mini';
+        const noteText = await callGitHubModels(buildChroniclePrompt(charForChronicle, field, body), model, CHRONICLE_NOTE_MAX_TOKENS);
+        const now = new Date();
+        const fileId = `${fm.slug}-${field}-${formatFileDate(now)}`;
+        const content = [
+          '---',
+          `id: ${fileId}`,
+          `type: agent-note`,
+          `model: ${model}`,
+          `action: ${fm.action}`,
+          `field: ${field}`,
+          `slug: ${fm.slug}`,
+          `date: ${now.toISOString()}`,
+          `dateStr: ${formatDateStr(now)}`,
+          `persona: ${fm.slug}`,
+          '---',
+          '',
+          noteText.trim(),
+        ].join('\n');
+        fs.writeFileSync(path.join(CHRONICLE_DIR, `${fileId}.md`), content, 'utf8');
+        execSync('node src/data/sync-chronicle.js', { cwd: UC_ROOT, encoding: 'utf8' });
+      } catch (chronicleErr) {
+        console.error('Chronicle generation failed:', chronicleErr.message);
+      }
+    }
+
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -446,7 +541,7 @@ app.post('/api/agent/run', async (req, res) => {
       content = await callGitHubModels(buildWritingPrompt(char, selection.field, relatedChars, architectureEntry), model, 2000);
 
       draftId = `${char.slug}-${selection.field}-${ts}`;
-      draftFm = { action, slug: char.slug, field: selection.field, reasoning: selection.reason };
+      draftFm = { action, model, slug: char.slug, field: selection.field, reasoning: selection.reason };
     } else if (action === 'add-encounter') {
       const prompt = buildAgentPrompt(action, chars, gaps, encounters, loreTitles);
       const rawOutput = await callGitHubModels(prompt, model);

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { CHARACTERS } from '../data/characters.js';
+import { CHRONICLE } from '../data/chronicle.js';
 import Nav from '../components/Nav.jsx';
 import Footer from '../components/Footer.jsx';
 import TextureBackdrop from '../components/TextureBackdrop.jsx';
@@ -21,8 +22,23 @@ const SEED_ECHOES = [
   },
 ];
 
+const agentEntries = CHRONICLE.map(e => ({
+  id: e.id,
+  author: `${e.model} · ${e.field}`,
+  persona: e.slug,
+  dateStr: e.dateStr,
+  text: e.text,
+  type: 'agent-note',
+}));
+
+const ALL_ECHOES = [...SEED_ECHOES, ...agentEntries].sort((a, b) => {
+  const dateA = a.id.match(/(\d{8}-\d{6})$/)?.[1] || '00000000-000000';
+  const dateB = b.id.match(/(\d{8}-\d{6})$/)?.[1] || '00000000-000000';
+  return dateB.localeCompare(dateA);
+});
+
 export default function Chronicle() {
-  const [echoes, setEchoes] = useState(SEED_ECHOES);
+  const [echoes, setEchoes] = useState(ALL_ECHOES);
   const [loading, setLoading] = useState(false);
   const [seed, setSeed] = useState('');
 
@@ -97,6 +113,9 @@ function EchoCard({ e }) {
 
   return (
     <article className={styles.echo}>
+      {e.type === 'agent-note' && (
+        <span className={`${styles.fieldNoteBadge} t-deco`}>FIELD NOTE</span>
+      )}
       <div className={styles.echoPortrait}>
         {c.img
           ? <img src={assetUrl(c.img)} alt={c.role} className={styles.echoImg} />
