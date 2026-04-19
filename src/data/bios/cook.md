@@ -1,4 +1,4 @@
-The Cook arrived in Munich in 1702. He opened no shop, posted no sign, and made no announcement — he simply began to cook, in a small kitchen off the Viktualienmarkt, for whoever arrived. No one could later recall who had told them to go there.
+The Cook arrived in the city in 1702. He opened no shop, posted no sign, and made no announcement — he simply began to cook, in a small kitchen off the market, for whoever arrived. No one could later recall who had told them to go there.
 
 People began to notice: conversations lasted longer in his presence. Feuds dissolved without resolution — simply faded, somewhere between the soup and the bread. His meals stretched past their natural conclusion, as if time itself had grown a larger appetite.
 

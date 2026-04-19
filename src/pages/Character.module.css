@@ -247,26 +247,86 @@
   max-width: 460px;
 }
 
-/* ── Extras ── */
-.extras {
-  padding: 100px var(--page-padding);
+/* ── Floriography band ── */
+.floriography {
+  border-top: var(--border-gold-faint);
+  background: color-mix(in srgb, var(--color-gold) 4%, transparent);
+  padding: 48px var(--page-padding);
+  max-width: var(--max-width);
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-20);
+}
+
+.floriographyText {
+  flex: 1;
+}
+
+.floriographyLabel {
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  letter-spacing: 0.4em;
+  margin-bottom: var(--space-3);
+}
+
+.floriographyFlower {
+  font-size: 38px;
+  color: var(--color-paper);
+  line-height: 1.1;
+  margin-bottom: var(--space-2);
+}
+
+.floriographyMeaning {
+  font-size: 15px;
+  color: var(--color-muted);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.floriographyPalette {
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+/* ── Lower section (artifact · relations · encounters) ── */
+.lower {
+  border-top: var(--border-gold-faint);
+  padding: 80px var(--page-padding);
   max-width: var(--max-width);
   margin: 0 auto;
   position: relative;
   z-index: 2;
 }
 
-.extrasGrid {
+.lowerGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-20);
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-16);
+  align-items: start;
 }
 
-.extrasLabel {
+.lowerLabel {
   font-size: var(--text-xs);
   color: var(--color-gold);
   letter-spacing: 0.4em;
   margin-bottom: var(--space-5);
+}
+
+.artifactBlock {}
+.relationsBlock {}
+
+.encountersBlock {}
+
+.encountersEmpty {
+  font-size: 14px;
+  color: var(--color-muted);
+  font-style: italic;
+  line-height: 1.7;
+  padding: var(--space-6);
+  border: 1px dashed color-mix(in srgb, var(--color-gold) 22%, transparent);
 }
 
 .artifactTitle {
@@ -339,19 +399,13 @@
   color: var(--color-paper);
 }
 
-.relationPersonName {
+.relationNote {
   display: block;
-  font-size: var(--text-sm);
+  font-size: 13px;
   color: var(--color-muted);
-}
-
-.relationDescription {
-  display: block;
-  font-size: 14px;
-  color: var(--color-paper-2);
   line-height: 1.5;
   margin-top: var(--space-2);
-  max-width: 340px;
+  max-width: 300px;
 }
 
 /* ── Story strip ── */
@@ -453,7 +507,8 @@
     gap: var(--space-12);
   }
 
-  .extrasGrid {
+  .extrasGrid,
+  .lowerGrid {
     grid-template-columns: 1fr;
     gap: var(--space-12);
   }
@@ -493,7 +548,8 @@
     padding: 60px var(--page-padding);
   }
 
-  .extras {
+  .extras,
+  .lower {
     padding: 60px var(--page-padding);
   }
 

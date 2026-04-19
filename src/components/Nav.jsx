@@ -54,7 +54,7 @@ export default function Nav() {
         ))}
       </ul>
 
-      <span className={`${styles.location} t-deco`}>München · MMXXVI</span>
+      <span className={`${styles.location} t-deco`}>MMXXVI</span>
 
       <button
         className={styles.hamburger}

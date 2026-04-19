@@ -1,4 +1,4 @@
-Elara Neumann moved to Munich from Hamburg in 1729, drawn by the city's particular quality of concealment — the sense that its most interesting rooms were not on any map. She established a small locksmith's shop that quickly gained a reputation for one specific skill: her extraordinary understanding of locks that should not, by ordinary reasoning, open.
+Elara Neumann moved to the city from a northern port in 1729, drawn by its particular quality of concealment — the sense that its most interesting rooms were not on any map. She established a small locksmith's shop that quickly gained a reputation for one specific skill: her extraordinary understanding of locks that should not, by ordinary reasoning, open.
 
 She had no formal training beyond what her father had taught her, and yet she could read a mechanism the way others read a face — instinctively, as if the lock were communicating something it wanted her to know. She learned to listen before she reached for her tools.
 

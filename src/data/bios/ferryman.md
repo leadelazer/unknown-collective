@@ -1,4 +1,4 @@
-The Ferryman arrived in Munich in 1899, his joining tied to a significant flood — a soul shaped by the river long before the Collective ever found him. He has spent lifetimes reading the Isar, learning the language of its currents, its silences, and its sudden rages.
+The Ferryman arrived in the city in 1899, his joining tied to a significant flood — a soul shaped by the river long before the Collective ever found him. He has spent lifetimes reading the river, learning the language of its currents, its silences, and its sudden rages.
 
 He is a man of thresholds. His work is not merely the crossing of water but the movement between states — physical and spiritual, known and unknown. Those who ride with him often find themselves changed by the time they reach the other bank.
 

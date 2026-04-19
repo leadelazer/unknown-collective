@@ -15,6 +15,13 @@ detail: true
 artifact: Floriographic dictionary, annotated in three hands.
 quote: A yellow tulip says you are sunshine. A striped carnation says I cannot be with you. I sell both in the same week.
 relations: [curator, gardener, weavers]
+relationNotes:
+  - slug: curator
+    note: He catalogued her dictionary once. She never asked him to.
+  - slug: gardener
+    note: They share a supplier. Nothing more has ever needed to be said.
+  - slug: weavers
+    note: The cloth and the flower arrived at the same ceremony. The occasion is not recorded.
 stories:
   - src: /assets/artifacts/floriography.png
     title: Floriographic plate

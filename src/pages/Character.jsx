@@ -6,7 +6,6 @@ import Footer from '../components/Footer.jsx';
 import TextureBackdrop from '../components/TextureBackdrop.jsx';
 import DecoRule from '../components/DecoRule.jsx';
 import { PortraitPlaceholder } from './Collective.jsx';
-import { assetUrl } from '../utils/assetUrl.js';
 import styles from './Character.module.css';
 
 export default function Character() {
@@ -46,7 +45,7 @@ function DetailedCharacter({ c, tier, navigate }) {
 
         <div className={styles.heroGrid}>
           <div className={styles.portraitWrap}>
-            <div className={styles.portrait} style={{ backgroundImage: `url(${assetUrl(c.img)})` }} />
+            <div className={styles.portrait} style={{ backgroundImage: `url(${c.img})` }} />
             <div className={`${styles.romanBadge} t-deco`}>{ROMAN[c.n]}</div>
           </div>
 
@@ -102,9 +101,6 @@ function DetailedCharacter({ c, tier, navigate }) {
           <div className={styles.talismanGrid}>
             {c.talisman && (
               <div>
-                {c.flower && (
-                  <p className={`${styles.talismanFlower} t-deco`}>{c.flower}</p>
-                )}
                 <p className={`${styles.talismanLabel} t-deco`}>Talisman Qualities</p>
                 <h3 className={`${styles.talismanTitle} t-display`}>When Held</h3>
                 <p className={`${styles.talismanText} t-body`}>{c.talisman}</p>
@@ -121,26 +117,51 @@ function DetailedCharacter({ c, tier, navigate }) {
         </section>
       )}
 
-      <section className={styles.extras}>
-        <div className={styles.extrasGrid}>
-          <div style={{ borderLeft: `2px solid ${c.hue}55`, paddingLeft: 'var(--space-5)' }}>
-            <p className={`${styles.extrasLabel} t-deco`}>Artifact &amp; Sign</p>
+      {(c.flower || c.palette?.length > 0) && (
+        <section className={styles.floriography}>
+          {c.flower && (
+            <div className={styles.floriographyText}>
+              <p className={`${styles.floriographyLabel} t-deco`}>Floriography</p>
+              <h3 className={`${styles.floriographyFlower} t-display`}>{c.flower}</h3>
+              {c.flowerMeaning && (
+                <p className={`${styles.floriographyMeaning} t-body`}>{c.flowerMeaning}</p>
+              )}
+            </div>
+          )}
+          {c.palette?.length > 0 && (
+            <div className={styles.floriographyPalette}>
+              <p className={`${styles.floriographyLabel} t-deco`}>Palette</p>
+              <div className={styles.palette}>
+                {c.palette.map((hex, i) => (
+                  <span key={i} className={styles.paletteSwatch} style={{ background: hex }} title={hex} />
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      <section className={styles.lower}>
+        <div className={styles.lowerGrid}>
+
+          <div className={styles.artifactBlock}>
+            <p className={`${styles.lowerLabel} t-deco`}>Artifact &amp; Sign</p>
             <h3 className={`${styles.artifactTitle} t-display`}>
               Carried by the {c.role.replace('The ', '').toLowerCase()}
             </h3>
             <p className={`${styles.artifactText} t-body`}>{c.artifact}</p>
             {c.stories?.[0] && (
               <img
-                src={assetUrl(c.stories[0].src)}
+                src={c.stories[0].src}
                 alt={c.stories[0].title}
                 className={styles.artifactImg}
               />
             )}
           </div>
 
-          {c.relations?.length > 0 && (
-            <div>
-              <p className={`${styles.extrasLabel} t-deco`}>Relations in the Collective</p>
+          {c.relations?.length > 0 ? (
+            <div className={styles.relationsBlock}>
+              <p className={`${styles.lowerLabel} t-deco`}>Relations in the Collective</p>
               <div className={styles.relations}>
                 {c.relations.map(rel => {
                   const slug = typeof rel === 'string' ? rel : rel.slug;
@@ -154,20 +175,29 @@ function DetailedCharacter({ c, tier, navigate }) {
                       onClick={() => navigate(`/character/${slug}`)}
                     >
                       {r.img
-                        ? <img src={assetUrl(r.img)} alt={r.role} className={styles.relationImg} />
+                        ? <img src={r.img} alt={r.role} className={styles.relationImg} />
                         : <div className={styles.relationImg} style={{ background: r.hue + '44' }} />
                       }
                       <div>
                         <span className={`${styles.relationRole} t-display`}>{r.role}</span>
                         {r.name && <span className={`${styles.relationPersonName} t-body`}>{r.name}</span>}
-                        {description && <span className={`${styles.relationDescription} t-body`}>{description}</span>}
+                        {(() => {
+                          const note = description || c.relationNotes?.find(n => n.slug === slug)?.note;
+                          return note ? <span className={`${styles.relationNote} t-body`}>{note}</span> : null;
+                        })()}
                       </div>
                     </button>
                   );
                 })}
               </div>
             </div>
-          )}
+          ) : <div className={styles.relationsBlock} />}
+
+          <div className={styles.encountersBlock}>
+            <p className={`${styles.lowerLabel} t-deco`}>Encounters</p>
+            <p className={`${styles.encountersEmpty} t-body`}>No encounters recorded for this member yet.</p>
+          </div>
+
         </div>
       </section>
 
@@ -177,7 +207,7 @@ function DetailedCharacter({ c, tier, navigate }) {
           <div className={styles.storyGrid}>
             {c.stories.map(s => (
               <div key={s.title} className={styles.storyItem}>
-                <div className={styles.storyImage} style={{ backgroundImage: `url(${assetUrl(s.src)})` }} />
+                <div className={styles.storyImage} style={{ backgroundImage: `url(${s.src})` }} />
                 <p className={`${styles.storyTitle} t-display`}>{s.title}</p>
                 <p className={`${styles.storyCaption} t-body`}>{s.caption}</p>
               </div>
@@ -200,7 +230,7 @@ function StubCharacter({ c, tier, navigate }) {
         <div className={styles.portraitWrap}>
           <div
             className={styles.portrait}
-            style={c.img ? { backgroundImage: `url(${assetUrl(c.img)})` } : { background: 'var(--color-ink-card)' }}
+            style={c.img ? { backgroundImage: `url(${c.img})` } : { background: 'var(--color-ink-card)' }}
           >
             {!c.img && <PortraitPlaceholder role={c.role} hue={c.hue} />}
           </div>

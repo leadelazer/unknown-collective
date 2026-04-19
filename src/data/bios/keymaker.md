@@ -1,4 +1,4 @@
-He arrived in Munich alone, carrying a wooden case of hand tools and a single letter of recommendation — unsigned, but sealed in a way recognised by the Collective. He never spoke of his past, and no one asked. The first records list him simply as 'M.'
+He arrived in the city alone, carrying a wooden case of hand tools and a single letter of recommendation — unsigned, but sealed in a way recognised by the Collective. He never spoke of his past, and no one asked. The first records list him simply as 'M.'
 
 He was called in initially as a repairman for the municipal registry — summoned when archival drawers or locked ledgers refused to open. Over time, they began to bring him items not yet broken, asking him to assess their security. He always returned them slightly changed. Quieter. As if they resisted being opened even more than before.
 

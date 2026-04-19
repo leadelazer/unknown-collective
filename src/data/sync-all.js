@@ -119,6 +119,9 @@ for (const file of charFiles) {
   char.slug = slug;
   char.img = `/assets/echos/${slug}.png`;
   char.hue = fm.hue;
+  if (fm.flower) char.flower = fm.flower;
+  if (fm.flowerMeaning) char.flowerMeaning = fm.flowerMeaning;
+  if (fm.palette && fm.palette.length > 0) char.palette = fm.palette;
   char.keywords = fm.keywords || [];
   char.essence = fm.essence;
   if (fm.detail) {
@@ -127,6 +130,7 @@ for (const file of charFiles) {
     if (sections.talisman) char.talisman = sections.talisman;
     if (sections.shadow) char.shadow = sections.shadow;
     if (fm.relations && fm.relations.length > 0) char.relations = fm.relations;
+    if (fm.relationNotes && fm.relationNotes.length > 0) char.relationNotes = fm.relationNotes;
     if (fm.artifact) char.artifact = fm.artifact;
     if (fm.quote) char.quote = fm.quote;
     if (fm.stories && fm.stories.length > 0) {
