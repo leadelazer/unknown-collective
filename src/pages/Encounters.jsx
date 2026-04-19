@@ -4,6 +4,7 @@ import { CHARACTERS } from '../data/characters.js';
 import Nav from '../components/Nav.jsx';
 import Footer from '../components/Footer.jsx';
 import TextureBackdrop from '../components/TextureBackdrop.jsx';
+import { assetUrl } from '../utils/assetUrl.js';
 import styles from './Encounters.module.css';
 
 export default function Encounters() {
@@ -81,7 +82,7 @@ function EncounterCard({ enc, navigate }) {
             <div
               key={c.slug}
               className={styles.cardAvatar}
-              style={{ backgroundImage: `url(${c.img})` }}
+              style={{ backgroundImage: `url(${assetUrl(c.img)})` }}
               title={c.role}
             />
           ))}

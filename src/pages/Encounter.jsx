@@ -5,6 +5,7 @@ import Nav from '../components/Nav.jsx';
 import Footer from '../components/Footer.jsx';
 import TextureBackdrop from '../components/TextureBackdrop.jsx';
 import DecoRule from '../components/DecoRule.jsx';
+import { assetUrl } from '../utils/assetUrl.js';
 import styles from './Encounter.module.css';
 
 export default function Encounter() {
@@ -53,7 +54,7 @@ export default function Encounter() {
               >
                 <div
                   className={styles.participantPortrait}
-                  style={{ backgroundImage: `url(${c.img})` }}
+                  style={{ backgroundImage: `url(${assetUrl(c.img)})` }}
                 />
                 <div>
                   <span className={`${styles.participantRole} t-display`}>{c.role}</span>
