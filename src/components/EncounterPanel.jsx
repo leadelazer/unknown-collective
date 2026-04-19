@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CHARACTERS } from '../data/characters.js';
+import { assetUrl } from '../utils/assetUrl.js';
 import styles from './EncounterPanel.module.css';
 
 export default function EncounterPanel({ encounter, onClose }) {
@@ -59,7 +60,7 @@ export default function EncounterPanel({ encounter, onClose }) {
               >
                 <div
                   className={styles.participantAvatar}
-                  style={{ backgroundImage: `url(${c.img})` }}
+                  style={{ backgroundImage: `url(${assetUrl(c.img)})` }}
                 />
                 <span className={`${styles.participantRole} t-deco`}>{c.role}</span>
               </button>
