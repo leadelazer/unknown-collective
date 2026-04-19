@@ -197,7 +197,7 @@ function StubCharacter({ c, tier, navigate }) {
           <p className={`${styles.detailEyebrow} t-deco`}>
             {c.arcana} · Tier of the {tier.short}
           </p>
-          <h1 className={`${styles.detailName} t-display`} style={{ fontSize: '76px' }}>{c.role}</h1>
+          <h1 className={`${styles.detailName} t-display`}>{c.role}</h1>
           <div className={styles.ruleWrap}><DecoRule /></div>
           <div className={styles.keywords}>
             {c.keywords.map(k => (

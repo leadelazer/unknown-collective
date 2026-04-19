@@ -78,3 +78,20 @@
   text-align: center;
   margin-top: var(--space-6);
 }
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+  }
+
+  .footer {
+    padding: var(--space-12) var(--page-padding) var(--space-10);
+  }
+}

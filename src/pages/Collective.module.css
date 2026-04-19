@@ -222,3 +222,32 @@
   position: relative;
   z-index: 1;
 }
+
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .title {
+    font-size: 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .title {
+    font-size: 42px;
+  }
+
+  .header {
+    padding: var(--space-12) var(--page-padding) var(--space-8);
+  }
+}

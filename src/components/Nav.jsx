@@ -15,6 +15,7 @@ export default function Nav() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,6 +27,7 @@ export default function Nav() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    setMenuOpen(false);
   }, [pathname]);
 
   return (
@@ -39,7 +41,7 @@ export default function Nav() {
         <span className="t-deco">The Collective</span>
       </button>
 
-      <ul className={styles.links}>
+      <ul className={`${styles.links} ${menuOpen ? styles.menuOpen : ''}`}>
         {NAV_LINKS.map(({ to, label }) => (
           <li key={to}>
             <button
@@ -53,6 +55,22 @@ export default function Nav() {
       </ul>
 
       <span className={`${styles.location} t-deco`}>München · MMXXVI</span>
+
+      <button
+        className={styles.hamburger}
+        onClick={() => setMenuOpen(o => !o)}
+        aria-label="Toggle menu"
+      >
+        {menuOpen ? (
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.2">
+            <path d="M4 4 L16 16 M16 4 L4 16" />
+          </svg>
+        ) : (
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.2">
+            <path d="M3 5 L17 5 M3 10 L17 10 M3 15 L17 15" />
+          </svg>
+        )}
+      </button>
     </nav>
   );
 }

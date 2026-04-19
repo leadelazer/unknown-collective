@@ -393,3 +393,78 @@
   line-height: 1.7;
   color: var(--color-muted);
 }
+
+@media (max-width: 1024px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+  }
+
+  .portrait {
+    max-width: 420px;
+  }
+
+  .detailName {
+    font-size: 56px;
+  }
+
+  .talismanGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-12);
+  }
+
+  .extrasGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-12);
+  }
+
+  .stubGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+  }
+
+  .storyGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: var(--space-10) var(--page-padding) var(--space-12);
+  }
+
+  .detailName {
+    font-size: 40px;
+  }
+
+  .detailPersonName {
+    font-size: 18px;
+  }
+
+  .quote {
+    font-size: var(--text-xl);
+  }
+
+  .quoteSlab {
+    padding: 60px var(--page-padding);
+  }
+
+  .talismanSection {
+    padding: 60px var(--page-padding);
+  }
+
+  .extras {
+    padding: 60px var(--page-padding);
+  }
+
+  .storyGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .romanBadge {
+    top: -12px;
+    left: -12px;
+    width: 44px;
+    height: 44px;
+  }
+}
