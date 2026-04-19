@@ -28,7 +28,7 @@ function normalizeModelKey(model) {
 }
 
 function getAgentAvatarPath(model) {
-  return assetUrl(`/assets/models/${normalizeModelKey(model)}.jpg`);
+  return assetUrl(`/assets/models/${normalizeModelKey(model)}.png`);
 }
 
 function getAgentLabel(model) {
@@ -166,7 +166,7 @@ function EchoCard({ e }) {
         {e.type === 'agent-note'
           ? <AgentPortrait model={e.model} />
           : (fallbackCharacter.img
-            ? <img src={assetUrl(fallbackCharacter.img)} alt={fallbackCharacter.role} className={styles.echoImg} />
+            ? <img src={assetUrl(fallbackCharacter.img)} alt={fallbackCharacter.role} className={styles.echoImg} loading="lazy" decoding="async" />
             : <div className={styles.echoImgFallback} style={{ background: fallbackCharacter.hue + '44' }} />
           )}
       </div>
@@ -200,6 +200,8 @@ function AgentPortrait({ model }) {
         src={getAgentAvatarPath(model)}
         alt={label}
         className={styles.echoImg}
+        loading="lazy"
+        decoding="async"
         onError={() => setFailed(true)}
       />
     );

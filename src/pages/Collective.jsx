@@ -9,6 +9,40 @@ import TextureBackdrop from '../components/TextureBackdrop.jsx';
 import { assetUrl } from '../utils/assetUrl.js';
 import styles from './Collective.module.css';
 
+const CARD_IMAGE_SIZES = '(max-width: 768px) 48vw, (max-width: 1200px) 31vw, 23vw';
+
+function getPortraitBaseName(imgPath) {
+  if (!imgPath) return null;
+  const file = String(imgPath).split('/').pop() || '';
+  const dot = file.lastIndexOf('.');
+  return dot > 0 ? file.slice(0, dot) : null;
+}
+
+function OptimizedPortrait({ img, role }) {
+  const [failed, setFailed] = useState(false);
+  const baseName = getPortraitBaseName(img);
+
+  if (!img || !baseName || failed) {
+    return <img src={assetUrl(img)} alt={role} className={styles.cardImage} loading="lazy" decoding="async" />;
+  }
+
+  return (
+    <img
+      src={assetUrl(`/assets/echos/optimized/${baseName}-960.webp`)}
+      srcSet={[
+        `${assetUrl(`/assets/echos/optimized/${baseName}-480.webp`)} 480w`,
+        `${assetUrl(`/assets/echos/optimized/${baseName}-960.webp`)} 960w`,
+      ].join(', ')}
+      sizes={CARD_IMAGE_SIZES}
+      alt={role}
+      className={styles.cardImage}
+      loading="lazy"
+      decoding="async"
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
 export default function Collective() {
   const navigate = useNavigate();
   const [filter, setFilter] = useState('all');
@@ -73,10 +107,11 @@ function CharCard({ c, navigate }) {
       </div>
 
       <div className={styles.cardImageWrap}>
-        {c.img
-          ? <img src={assetUrl(c.img)} alt={c.role} className={styles.cardImage} />
-          : <PortraitPlaceholder role={c.role} hue={c.hue} />
-        }
+        {c.img ? (
+          <OptimizedPortrait img={c.img} role={c.role} />
+        ) : (
+          <PortraitPlaceholder role={c.role} hue={c.hue} />
+        )}
 
         <div className={styles.cardOverlay}>
           <div className={styles.cardPalette} aria-label={`${c.role} palette`}>

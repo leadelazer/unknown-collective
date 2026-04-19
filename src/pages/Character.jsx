@@ -153,6 +153,8 @@ function DetailedCharacter({ c, tier, navigate }) {
                 src={assetUrl(c.stories[0].src)}
                 alt={c.stories[0].title}
                 className={styles.artifactImg}
+                loading="lazy"
+                decoding="async"
               />
             )}
           </div>
@@ -173,7 +175,7 @@ function DetailedCharacter({ c, tier, navigate }) {
                       onClick={() => navigate(`/character/${slug}`)}
                     >
                       {r.img
-                        ? <img src={assetUrl(r.img)} alt={r.role} className={styles.relationImg} />
+                        ? <img src={assetUrl(r.img)} alt={r.role} className={styles.relationImg} loading="lazy" decoding="async" />
                         : <div className={styles.relationImg} style={{ background: r.hue + '44' }} />
                       }
                       <div>

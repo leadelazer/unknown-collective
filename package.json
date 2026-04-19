@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "optimize:portraits": "node scripts/optimize-portraits.mjs",
     "sync-bios": "node src/data/sync-bios.js",
     "sync-all": "node src/data/sync-all.js"
   },
@@ -25,6 +26,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "sharp": "^0.34.5",
     "vite": "^8.0.4"
   }
 }

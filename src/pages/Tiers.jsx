@@ -54,7 +54,7 @@ export default function Tiers() {
                 <button key={c.slug} className={styles.charBtn} onClick={() => navigate(`/character/${c.slug}`)}>
                   <div className={styles.charImg}>
                     {c.img
-                      ? <img src={assetUrl(c.img)} alt={c.role} className={styles.charImgEl} />
+                      ? <img src={assetUrl(c.img)} alt={c.role} className={styles.charImgEl} loading="lazy" decoding="async" />
                       : <PortraitPlaceholder role={c.role} hue={c.hue} />
                     }
                   </div>
