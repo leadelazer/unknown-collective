@@ -42,15 +42,95 @@
 }
 
 .portrait {
+  --spot-primary: var(--color-gold-hi);
+  --spot-secondary: var(--color-gold);
+  position: relative;
   aspect-ratio: 3 / 4;
   border: var(--border-gold);
+  transform: perspective(1200px) rotateX(var(--portrait-rx, 0deg)) rotateY(var(--portrait-ry, 0deg));
+  transition: transform 0.45s ease, box-shadow 0.45s ease, filter 0.45s ease;
   box-shadow:
     0 40px 100px rgba(0,0,0,0.7),
     inset 0 0 0 8px var(--color-ink),
     inset 0 0 0 9px color-mix(in srgb, var(--color-gold) 53%, transparent);
-  background-size: cover;
-  background-position: center;
+  background: var(--color-ink-card);
   overflow: hidden;
+}
+
+.portraitInteractive {
+  cursor: pointer;
+}
+
+.portraitActive {
+  box-shadow:
+    0 48px 108px rgba(0,0,0,0.74),
+    inset 0 0 0 8px var(--color-ink),
+    inset 0 0 0 9px color-mix(in srgb, var(--color-gold-hi) 68%, transparent);
+}
+
+.portraitImage,
+.portraitLight,
+.portraitSheen {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.portraitImage {
+  object-fit: cover;
+  z-index: 0;
+  filter: brightness(0.92) saturate(0.96);
+  transform: translate3d(var(--portrait-tx, 0px), var(--portrait-ty, 0px), 0) scale(1.02);
+  transition: transform 0.8s ease, filter 0.45s ease;
+}
+
+.portraitLight {
+  z-index: 1;
+  background:
+    radial-gradient(
+      circle 320px at var(--portrait-mx, 50%) var(--portrait-my, 50%),
+      color-mix(in srgb, var(--spot-primary) 30%, transparent) 0%,
+      color-mix(in srgb, var(--spot-primary) 18%, transparent) 34%,
+      color-mix(in srgb, var(--spot-secondary) 9%, transparent) 60%,
+      transparent 100%
+    );
+  opacity: 0;
+  transition: opacity 0.35s ease, transform 0.45s ease;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  filter: blur(6px);
+  transform: scale(1.04);
+}
+
+.portraitSheen {
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(var(--portrait-sx, 0px), var(--portrait-sy, 0px), 0);
+  transition: opacity 0.35s ease, transform 0.45s ease;
+  mix-blend-mode: screen;
+  background: linear-gradient(
+    115deg,
+    transparent 18%,
+    color-mix(in srgb, var(--spot-primary) 10%, transparent) 38%,
+    color-mix(in srgb, var(--spot-secondary) 22%, transparent) 50%,
+    color-mix(in srgb, var(--spot-primary) 10%, transparent) 62%,
+    transparent 82%
+  );
+}
+
+.portraitActive .portraitImage {
+  transform: translate3d(var(--portrait-tx, 0px), var(--portrait-ty, 0px), 0) scale(1.02);
+  filter: brightness(0.98) saturate(1.01);
+}
+
+.portraitActive .portraitLight {
+  opacity: 0.85;
+}
+
+.portraitActive .portraitSheen {
+  opacity: 0.34;
 }
 
 .romanBadge {
@@ -593,5 +673,20 @@
     left: -12px;
     width: 44px;
     height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portrait,
+  .portraitImage,
+  .portraitLight,
+  .portraitSheen {
+    transition: none;
+    transform: none;
+  }
+
+  .portraitLight,
+  .portraitSheen {
+    opacity: 0 !important;
   }
 }

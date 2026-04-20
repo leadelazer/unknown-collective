@@ -9,7 +9,7 @@ function encounterParticipants(encounter) {
     : [encounter.slugA, encounter.slugB].filter(Boolean);
 }
 
-export default function Sidebar({ characters, encounters, lore, selected, onSelect, onNewEncounter, onNewLore }) {
+export default function Sidebar({ characters, encounters, lore, selected, onSelect, onNewEncounter, onNewLore, collapsed, onToggleCollapse }) {
   const [search, setSearch] = useState('');
   const [newEncSlugA, setNewEncSlugA] = useState('');
   const [newEncSlugB, setNewEncSlugB] = useState('');
@@ -42,18 +42,27 @@ export default function Sidebar({ characters, encounters, lore, selected, onSele
   })).filter(g => g.chars.length > 0);
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar${collapsed ? ' sidebar-collapsed' : ''}`}>
       <div className="sidebar-header">
-        <span className="sidebar-title">UC Studio</span>
+        {!collapsed && <span className="sidebar-title">UC Studio</span>}
+        <button
+          onClick={onToggleCollapse}
+          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          style={{ marginLeft: collapsed ? 'auto' : undefined, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px', color: 'var(--text-3)', fontSize: 14, lineHeight: 1, borderRadius: 4, display: 'flex', alignItems: 'center' }}
+        >
+          {collapsed ? '›' : '‹'}
+        </button>
       </div>
-      <div className="sidebar-search">
-        <input
-          placeholder="Search characters…"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-      </div>
-      <div className="sidebar-nav">
+      {!collapsed && (
+        <>
+          <div className="sidebar-search">
+            <input
+              placeholder="Search characters…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="sidebar-nav">
         {/* Characters by tier */}
         {grouped.map(({ tier, chars }) => (
           <div key={tier} className="nav-section">
@@ -149,6 +158,8 @@ export default function Sidebar({ characters, encounters, lore, selected, onSele
           )}
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 }

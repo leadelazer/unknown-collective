@@ -2,7 +2,7 @@ The Lightkeeper arrived in the city in 1879, the year it began installing its fi
 
 He was unhurried in everything. He moved through the evening streets with a lamplighter's pole and a quiet that was not unfriendliness but self-containment — the composure of someone who had learned long ago that darkness was not the problem people assumed it was.
 
-He joined the Collective in the late 1880s, introduced by the Ferryman, who had noticed him on the river path. The Ferryman took people across water; the Lightkeeper, it became clear, took people across the spaces between moments of understanding. The two recognised something in each other that neither tried to name.
+He joined the Collective around the turn of the century, after the Ferryman had noticed him on the river path. The Ferryman took people across water; the Lightkeeper, it became clear, took people across the spaces between moments of understanding. The two recognised something in each other that neither tried to name.
 
 Within the Collective, he serves as a gentle but persistent presence — one who offers hope not as a feeling but as a practice. He does not promise that things will improve. He simply maintains the light, so that improvement remains possible when the time comes.
 

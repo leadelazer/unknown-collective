@@ -58,6 +58,26 @@ export const ENCOUNTERS = [
     "hasContent": true
   },
   {
+    "id": "curator--merchant-prince",
+    "title": "Records Transferred at the Administrative Gate, April 1819",
+    "participants": [
+      "curator",
+      "merchant-prince"
+    ],
+    "body": "The administrative gate opened late that April. Rain made the stones slick along the southern edge of the government quarter. A bundle of ledgers sat under a cloth, bound tight, waiting on the bench by the iron door. Two men arrived at different hours; the Curator first, carrying a satchel of folded correspondence, and the Merchant Prince later, his umbrella angled over a polished shoe.\n\nEyewitness accounts from clerks describe terse words. The Curator handed over two ledgers, not three. The Merchant Prince examined the bindings, then counted the pages aloud. Five witnesses recall the sound of the lock as the door closed again. The balance of municipal debt and property transfer had shifted, but no signatures were exchanged.\n\nThe transaction ended quickly. The sky remained gray. One account notes the bench was left empty by evening. Archival staff found the ink stains on the stone.\n\nLater correspondence references \"the missing third ledger\" and \"the unsettled account of that April.\" No record exists of a formal reconciliation. The location and contents of the third ledger are disputed among municipal historians.",
+    "hasContent": true
+  },
+  {
+    "id": "curator--oracle",
+    "title": "The Lost Ledger — Autumn in the Central Archive, 1906",
+    "participants": [
+      "curator",
+      "oracle"
+    ],
+    "body": "The central archive was unheated that autumn. Damp crept up the stone walls, staining ledgers stacked near the iron grating. The Curator arrived before dawn, coat buttoned, gloves missing. The Oracle entered after him, footsteps echoing in the corridor. She paused at the doorway, gaze lingering over the shelves.\n\nA ledger, dust-thick, lay open on the reading table. The Curator asked short questions. The Oracle shook her head once, then once more. She traced lines on the page without speaking. The clock on the wall slipped past seven. Outside, municipal workers swept leaves past the entryway.\n\nHe wrote her name in pencil inside the ledger, then scratched it out. She left with a slip of paper, folded three times. Later, officials noted a blank space in the records. No signature. No witness. The archive remained cold until spring.\n\nNo one commented on the ledger's absence, though its file reference persisted in correspondence for years. Questions were raised but not followed. The incident's importance was uncertain; some cited routine error, others whispered about protocol. No new policies were issued. The archive’s door, recently repaired, squeaked when closed.",
+    "hasContent": true
+  },
+  {
     "id": "duchess--merchant-prince",
     "title": "The Reluctant Transaction at the Central Square, March 1932",
     "participants": [
@@ -65,6 +85,17 @@ export const ENCOUNTERS = [
       "merchant-prince"
     ],
     "body": "On a gray afternoon in early March, the central square was crowded. Market stalls filled with cloth and food, buzzing with merchant chatter. The scent of baked goods mingled with the faint hint of damp earth. The Duchess approached the Merchant Prince, her steps sure yet cautious. \n\nThey stood near a fountain, its chipped stone weathered by years of use. He wore a tailored dark coat, meticulously clean but lacking warmth. She clutched a small velvet pouch, fingers tapping nervously against the fabric. Words were exchanged, low and tense. The Merchant Prince leaned closer, voice firm, while the Duchess maintained her composure. This was no casual meeting. \n\nOnlookers observed the exchange with keen interest. They stood just outside the circle of influence, captivated by the tension. One could feel the faint pulse of their unease, what lay beneath polished surfaces. Each was aware of the stakes: tradition versus innovation, family ties clashing with commercial logic. \n\nEventually, they parted ways, the pouch remaining securely in the Duchess' grasp. The square resumed its hum, but the air lingered with an unspoken agreement, a deal not yet sealed. Solutions waited, but for now, they remained unspoken and at odds.",
+    "hasContent": true
+  },
+  {
+    "id": "gardener-oracle--merchant-prince",
+    "title": "The Disputed Bouquets in the Northern District, March 1971",
+    "participants": [
+      "gardener",
+      "oracle",
+      "merchant-prince"
+    ],
+    "body": "In the northern district, an argument arose between the Gardener and the Merchant Prince. It transpired in a dimly lit shop filled with plants and a competing display of imported goods. The Gardener, dirt under fingernails, held a fresh bouquet. Its vibrant blooms, grown in her own patch, radiated life. The Merchant Prince examined them with a critical eye. \n\nHe dismissed the bouquet’s worth. “This cannot compete with what is harvested from abroad,” he asserted, his voice echoing among rows of potted cacti. The Gardener countered with fervor, emphasizing the essence of local production. “It is not just about currency. It’s about roots, growth, and sustainability.” \n\nThe Oracle watched quietly from the corner. Her focus was not on the flowers or the price tags, but on the tension boiling over. The weight of her silence suggested deeper implications, perhaps voicing unspoken truths about the economy of the riverbank and its effects on community values. In that moment, it was clear: their clash was not merely over flowers, but over what they stood to lose and gain in a changing world.",
     "hasContent": true
   }
 ];

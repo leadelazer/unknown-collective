@@ -29,6 +29,7 @@ export default function App() {
   const [view, setView] = useState('editor'); // 'editor' | 'graph' | 'dashboard'
   const [syncing, setSyncing] = useState(false);
   const [graphState, setGraphState] = useState(DEFAULT_GRAPH_STATE);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const showToast = useCallback((msg, type = 'success') => {
     setToast({ msg, type });
@@ -152,6 +153,8 @@ export default function App() {
         onSelect={setSelected}
         onNewEncounter={handleCreateEncounter}
         onNewLore={handleCreateLore}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(c => !c)}
       />
 
       <div className="main">

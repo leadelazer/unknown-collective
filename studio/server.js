@@ -243,11 +243,6 @@ function snippet(text, maxChars = 240) {
   return normalized.slice(0, Math.max(0, maxChars - 1)).trimEnd() + '…';
 }
 
-function getFieldLabel(field) {
-  if (field === 'talisman-shadow') return 'talisman and shadow';
-  return field || 'bio';
-}
-
 function getFieldGapDescription(char, field) {
   if (field === 'talisman-shadow') {
     const missing = [];
@@ -1007,4 +1002,5 @@ app.post('/api/agent/pull', (req, res) => {
   }
 });
 
-app.listen(3099, () => console.log('UC Studio API → http://localhost:3099'));
+const API_PORT = Number(process.env.UC_STUDIO_API_PORT || 3099);
+app.listen(API_PORT, () => console.log(`UC Studio API -> http://localhost:${API_PORT}`));

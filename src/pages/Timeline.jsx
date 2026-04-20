@@ -1,0 +1,373 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Nav from '../components/Nav.jsx';
+import Footer from '../components/Footer.jsx';
+import TextureBackdrop from '../components/TextureBackdrop.jsx';
+import { TIMELINE_ENTRIES } from '../data/timeline.js';
+import { ENCOUNTERS } from '../data/encounters.js';
+import { assetUrl } from '../utils/assetUrl.js';
+import styles from './Timeline.module.css';
+
+const PX_PER_YEAR = 14;
+const EDGE_PAD_YEARS = 8;
+const LEVELS = 5;
+const LEVEL_STEP = 48;
+const LABEL_MIN_WIDTH = 104;
+const LABEL_MAX_WIDTH = 186;
+const LABEL_CHAR_PX = 8.8;
+const LABEL_GAP = 14;
+const LABEL_HEIGHT = 38;
+const AXIS_OFFSET_TOP = 246;
+const DIAMOND_Y = AXIS_OFFSET_TOP + 34;
+
+export default function Timeline() {
+  const navigate = useNavigate();
+  const scrollerRef = useRef(null);
+  const dotRefs = useRef({});
+  const scrollTriggeredByKey = useRef(false);
+
+  const dated = useMemo(
+    () => TIMELINE_ENTRIES.filter(e => e.hasPrecisePlacement).sort((a, b) => a.sortStart - b.sortStart || a.n - b.n),
+    []
+  );
+  const undated = useMemo(() => TIMELINE_ENTRIES.filter(e => !e.hasPrecisePlacement), []);
+
+  const datedEncounters = useMemo(() => {
+    return ENCOUNTERS
+      .filter(e => e.hasContent)
+      .map(e => {
+        const match = e.title.match(/\b(1[0-9]{3}|2[0-9]{3})\b/);
+        if (!match) return null;
+        return { ...e, year: parseInt(match[0]), type: 'encounter' };
+      })
+      .filter(Boolean);
+  }, []);
+
+  const timelineStartYears = [
+    ...dated.map(e => e.sortStart),
+    ...datedEncounters.map(e => e.year),
+  ];
+  const timelineEndYears = [
+    ...dated.map(e => e.sortEnd ?? e.sortStart),
+    ...datedEncounters.map(e => e.year),
+  ];
+
+  const minYear = Math.floor((Math.min(...timelineStartYears) - EDGE_PAD_YEARS) / 10) * 10;
+  const maxYear = Math.ceil((Math.max(...timelineEndYears) + EDGE_PAD_YEARS) / 10) * 10;
+  const axisWidth = (maxYear - minYear) * PX_PER_YEAR;
+
+  const decades = [];
+  for (let y = minYear; y <= maxYear; y += 10) decades.push(y);
+
+  const staggered = useMemo(() => {
+    const laneRights = Array(LEVELS).fill(-Infinity);
+    return dated.map(entry => {
+      const labelWidth = Math.max(LABEL_MIN_WIDTH, Math.min(LABEL_MAX_WIDTH, Math.round(entry.role.length * LABEL_CHAR_PX)));
+      const x = xFor(entry.sortStart);
+      let level = 0;
+      let fallbackLevel = 0;
+      let smallestOverflow = Infinity;
+
+      for (let i = 0; i < LEVELS; i++) {
+        const leftEdge = x - labelWidth / 2;
+        const overflow = laneRights[i] - leftEdge;
+        if (leftEdge >= laneRights[i] + LABEL_GAP) {
+          level = i;
+          fallbackLevel = i;
+          smallestOverflow = -Infinity;
+          break;
+        }
+        if (overflow < smallestOverflow) {
+          smallestOverflow = overflow;
+          fallbackLevel = i;
+        }
+      }
+
+      if (smallestOverflow !== -Infinity) level = fallbackLevel;
+      laneRights[level] = x + labelWidth / 2;
+      return { ...entry, level, labelWidth };
+    });
+  }, [dated]);
+
+  const [activeId, setActiveId] = useState(`char:${staggered[0]?.slug || ''}`);
+
+  const activeType = activeId?.startsWith('enc:') ? 'encounter' : 'character';
+  const activeSlug = activeType === 'character' ? activeId?.replace('char:', '') : null;
+  const activeEncId = activeType === 'encounter' ? activeId?.replace('enc:', '') : null;
+
+  const active = useMemo(() => {
+    if (activeType === 'encounter') {
+      return datedEncounters.find(e => e.id === activeEncId) || null;
+    }
+    return (
+      staggered.find(e => e.slug === activeSlug) ||
+      undated.find(e => e.slug === activeSlug) ||
+      staggered[0]
+    );
+  }, [activeId, staggered, undated, datedEncounters, activeType, activeSlug, activeEncId]);
+
+  useEffect(() => {
+    const onKey = e => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      const all = [...staggered, ...undated];
+      const idx = all.findIndex(x => `char:${x.slug}` === activeId);
+      if (idx === -1) return;
+      const next = e.key === 'ArrowRight' ? Math.min(all.length - 1, idx + 1) : Math.max(0, idx - 1);
+      scrollTriggeredByKey.current = true;
+      setActiveId(`char:${all[next].slug}`);
+      e.preventDefault();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [activeId, staggered, undated]);
+
+  useEffect(() => {
+    if (!scrollTriggeredByKey.current) return;
+    scrollTriggeredByKey.current = false;
+    if (activeType !== 'character' || !activeSlug) return;
+    const node = dotRefs.current[activeSlug];
+    const scroller = scrollerRef.current;
+    if (!node || !scroller) return;
+    const nodeRect = node.getBoundingClientRect();
+    const scrollerRect = scroller.getBoundingClientRect();
+    const nodeCenter = scroller.scrollLeft + (nodeRect.left - scrollerRect.left) + nodeRect.width / 2;
+    scroller.scrollTo({ left: Math.max(0, nodeCenter - scroller.clientWidth / 2), behavior: 'smooth' });
+  }, [activeId]);
+
+  function xFor(year) {
+    return (year - minYear) * PX_PER_YEAR;
+  }
+
+  const certaintyLabel = {
+    exact: 'Exact',
+    range: 'Range',
+    approx: 'Approximate',
+    era: 'Era',
+    legendary: 'Legend',
+    undated: 'Undated',
+  };
+
+  const activeMeta = activeType === 'encounter'
+    ? `${active?.year || ''} · Encounter`
+    : [active?.displayDate, active?.certainty && active.certainty !== 'undated' ? certaintyLabel[active.certainty] : null]
+        .filter(Boolean)
+        .join(' · ');
+
+  const activeTypeLabel = activeType === 'encounter' ? 'Encounter' : 'Member';
+  const activeDateLabel = activeType === 'encounter' ? String(active?.year || 'Undated') : active?.displayDate;
+  const activeCertaintyLabel = activeType === 'encounter'
+    ? 'Recorded'
+    : certaintyLabel[active?.certainty || 'undated'];
+  const activeTitle = activeType === 'encounter' ? active?.title : active?.role;
+  const activeEvent = activeType === 'encounter'
+    ? active?.participants?.map(p => p.replace(/-/g, '\u00a0')).join(', ')
+    : active?.eventLabel;
+  const activeSummary = activeType === 'encounter'
+    ? active?.body?.split(/\n\n+/)[0]?.trim() || 'A recorded meeting within the archive chronology.'
+    : active?.summary;
+  const activeActionLabel = activeType === 'encounter' ? 'Open encounter' : 'Open profile';
+  const activeParticipants = activeType === 'encounter'
+    ? (active?.participants || []).map(slug => TIMELINE_ENTRIES.find(entry => entry.slug === slug)).filter(Boolean)
+    : [];
+
+  function handleOpenActive() {
+    if (!active) return;
+    if (activeType === 'encounter') {
+      navigate(`/encounter/${active.id}`);
+      return;
+    }
+    navigate(`/character/${active.slug}`);
+  }
+
+  return (
+    <div className={styles.page}>
+      <TextureBackdrop />
+      <Nav />
+
+      <header className={styles.header}>
+        <div className={styles.headerLeft}>
+          <p className={`${styles.eyebrow} t-deco`}>Chronology</p>
+          <h1 className={`${styles.title} t-display`}>
+            The <span className={styles.titleAccent}>Timeline</span>
+          </h1>
+          <p className={`${styles.intro} t-body`}>
+            Click any mark to read its moment. Double-click to open. Drag or arrow-keys to travel.
+          </p>
+        </div>
+
+        <div className={`${styles.infoCard} glass ${activeType === 'encounter' ? styles.infoCardEnc : ''}`} key={activeId}>
+          {activeType === 'character' && active?.img && (
+            <div className={styles.icPortraitWrap}>
+              <img src={assetUrl(active.img)} alt={activeTitle} className={styles.icPortrait} loading="lazy" decoding="async" />
+              <div className={styles.icPortraitShade} />
+            </div>
+          )}
+
+          <div className={styles.icBody}>
+            {activeType === 'encounter' && activeParticipants.length > 0 && (
+              <div className={styles.icParticipants}>
+                {activeParticipants.map(participant => (
+                  <button
+                    key={participant.slug}
+                    className={styles.icParticipant}
+                    onClick={() => navigate(`/character/${participant.slug}`)}
+                  >
+                    <span
+                      className={styles.icParticipantPortrait}
+                      style={participant.img ? { backgroundImage: `url(${assetUrl(participant.img)})` } : undefined}
+                    />
+                    <span className={styles.icParticipantRole}>{participant.role}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <span className={`${styles.icLabel} t-deco`}>Selected record</span>
+            <span className={`${styles.icTitle} t-display`}>{activeTitle}</span>
+            {activeSummary && <p className={`${styles.icSummary} t-body`}>{activeSummary}</p>}
+            <div className={styles.icFooter}>
+              {activeEvent && <span className={styles.icEvent}>{activeEvent}</span>}
+              <button className={`${styles.icAction} t-deco`} onClick={handleOpenActive}>{activeActionLabel} →</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section className={styles.axisSection}>
+        <div className={styles.axisFrame}>
+        <div className={styles.scroller} ref={scrollerRef}>
+          <div className={styles.axisStage} style={{ width: `${axisWidth + 160}px` }}>
+            <div className={styles.stageInner} style={{ width: `${axisWidth}px`, marginLeft: '80px' }}>
+
+              {/* Labels above axis */}
+              {staggered.map(entry => {
+                const x = xFor(entry.sortStart);
+                const top = AXIS_OFFSET_TOP - 24 - entry.level * LEVEL_STEP;
+                const isActive = activeSlug === entry.slug;
+                return (
+                  <button
+                    key={`label-${entry.slug}`}
+                    className={`${styles.label} ${isActive ? styles.labelActive : ''}`}
+                    style={{ left: `${x}px`, top: `${top}px`, width: `${entry.labelWidth}px` }}
+                    onClick={() => setActiveId(`char:${entry.slug}`)}
+                  >
+                    <span className={styles.labelYear}>{entry.displayDate}</span>
+                    <span className={styles.labelRole}>{entry.role}</span>
+                  </button>
+                );
+              })}
+
+              {/* Leader lines — characters only */}
+              <svg className={styles.leaders} width={axisWidth} height={AXIS_OFFSET_TOP} aria-hidden="true">
+                {staggered.map(entry => {
+                  const x = xFor(entry.sortStart);
+                  const top = AXIS_OFFSET_TOP - 24 - entry.level * LEVEL_STEP;
+                  const isActive = activeSlug === entry.slug;
+                  return (
+                    <line
+                      key={`leader-${entry.slug}`}
+                      x1={x} x2={x}
+                      y1={top + LABEL_HEIGHT} y2={AXIS_OFFSET_TOP}
+                      className={`${styles.leader} ${isActive ? styles.leaderActive : ''}`}
+                    />
+                  );
+                })}
+              </svg>
+
+              {/* The axis */}
+              <div className={styles.axis} style={{ top: `${AXIS_OFFSET_TOP}px`, width: `${axisWidth}px` }} />
+
+              {/* Decade / century ticks */}
+              {decades.map(y => {
+                const isCentury = y % 100 === 0;
+                return (
+                  <div
+                    key={`tick-${y}`}
+                    className={`${styles.tick} ${isCentury ? styles.tickCentury : ''}`}
+                    style={{ left: `${xFor(y)}px`, top: `${AXIS_OFFSET_TOP}px` }}
+                  >
+                    {isCentury && <span className={styles.tickLabel}>{y}</span>}
+                  </div>
+                );
+              })}
+
+              {/* Encounter diamonds — floating, no leader line */}
+              {datedEncounters.map(enc => {
+                const x = xFor(enc.year);
+                const isActive = activeEncId === enc.id;
+                return (
+                  <button
+                    key={`enc-${enc.id}`}
+                    className={`${styles.diamond} ${isActive ? styles.diamondActive : ''}`}
+                    style={{ left: `${x}px`, top: `${DIAMOND_Y}px` }}
+                    onClick={() => setActiveId(`enc:${enc.id}`)}
+                    aria-label={enc.title}
+                  />
+                );
+              })}
+
+              {/* Character dots on the axis */}
+              {staggered.map(entry => {
+                const x = xFor(entry.sortStart);
+                const durEnd = entry.sortEnd ?? entry.sortStart;
+                const durWidth = Math.max(0, (durEnd - entry.sortStart) * PX_PER_YEAR);
+                const isActive = activeSlug === entry.slug;
+                const dotClass = [
+                  styles.dot,
+                  styles[`dot_${entry.certainty}`],
+                  isActive ? styles.dotActive : '',
+                ].join(' ');
+                return (
+                  <div key={`dot-${entry.slug}`}>
+                    {durWidth > 0 && (
+                      <span
+                        className={`${styles.duration} ${isActive ? styles.durationActive : ''}`}
+                        style={{ left: `${x}px`, width: `${durWidth}px`, top: `${AXIS_OFFSET_TOP}px` }}
+                      />
+                    )}
+                    <button
+                      ref={node => {
+                        if (node) dotRefs.current[entry.slug] = node;
+                        else delete dotRefs.current[entry.slug];
+                      }}
+                      className={dotClass}
+                      style={{ left: `${x}px`, top: `${AXIS_OFFSET_TOP}px` }}
+                      onClick={() => setActiveId(`char:${entry.slug}`)}
+                      onDoubleClick={() => navigate(`/character/${entry.slug}`)}
+                      aria-label={`${entry.role}, ${entry.displayDate}`}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+        </div>
+
+        {undated.length > 0 && (
+          <div className={styles.undated}>
+            <p className={styles.undatedLabel}>Undated · Outside the chronology</p>
+            <div className={styles.undatedRow}>
+              {undated.map(entry => {
+                const isActive = activeSlug === entry.slug;
+                return (
+                  <button
+                    key={entry.slug}
+                    className={`${styles.undatedDot} ${isActive ? styles.undatedDotActive : ''}`}
+                    onClick={() => setActiveId(`char:${entry.slug}`)}
+                    onDoubleClick={() => navigate(`/character/${entry.slug}`)}
+                  >
+                    <span className={`${styles.undatedRole} t-deco`}>{entry.role}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+      </section>
+
+      <Footer />
+    </div>
+  );
+}

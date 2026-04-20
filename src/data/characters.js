@@ -1061,7 +1061,7 @@ export const CHARACTERS = [
           },
           {
                 "slug": "duchess",
-                "note": "She made the key for the Duchess's east correspondence box. A copy exists; it was never requested."
+                "note": "He made the key for the Duchess's east correspondence box. A copy exists; it was never requested."
           },
           {
                 "slug": "doorwarden",
@@ -1069,7 +1069,7 @@ export const CHARACTERS = [
           },
           {
                 "slug": "mapmaker",
-                "note": "He left an access schematic on her workbench for a survey he could not otherwise complete."
+                "note": "He left an access schematic on the Mapmaker's workbench for a survey he could not otherwise complete."
           }
     ],
     artifact: "A folded diagram, left on the Curator's desk, showing a schematic of a cabinet that does not yet exist. The tags in its drawers are labelled with future dates.",

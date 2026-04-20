@@ -4,6 +4,6 @@ He took a position at the historic glass manufactory and advanced quickly to mas
 
 His mirrors did not simply reflect appearance. They reflected something harder to name — a quality of the moment, or of the person standing in it, that was usually more comfortable to leave unexamined. People left his studio changed, though most could not explain how.
 
-The Custodians noticed. In 1707, Valentin was invited to join their ranks. He accepted without surprise, as if the invitation were simply confirmation of something he had always understood about himself. He became the Mirrormaker — reflecting inner truths and darker aspects of the world to those who could bear to look.
+The Custodians noticed. In 1857, Valentin was invited to join their ranks. He accepted without surprise, as if the invitation were simply confirmation of something he had always understood about himself. He became the Mirrormaker — reflecting inner truths and darker aspects of the world to those who could bear to look.
 
 His mirrors can be found in the most prestigious establishments across the city. The Obsidian Count has several. So does the Duchess. Neither will say what they saw when they first stood before them.

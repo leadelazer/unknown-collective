@@ -21,6 +21,20 @@ async function ensureDir(dirPath) {
   await fs.mkdir(dirPath, { recursive: true });
 }
 
+async function isUpToDate(sourcePath, outputDir, slug) {
+  try {
+    const srcStat = await fs.stat(sourcePath);
+    const outputs = widths.flatMap(w => [
+      path.join(outputDir, `${slug}-${w}.avif`),
+      path.join(outputDir, `${slug}-${w}.webp`),
+    ]);
+    const stats = await Promise.all(outputs.map(p => fs.stat(p)));
+    return stats.every(s => s.mtimeMs >= srcStat.mtimeMs);
+  } catch {
+    return false;
+  }
+}
+
 async function optimizeOne(slug) {
   const sourcePath = path.join(ROOT, 'public', 'assets', 'echos', `${slug}.png`);
   const outputDir = path.join(ROOT, 'public', 'assets', 'echos', 'optimized');
@@ -29,6 +43,10 @@ async function optimizeOne(slug) {
     await fs.access(sourcePath);
   } catch {
     return { slug, skipped: true, reason: 'missing source' };
+  }
+
+  if (await isUpToDate(sourcePath, outputDir, slug)) {
+    return { slug, skipped: true, reason: 'up to date' };
   }
 
   await ensureDir(outputDir);
@@ -78,13 +96,18 @@ async function main() {
   }
 
   const generated = results.reduce((sum, r) => sum + (r.generated || 0), 0);
-  const skipped = results.filter(r => r.skipped);
+  const upToDate = results.filter(r => r.skipped && r.reason === 'up to date');
+  const missing = results.filter(r => r.skipped && r.reason !== 'up to date');
 
-  console.log(`Optimized portraits: ${generated} files generated for ${slugs.length} characters.`);
-  if (skipped.length > 0) {
-    console.log('Skipped:');
-    for (const r of skipped) {
-      console.log(`- ${r.slug}: ${r.reason}`);
+  if (generated > 0) {
+    console.log(`Optimized portraits: ${generated} files generated for ${slugs.length - upToDate.length - missing.length} characters.`);
+  } else {
+    console.log(`Optimized portraits: all ${upToDate.length} characters already up to date.`);
+  }
+  if (missing.length > 0) {
+    console.log('Skipped (missing source):');
+    for (const r of missing) {
+      console.log(`  - ${r.slug}: ${r.reason}`);
     }
   }
 }

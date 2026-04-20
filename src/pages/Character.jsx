@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CHARACTERS } from '../data/characters.js';
 import { ENCOUNTERS } from '../data/encounters.js';
@@ -12,6 +12,93 @@ import EncounterPanel from '../components/EncounterPanel.jsx';
 import { PortraitPlaceholder } from './Collective.jsx';
 import { assetUrl } from '../utils/assetUrl.js';
 import styles from './Character.module.css';
+
+function AnimatedPortrait({ c }) {
+  const frameRef = useRef(null);
+  const [isActive, setIsActive] = useState(false);
+  const palette = resolveCharacterPalette(c);
+  const spotPrimary = palette[1] || palette[0] || 'var(--color-gold-hi)';
+  const spotSecondary = palette[2] || palette[1] || palette[0] || 'var(--color-gold)';
+
+  const resetPointer = () => {
+    const frame = frameRef.current;
+    if (!frame) return;
+    frame.style.setProperty('--portrait-rx', '0deg');
+    frame.style.setProperty('--portrait-ry', '0deg');
+    frame.style.setProperty('--portrait-tx', '0px');
+    frame.style.setProperty('--portrait-ty', '0px');
+    frame.style.setProperty('--portrait-sx', '0px');
+    frame.style.setProperty('--portrait-sy', '0px');
+    frame.style.setProperty('--portrait-mx', '50%');
+    frame.style.setProperty('--portrait-my', '50%');
+  };
+
+  const handlePointerMove = (e) => {
+    if (e.pointerType === 'touch') return;
+    const frame = frameRef.current;
+    if (!frame) return;
+    const rect = frame.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    const rotateY = (x - 0.5) * 7;
+    const rotateX = (0.5 - y) * 7;
+    const shiftX = (x - 0.5) * -12;
+    const shiftY = (y - 0.5) * -12;
+    const sheenX = (x - 0.5) * 28;
+    const sheenY = (y - 0.5) * 12;
+    frame.style.setProperty('--portrait-rx', `${rotateX.toFixed(2)}deg`);
+    frame.style.setProperty('--portrait-ry', `${rotateY.toFixed(2)}deg`);
+    frame.style.setProperty('--portrait-tx', `${shiftX.toFixed(2)}px`);
+    frame.style.setProperty('--portrait-ty', `${shiftY.toFixed(2)}px`);
+    frame.style.setProperty('--portrait-sx', `${sheenX.toFixed(2)}px`);
+    frame.style.setProperty('--portrait-sy', `${sheenY.toFixed(2)}px`);
+    frame.style.setProperty('--portrait-mx', `${(x * 100).toFixed(1)}%`);
+    frame.style.setProperty('--portrait-my', `${(y * 100).toFixed(1)}%`);
+  };
+
+  const activateDepth = () => setIsActive(true);
+
+  const deactivateDepth = () => {
+    setIsActive(false);
+    resetPointer();
+  };
+
+  const portraitClassName = [styles.portrait, styles.portraitInteractive, isActive ? styles.portraitActive : '']
+    .filter(Boolean)
+    .join(' ');
+
+  const portraitStyle = {
+    '--spot-primary': spotPrimary,
+    '--spot-secondary': spotSecondary,
+    ...(!c.img ? { background: 'var(--color-ink-card)' } : {}),
+  };
+
+  return (
+    <div
+      ref={frameRef}
+      className={portraitClassName}
+      style={portraitStyle}
+      onPointerEnter={activateDepth}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={deactivateDepth}
+      onPointerCancel={deactivateDepth}
+    >
+      {c.img ? (
+        <img
+          src={assetUrl(c.img)}
+          alt={c.role}
+          className={styles.portraitImage}
+          loading="eager"
+          decoding="async"
+        />
+      ) : (
+        <PortraitPlaceholder role={c.role} hue={c.hue} />
+      )}
+      <span className={styles.portraitLight} aria-hidden="true" />
+      <span className={styles.portraitSheen} aria-hidden="true" />
+    </div>
+  );
+}
 
 export default function Character() {
   const { slug } = useParams();
@@ -53,7 +140,7 @@ function DetailedCharacter({ c, tier, navigate }) {
 
         <div className={styles.heroGrid}>
           <div className={styles.portraitWrap}>
-            <div className={styles.portrait} style={{ backgroundImage: `url(${assetUrl(c.img)})` }} />
+            <AnimatedPortrait c={c} />
             <div className={`${styles.romanBadge} t-deco`}>{ROMAN[c.n]}</div>
           </div>
 
@@ -252,12 +339,7 @@ function StubCharacter({ c, tier, navigate }) {
 
       <div className={styles.stubGrid}>
         <div className={styles.portraitWrap}>
-          <div
-            className={styles.portrait}
-            style={c.img ? { backgroundImage: `url(${assetUrl(c.img)})` } : { background: 'var(--color-ink-card)' }}
-          >
-            {!c.img && <PortraitPlaceholder role={c.role} hue={c.hue} />}
-          </div>
+          <AnimatedPortrait c={c} />
           <div className={`${styles.romanBadge} t-deco`}>{ROMAN[c.n]}</div>
         </div>
 

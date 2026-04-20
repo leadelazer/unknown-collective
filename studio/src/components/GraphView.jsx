@@ -1,138 +1,79 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { createContext, useContext, useMemo, useState, useCallback, useEffect } from 'react';
+import {
+  ReactFlow, ReactFlowProvider,
+  useNodesState, useEdgesState,
+  Background, Controls,
+  BaseEdge, getStraightPath,
+  Handle, Position,
+  useViewport,
+} from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
 
-const W = 1000;
-const H = 640;
-const INITIAL_VIEWBOX = { x: -90, y: -60, w: 1180, h: 760 };
-const MIN_VIEWBOX_WIDTH = 620;
-const MAX_VIEWBOX_WIDTH = 1800;
-const PAN_MARGIN = 260;
-
-const TIER_RINGS = {
-  guides: { r: 90, color: '#fce4ec', label: 'Guides' },
-  luminaries: { r: 195, color: '#f3e5f5', label: 'Luminaries' },
-  guardians: { r: 290, color: '#e3f2fd', label: 'Guardians' },
-  custodians: { r: 380, color: '#fff3e0', label: 'Custodians' },
-  grounded: { r: 465, color: '#e8f5e9', label: 'Grounded' },
-};
-
+// ─── Constants ────────────────────────────────────────────────────────────────
 const EDGE_MODES = [
-  { id: 'all', label: 'All links' },
-  { id: 'relations', label: 'Relations' },
+  { id: 'all',        label: 'All links' },
+  { id: 'relations',  label: 'Relations' },
   { id: 'encounters', label: 'Encounters' },
   { id: 'mismatches', label: 'Gaps' },
 ];
 
 const ISSUE_FILTERS = [
-  { id: 'all', label: 'All nodes' },
-  { id: 'content', label: 'Thin content' },
-  { id: 'coverage', label: 'Coverage gaps' },
+  { id: 'all',       label: 'All nodes' },
+  { id: 'content',   label: 'Thin content' },
+  { id: 'coverage',  label: 'Coverage gaps' },
   { id: 'asymmetry', label: 'One-way links' },
-  { id: 'isolated', label: 'Isolated' },
+  { id: 'isolated',  label: 'Isolated' },
 ];
 
-function pairKey(a, b) {
-  return [a, b].sort().join('--');
-}
+const TIER_ORDER = ['guides', 'luminaries', 'guardians', 'custodians', 'grounded'];
+const TIER_META  = {
+  guides:      { label: 'Guides' },
+  luminaries:  { label: 'Luminaries' },
+  guardians:   { label: 'Guardians' },
+  custodians:  { label: 'Custodians' },
+  grounded:    { label: 'Grounded' },
+};
 
-function encounterParticipants(encounter) {
-  const participants = Array.isArray(encounter.participants) && encounter.participants.length > 0
-    ? encounter.participants
-    : [encounter.slugA, encounter.slugB].filter(Boolean);
-  return [...new Set(participants)];
-}
+const EDGE_LEGEND = [
+  { label: 'Relation + encounter', color: '#4a4540', dash: undefined },
+  { label: 'Relation only',        color: '#c8a856', dash: undefined },
+  { label: 'Encounter only',       color: '#4a7fbd', dash: '6 3' },
+  { label: 'Gap (Gaps mode only)', color: '#c45a2d', dash: '4 3' },
+];
 
-function buildLayout(characters) {
-  const byTier = {};
-  characters.forEach(character => {
-    if (!byTier[character.tier]) byTier[character.tier] = [];
-    byTier[character.tier].push(character);
-  });
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function pairKey(a, b) { return [a, b].sort().join('--'); }
 
-  const positions = {};
-  Object.entries(TIER_RINGS).forEach(([tier, { r }]) => {
-    const tierCharacters = (byTier[tier] || []).slice().sort((left, right) => (left.n ?? 99) - (right.n ?? 99));
-    tierCharacters.forEach((character, index) => {
-      const angle = (index / tierCharacters.length) * 2 * Math.PI - Math.PI / 2;
-      positions[character.slug] = {
-        x: W / 2 + Math.cos(angle) * r,
-        y: H / 2 + Math.sin(angle) * r,
-      };
-    });
-  });
-
-  return positions;
+function encounterParticipants(enc) {
+  const p = Array.isArray(enc.participants) && enc.participants.length > 0
+    ? enc.participants : [enc.slugA, enc.slugB].filter(Boolean);
+  return [...new Set(p)];
 }
 
 function buildAdjacency(edges) {
-  const adjacency = new Map();
-  edges.forEach(edge => {
-    if (!adjacency.has(edge.source)) adjacency.set(edge.source, new Set());
-    if (!adjacency.has(edge.target)) adjacency.set(edge.target, new Set());
-    adjacency.get(edge.source).add(edge.target);
-    adjacency.get(edge.target).add(edge.source);
+  const adj = new Map();
+  edges.forEach(e => {
+    if (!adj.has(e.source)) adj.set(e.source, new Set());
+    if (!adj.has(e.target)) adj.set(e.target, new Set());
+    adj.get(e.source).add(e.target);
+    adj.get(e.target).add(e.source);
   });
-  return adjacency;
+  return adj;
 }
 
-function collectNeighborhood(seedSlugs, adjacency, depth) {
-  const queue = seedSlugs.filter(Boolean).map(slug => ({ slug, depth: 0 }));
-  const visited = new Set(queue.map(item => item.slug));
-
-  while (queue.length > 0) {
-    const current = queue.shift();
-    if (current.depth >= depth) continue;
-    const neighbors = adjacency.get(current.slug) || new Set();
-    neighbors.forEach(neighbor => {
-      if (visited.has(neighbor)) return;
-      visited.add(neighbor);
-      queue.push({ slug: neighbor, depth: current.depth + 1 });
+function collectNeighborhood(seeds, adj, depth) {
+  const queue = seeds.filter(Boolean).map(s => ({ slug: s, d: 0 }));
+  const visited = new Set(seeds.filter(Boolean));
+  while (queue.length) {
+    const cur = queue.shift();
+    if (cur.d >= depth) continue;
+    (adj.get(cur.slug) || new Set()).forEach(n => {
+      if (visited.has(n)) return;
+      visited.add(n);
+      queue.push({ slug: n, d: cur.d + 1 });
     });
   }
-
   return visited;
-}
-
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
-}
-
-function clampViewBox(viewBox) {
-  const nextWidth = clamp(viewBox.w, MIN_VIEWBOX_WIDTH, MAX_VIEWBOX_WIDTH);
-  const nextHeight = (nextWidth / W) * H;
-  const minX = -PAN_MARGIN;
-  const minY = -PAN_MARGIN;
-  const maxX = W - nextWidth + PAN_MARGIN;
-  const maxY = H - nextHeight + PAN_MARGIN;
-
-  return {
-    x: clamp(viewBox.x, minX, maxX),
-    y: clamp(viewBox.y, minY, maxY),
-    w: nextWidth,
-    h: nextHeight,
-  };
-}
-
-function zoomViewBox(viewBox, factor, anchorX = W / 2, anchorY = H / 2) {
-  const nextWidth = clamp(viewBox.w * factor, MIN_VIEWBOX_WIDTH, MAX_VIEWBOX_WIDTH);
-  const scale = nextWidth / viewBox.w;
-  const nextHeight = (nextWidth / W) * H;
-  const nextX = anchorX - (anchorX - viewBox.x) * scale;
-  const nextY = anchorY - (anchorY - viewBox.y) * scale;
-  return clampViewBox({ x: nextX, y: nextY, w: nextWidth, h: nextHeight });
-}
-
-function graphGapScore(issues) {
-  return issues.reduce((score, issue) => {
-    if (issue === 'bio-structure') return score + 6;
-    if (issue === 'bio-thin') return score + 5;
-    if (issue === 'talisman' || issue === 'shadow') return score + 5;
-    if (issue === 'talisman-thin' || issue === 'shadow-thin') return score + 3;
-    if (issue === 'relation-notes') return score + 3;
-    if (issue === 'relation-notes-incomplete') return score + 2;
-    if (issue === 'flower' || issue === 'palette') return score + 2;
-    if (issue === 'flower-meaning') return score + 1;
-    return 1;
-  }, 0);
 }
 
 function bioParagraphCount(bio) {
@@ -140,711 +81,624 @@ function bioParagraphCount(bio) {
   return bio.trim().split(/\n\n+/).filter(Boolean).length;
 }
 
+function graphGapScore(issues) {
+  return issues.reduce((s, i) => {
+    if (i === 'bio-structure') return s + 6;
+    if (i === 'bio-thin') return s + 5;
+    if (i === 'talisman' || i === 'shadow') return s + 5;
+    if (i === 'talisman-thin' || i === 'shadow-thin') return s + 3;
+    if (i === 'relation-notes') return s + 3;
+    if (i === 'relation-notes-incomplete') return s + 2;
+    if (i === 'flower' || i === 'palette') return s + 2;
+    return s + 1;
+  }, 0);
+}
+
 function computeGraphGaps(characters) {
-  const allSlugs = new Set(characters.map(character => character.slug));
-  return characters.map(character => {
+  const allSlugs = new Set(characters.map(c => c.slug));
+  return characters.map(c => {
     const issues = [];
-    const talismanLength = character.talisman?.trim().length || 0;
-    const shadowLength = character.shadow?.trim().length || 0;
-    const bioLength = character.bio?.trim().length || 0;
-    const paragraphs = bioParagraphCount(character.bio);
-    const relationSlugs = (character.relations || []).filter(slug => allSlugs.has(slug));
-    const relationNotes = Array.isArray(character.relationNotes) ? character.relationNotes.filter(note => note?.slug && note?.note?.trim()) : [];
-
-    if (talismanLength < 30) issues.push('talisman');
-    else if (talismanLength < 340) issues.push('talisman-thin');
-
-    if (shadowLength < 30) issues.push('shadow');
-    else if (shadowLength < 340) issues.push('shadow-thin');
-
-    if (bioLength < 150) issues.push('bio');
-    else {
-      if (paragraphs < 4) issues.push('bio-structure');
-      if (bioLength < 900) issues.push('bio-thin');
+    const tLen = c.talisman?.trim().length || 0;
+    const sLen = c.shadow?.trim().length || 0;
+    const bLen = c.bio?.trim().length || 0;
+    const paras = bioParagraphCount(c.bio);
+    const relSlugs = (c.relations || []).filter(s => allSlugs.has(s));
+    const relNotes = (Array.isArray(c.relationNotes) ? c.relationNotes : []).filter(n => n?.slug && n?.note?.trim());
+    if (tLen < 30) issues.push('talisman'); else if (tLen < 340) issues.push('talisman-thin');
+    if (sLen < 30) issues.push('shadow');   else if (sLen < 340) issues.push('shadow-thin');
+    if (bLen < 150) issues.push('bio');
+    else { if (paras < 4) issues.push('bio-structure'); if (bLen < 900) issues.push('bio-thin'); }
+    if (!c.flower?.trim()) issues.push('flower');
+    if (!c.flowerMeaning?.trim()) issues.push('flower-meaning');
+    if (!Array.isArray(c.palette) || c.palette.filter(Boolean).length < 3) issues.push('palette');
+    if (relSlugs.length > 0) {
+      if (relNotes.length === 0) issues.push('relation-notes');
+      else if (relNotes.length < relSlugs.length) issues.push('relation-notes-incomplete');
     }
-
-    if (!character.flower?.trim()) issues.push('flower');
-    if (!character.flowerMeaning?.trim()) issues.push('flower-meaning');
-    if (!Array.isArray(character.palette) || character.palette.filter(Boolean).length < 3) issues.push('palette');
-
-    if (relationSlugs.length > 0) {
-      if (relationNotes.length === 0) issues.push('relation-notes');
-      else if (relationNotes.length < relationSlugs.length) issues.push('relation-notes-incomplete');
-    }
-
-    const brokenRelations = (character.relations || []).filter(slug => !allSlugs.has(slug));
-    if (brokenRelations.length > 0) issues.push(`broken-relations(${brokenRelations.join(',')})`);
-
-    return {
-      slug: character.slug,
-      issues,
-      score: graphGapScore(issues),
-    };
-  }).filter(gap => gap.issues.length > 0);
+    const broken = (c.relations || []).filter(r => !allSlugs.has(r));
+    if (broken.length) issues.push('broken-relations(' + broken.join(',') + ')');
+    return issues.length ? { slug: c.slug, issues, score: graphGapScore(issues) } : null;
+  }).filter(Boolean);
 }
 
-function issueLabel(issue) {
-  return issue
-    .replace(/\(.+\)/, '')
-    .replace(/-/g, ' ')
-    .replace(/\b\w/g, match => match.toUpperCase());
+function issueLabel(i) {
+  return i.replace(/\(.+\)/, '').replace(/-/g, ' ').replace(/\b\w/g, m => m.toUpperCase());
 }
 
-function SectionTitle({ children, meta }) {
+// ─── Concentric tier layout ────────────────────────────────────────────────────
+// luminaries at centre → guardians → custodians → grounded → guides (outermost)
+const TIER_RING_ORDER  = ['luminaries', 'guardians', 'custodians', 'grounded', 'guides'];
+const TIER_RING_RADII  = { luminaries: 160, guardians: 320, custodians: 490, grounded: 660, guides: 830 };
+const TIER_RING_COLORS = { luminaries: '#c8a856', guardians: '#6a8fc0', custodians: '#85a87a', grounded: '#b07b55', guides: '#9b7eb5' };
+const TIER_RING_LABELS = { luminaries: 'Luminaries', guardians: 'Guardians', custodians: 'Custodians', grounded: 'Grounded', guides: 'Guides' };
+// Angular offset per ring so nodes don't all cluster at the top
+const TIER_RING_ANGLE_OFFSET = { luminaries: 0, guardians: Math.PI / 4, custodians: Math.PI / 8, grounded: Math.PI / 12, guides: Math.PI / 3 };
+
+function computeLayout(characters) {
+  const byTier = {};
+  TIER_RING_ORDER.forEach(t => { byTier[t] = []; });
+  characters.forEach(c => { (byTier[c.tier] || (byTier[c.tier] = [])).push(c.slug); });
+
+  const tiersPresent = TIER_RING_ORDER.filter(t => byTier[t]?.length > 0);
+
+  // Single-tier filter → single ring
+  if (tiersPresent.length === 1) {
+    const slugs = byTier[tiersPresent[0]];
+    const r = Math.max(200, slugs.length * 55);
+    return Object.fromEntries(slugs.map((slug, i) => {
+      const a = (i / slugs.length) * 2 * Math.PI - Math.PI / 2;
+      return [slug, { x: Math.cos(a) * r, y: Math.sin(a) * r }];
+    }));
+  }
+
+  const positions = {};
+  tiersPresent.forEach(tier => {
+    const slugs = byTier[tier];
+    const r = TIER_RING_RADII[tier] || 500;
+    const offset = TIER_RING_ANGLE_OFFSET[tier] || 0;
+    slugs.forEach((slug, i) => {
+      const a = (i / slugs.length) * 2 * Math.PI - Math.PI / 2 + offset;
+      positions[slug] = { x: Math.cos(a) * r, y: Math.sin(a) * r };
+    });
+  });
+  return positions;
+}
+
+// ─── Tier ring background (inside ReactFlow, scales with zoom) ─────────────────
+function TierRings({ tiersPresent }) {
+  const { x: vpX, y: vpY, zoom } = useViewport();
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 10 }}>
-      <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-3)' }}>
-        {children}
+    <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0, overflow: 'visible' }}>
+      {TIER_RING_ORDER.filter(t => tiersPresent.has(t)).map(tier => {
+        const r = (TIER_RING_RADII[tier] || 400) * zoom;
+        const color = TIER_RING_COLORS[tier];
+        // Label positioned at the top of each ring
+        const lx = vpX;
+        const ly = vpY - r;
+        return (
+          <g key={tier}>
+            <circle cx={vpX} cy={vpY} r={r} fill="none" stroke={color} strokeWidth={1} strokeDasharray="6 4" opacity={0.25} />
+            <text x={lx} y={ly - 6} textAnchor="middle" fontSize={10} fill={color} opacity={0.55} fontWeight={600} letterSpacing="0.06em" style={{ textTransform: 'uppercase', fontFamily: 'inherit' }}>
+              {TIER_RING_LABELS[tier]}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+// ─── Context ──────────────────────────────────────────────────────────────────
+const GraphContext = createContext({ highlightedSlugs: null, pinnedSlug: null, compareSlug: null, edgeMode: 'all' });
+
+// ─── Custom node ──────────────────────────────────────────────────────────────
+function CharacterNode({ id, data }) {
+  const { highlightedSlugs, pinnedSlug, compareSlug } = useContext(GraphContext);
+  const { character, gapCount } = data;
+  const isPinned  = pinnedSlug  === id;
+  const isCompare = compareSlug === id;
+  const isDimmed  = highlightedSlugs && !highlightedSlugs.has(id);
+  const r = 22 + Math.min((data.connectionCount || 0) * 1.2, 8);
+  const size = r * 2;
+
+  const ringStyle = isPinned
+    ? { boxShadow: '0 0 0 3px #1a1a1a' }
+    : isCompare
+    ? { boxShadow: '0 0 0 3px ' + character.hue, outline: '2px dashed ' + character.hue, outlineOffset: 5 }
+    : {};
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7, cursor: 'pointer', userSelect: 'none' }}>
+      <Handle type="source" position={Position.Top}    style={{ opacity: 0, width: 1, height: 1, minWidth: 1, minHeight: 1, border: 'none', background: 'transparent', top: '50%', left: '50%' }} />
+      <Handle type="target" position={Position.Bottom} style={{ opacity: 0, width: 1, height: 1, minWidth: 1, minHeight: 1, border: 'none', background: 'transparent', top: '50%', left: '50%' }} />
+      <div style={{
+        width: size, height: size, borderRadius: '50%',
+        background: character.hue, border: '2.5px solid white',
+        opacity: isDimmed ? 0.1 : (highlightedSlugs ? 1 : 0.68),
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        transition: 'opacity 0.18s, box-shadow 0.18s',
+        position: 'relative',
+        ...ringStyle,
+      }}>
+        <span style={{ color: 'white', fontSize: 11, fontWeight: 700, lineHeight: 1 }}>{character.n}</span>
+        {gapCount > 0 && (
+          <div style={{ position: 'absolute', top: -4, right: -4, width: 14, height: 14, borderRadius: '50%', background: '#fff4eb', border: '1px solid #9a3412', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, color: '#9a3412', fontWeight: 700 }}>
+            {Math.min(gapCount, 9)}
+          </div>
+        )}
       </div>
-      {meta ? <div style={{ fontSize: 11, color: 'var(--text-3)' }}>{meta}</div> : null}
+      <div style={{
+        fontSize: 10, fontWeight: isPinned ? 700 : 500, color: isPinned ? '#1a1a1a' : '#444',
+        whiteSpace: 'nowrap', lineHeight: 1, opacity: isDimmed ? 0.1 : (highlightedSlugs ? 1 : 0.65),
+        transition: 'opacity 0.18s', pointerEvents: 'none',
+      }}>
+        {character.role?.replace('The ', '')}
+      </div>
     </div>
   );
 }
 
-function StatChip({ label, value, tone = 'default' }) {
-  const background = tone === 'accent'
-    ? 'var(--accent-soft)'
-    : tone === 'warning'
-      ? '#fff4eb'
-      : 'var(--surface-2)';
-  const color = tone === 'accent'
-    ? 'var(--accent)'
-    : tone === 'warning'
-      ? '#9a3412'
-      : 'var(--text-2)';
-
+// ─── Custom edge ──────────────────────────────────────────────────────────────
+function RelationEdge({ sourceX, sourceY, targetX, targetY, source, target, data }) {
+  const { highlightedSlugs, edgeMode } = useContext(GraphContext);
+  const edge = data.edge;
+  const isActive = !highlightedSlugs || (highlightedSlugs.has(source) && highlightedSlugs.has(target));
+  const isDimmed  = highlightedSlugs && !(highlightedSlugs.has(source) && highlightedSlugs.has(target));
+  const gapsMode = edgeMode === 'mismatches';
+  let color, dash, width;
+  if (gapsMode && edge.mismatch) {
+    color = isActive ? '#c45a2d' : '#e09070'; dash = '4 3'; width = isActive ? 2.5 : 1.4;
+  } else if (edge.encounter && edge.relation) {
+    color = isActive ? '#4a4540' : '#9a9088'; dash = undefined; width = isActive ? 2.4 : 1.6;
+  } else if (edge.encounter) {
+    color = isActive ? '#4a7fbd' : '#8ab0d8'; dash = '6 3'; width = isActive ? 1.8 : 1.1;
+  } else {
+    color = isActive ? '#b8964e' : '#c8a856'; dash = undefined; width = isActive ? 1.8 : 1.1;
+  }
+  const [edgePath] = getStraightPath({ sourceX, sourceY, targetX, targetY });
   return (
-    <div style={{ padding: '8px 10px', border: '1px solid var(--border)', borderRadius: 8, background, minWidth: 82 }}>
+    <BaseEdge path={edgePath} style={{
+      stroke: color, strokeWidth: width, strokeDasharray: dash,
+      opacity: isDimmed ? 0.04 : (highlightedSlugs ? 1 : 0.2),
+      transition: 'opacity 0.18s, stroke 0.18s',
+    }} />
+  );
+}
+
+const nodeTypes = { character: CharacterNode };
+const edgeTypes = { relation: RelationEdge };
+
+// ─── Shared UI pieces ─────────────────────────────────────────────────────────
+function StatChip({ label, value, tone }) {
+  const bg  = tone === 'accent' ? 'var(--accent-soft)' : tone === 'warning' ? '#fff4eb' : 'var(--surface-2)';
+  const col = tone === 'accent' ? 'var(--accent)'      : tone === 'warning' ? '#9a3412' : 'var(--text-2)';
+  return (
+    <div style={{ padding: '8px 10px', border: '1px solid var(--border)', borderRadius: 8, background: bg, minWidth: 80 }}>
       <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)' }}>{value}</div>
-      <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '.06em', color }}>{label}</div>
+      <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '.06em', color: col }}>{label}</div>
     </div>
   );
 }
 
-function CollapsibleSection({ title, meta, defaultOpen = true, children, count }) {
-  const [open, setOpen] = useState(defaultOpen);
+function CollapsibleSection({ title, count, defaultOpen, children }) {
+  const [open, setOpen] = useState(defaultOpen !== false);
   return (
-    <div style={{ marginBottom: 16 }}>
-      <div
-        onClick={() => setOpen(o => !o)}
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: open ? 10 : 0, cursor: 'pointer', userSelect: 'none' }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 10, color: 'var(--text-3)', transition: 'transform .15s', transform: open ? 'rotate(90deg)' : 'rotate(0)', display: 'inline-block' }}>{"\u25B6"}</span>
-          <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-3)' }}>{title}</span>
-          {count != null ? <span style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 400 }}>({count})</span> : null}
-        </div>
-        {meta ? <div style={{ fontSize: 11, color: 'var(--text-3)' }}>{meta}</div> : null}
+    <div style={{ marginBottom: 14 }}>
+      <div onClick={() => setOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: open ? 8 : 0, cursor: 'pointer', userSelect: 'none' }}>
+        <span style={{ fontSize: 9, color: 'var(--text-3)', display: 'inline-block', transition: 'transform .15s', transform: open ? 'rotate(90deg)' : 'rotate(0)' }}>&#9654;</span>
+        <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-3)' }}>{title}</span>
+        {count != null && <span style={{ fontSize: 10, color: 'var(--text-3)' }}>({count})</span>}
       </div>
-      {open ? children : null}
+      {open && children}
     </div>
   );
 }
 
-const EDGE_LEGEND = [
-  { label: 'Relation + encounter', color: '#4a4540', dash: undefined, width: 2 },
-  { label: 'Relation only', color: '#c8a856', dash: undefined, width: 1.5 },
-  { label: 'Encounter only', color: '#4a7fbd', dash: '5 3', width: 1.5 },
-  { label: 'Gap (in Gaps mode)', color: '#c45a2d', dash: '4 3', width: 2 },
-];
-
-function PartnerRow({ character, statuses, onFocus, onCompare, onOpenEditor, onEncounterAction, encounterLabel }) {
+function PartnerRow({ character, statuses, onFocus, onOpenEditor, onEncounterAction, encounterLabel }) {
   return (
     <div style={{ border: '1px solid var(--border)', borderRadius: 8, padding: 10, background: 'var(--surface)' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-        <div style={{ width: 12, height: 12, borderRadius: '50%', background: character.hue, flexShrink: 0, marginTop: 4 }} />
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{character.role}</div>
-          <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>{character.arcana}</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
-            {statuses.map(status => (
-              <span
-                key={status}
-                style={{
-                  fontSize: 10,
-                  padding: '2px 7px',
-                  borderRadius: 999,
-                  border: '1px solid var(--border)',
-                  background: status === 'missing encounter' ? '#fff4eb' : 'var(--surface-2)',
-                  color: status === 'missing encounter' ? '#9a3412' : 'var(--text-2)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '.05em',
-                }}
-              >
-                {status}
-              </span>
-            ))}
-          </div>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 8 }}>
+        <div style={{ width: 10, height: 10, borderRadius: '50%', background: character.hue, flexShrink: 0, marginTop: 3 }} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 600 }}>{character.role}</div>
+          <div style={{ fontSize: 11, color: 'var(--text-3)' }}>{character.arcana}</div>
+          {statuses?.length > 0 && (
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 5 }}>
+              {statuses.map(s => <span key={s} style={{ fontSize: 10, padding: '2px 6px', borderRadius: 999, border: '1px solid var(--border)', background: s.includes('no enc') ? '#fff4eb' : 'var(--surface-2)', color: s.includes('no enc') ? '#9a3412' : 'var(--text-2)', textTransform: 'uppercase', letterSpacing: '.05em' }}>{s}</span>)}
+            </div>
+          )}
         </div>
       </div>
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10 }}>
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
         <button className="btn btn-ghost btn-sm" onClick={onFocus}>Focus</button>
-        <button className="btn btn-ghost btn-sm" onClick={onCompare}>Compare</button>
-        <button className="btn btn-ghost btn-sm" onClick={onOpenEditor}>Open Editor</button>
-        {onEncounterAction ? <button className="btn btn-primary btn-sm" onClick={onEncounterAction}>{encounterLabel}</button> : null}
+        <button className="btn btn-ghost btn-sm" onClick={onOpenEditor}>Editor</button>
+        {onEncounterAction && <button className="btn btn-primary btn-sm" onClick={onEncounterAction}>{encounterLabel}</button>}
       </div>
     </div>
   );
 }
 
-function EmptyInspector({ hoveredCharacter, relationCount, encounterCount, issueCount, totalCharacters }) {
-  return (
-    <div style={{ width: 360, borderLeft: '1px solid var(--border)', background: 'var(--surface)', padding: 20, overflowY: 'auto', flexShrink: 0 }}>
-      <div style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.2, marginBottom: 8 }}>Relationship graph</div>
+// ─── Inner graph (needs ReactFlowProvider ancestor) ───────────────────────────
+function GraphInner({
+  characters, encounters,
+  selectedCharacterSlug,
+  graphState, onGraphStateChange,
+  onOpenCharacter, onOpenEncounter, onCreateEncounter, showToast,
+}) {
+  const [pinnedSlug,  setPinnedSlug]  = useState(null);
+  const [compareSlug, setCompareSlug] = useState(null);
+  const [hoveredSlug, setHoveredSlug] = useState(null);
+
+  function updateGraphState(updater) {
+    onGraphStateChange(cur => typeof updater === 'function' ? updater(cur) : updater);
+  }
+
+  const bySlug = useMemo(() => new Map(characters.map(c => [c.slug, c])), [characters]);
+  const gaps   = useMemo(() => computeGraphGaps(characters), [characters]);
+  const gapMap = useMemo(() => new Map(gaps.map(g => [g.slug, g])), [gaps]);
+
+  const { allEdges, encountersByPair } = useMemo(() => {
+    const pairMap = new Map();
+    const slugSet = new Set(characters.map(c => c.slug));
+    characters.forEach(c => {
+      (c.relations || []).forEach(target => {
+        if (!slugSet.has(target) || target === c.slug) return;
+        const key = pairKey(c.slug, target);
+        const [src, tgt] = [c.slug, target].sort();
+        const e = pairMap.get(key) || { source: src, target: tgt, relation: false, encounter: false, encounterId: null, encounterTitle: null };
+        e.relation = true;
+        pairMap.set(key, e);
+      });
+    });
+    encounters.forEach(enc => {
+      const parts = encounterParticipants(enc).filter(s => slugSet.has(s));
+      if (parts.length < 2) return;
+      for (let i = 0; i < parts.length; i++) for (let j = i + 1; j < parts.length; j++) {
+        if (parts[i] === parts[j]) continue;
+        const key = pairKey(parts[i], parts[j]);
+        const [src, tgt] = [parts[i], parts[j]].sort();
+        const e = pairMap.get(key) || { source: src, target: tgt, relation: false, encounter: false, encounterId: null, encounterTitle: null };
+        e.encounter = true;
+        e.encounterId = e.encounterId || enc.id;
+        e.encounterTitle = e.encounterTitle || enc.title || enc.id;
+        pairMap.set(key, e);
+      }
+    });
+    const allEdges = Array.from(pairMap.values()).map(e => ({
+      ...e, kind: e.relation && e.encounter ? 'both' : e.relation ? 'relation' : 'encounter', mismatch: e.relation !== e.encounter,
+    }));
+    const encMap = new Map();
+    encounters.forEach(enc => {
+      const parts = encounterParticipants(enc);
+      for (let i = 0; i < parts.length; i++) for (let j = i + 1; j < parts.length; j++) {
+        const key = pairKey(parts[i], parts[j]);
+        if (!encMap.has(key)) encMap.set(key, enc);
+      }
+    });
+    return { allEdges, encountersByPair: encMap };
+  }, [characters, encounters]);
+
+  const analysisBySlug = useMemo(() => {
+    const m = new Map();
+    characters.forEach(c => {
+      const declared = (c.relations || []).filter(s => bySlug.has(s));
+      const referencedBy = characters.filter(o => o.slug !== c.slug && o.relations?.includes(c.slug)).map(o => o.slug);
+      const encPartners = allEdges.filter(e => e.encounter && (e.source === c.slug || e.target === c.slug)).map(e => e.source === c.slug ? e.target : e.source);
+      m.set(c.slug, {
+        declared, referencedBy, encounterPartners: encPartners,
+        missingEncounterPartners: declared.filter(s => !encPartners.includes(s)),
+        encounterOnlyPartners: encPartners.filter(s => !declared.includes(s)),
+        oneWayOutgoing: declared.filter(s => !bySlug.get(s)?.relations?.includes(c.slug)),
+        oneWayIncoming: referencedBy.filter(s => !declared.includes(s)),
+      });
+    });
+    return m;
+  }, [bySlug, characters, allEdges]);
+
+  const matchesIssueFilter = useCallback((slug) => {
+    const a = analysisBySlug.get(slug);
+    const g = gapMap.get(slug);
+    const conn = (a?.declared.length || 0) + (a?.encounterOnlyPartners.length || 0);
+    switch (graphState.issueFilter) {
+      case 'content':   return Boolean(g);
+      case 'coverage':  return Boolean(a?.missingEncounterPartners.length || a?.encounterOnlyPartners.length);
+      case 'asymmetry': return Boolean(a?.oneWayOutgoing.length || a?.oneWayIncoming.length);
+      case 'isolated':  return conn === 0;
+      default: return true;
+    }
+  }, [analysisBySlug, gapMap, graphState.issueFilter]);
+
+  const visibleCharacters = useMemo(() =>
+    characters.filter(c => (!graphState.tierFilter || c.tier === graphState.tierFilter) && matchesIssueFilter(c.slug)),
+    [characters, graphState.tierFilter, matchesIssueFilter]);
+
+  const visibleSlugs = useMemo(() => new Set(visibleCharacters.map(c => c.slug)), [visibleCharacters]);
+
+  const tiersPresent = useMemo(() => new Set(visibleCharacters.map(c => c.tier)), [visibleCharacters]);
+
+  const visibleEdges = useMemo(() => allEdges.filter(e => {
+    if (!visibleSlugs.has(e.source) || !visibleSlugs.has(e.target)) return false;
+    if (graphState.edgeMode === 'relations')  return e.relation;
+    if (graphState.edgeMode === 'encounters') return e.encounter;
+    if (graphState.edgeMode === 'mismatches') return e.mismatch;
+    return true;
+  }), [allEdges, graphState.edgeMode, visibleSlugs]);
+
+  const visibleAdjacency = useMemo(() => buildAdjacency(visibleEdges), [visibleEdges]);
+
+  const totalConnections = useMemo(() => {
+    const cnt = {};
+    allEdges.forEach(e => { cnt[e.source] = (cnt[e.source] || 0) + 1; cnt[e.target] = (cnt[e.target] || 0) + 1; });
+    return cnt;
+  }, [allEdges]);
+
+  // Initial layout — compute once from visible chars
+  const initialLayout = useMemo(() => computeLayout(visibleCharacters), []);
+
+  const [rfNodes, setRfNodes, onNodesChange] = useNodesState(
+    visibleCharacters.map(c => {
+      const pos = initialLayout[c.slug] || { x: 0, y: 0 };
+      return { id: c.slug, type: 'character', position: { x: pos.x, y: pos.y }, data: { character: c, gapCount: gapMap.get(c.slug)?.issues.length || 0, connectionCount: totalConnections[c.slug] || 0 } };
+    })
+  );
+
+  const [rfEdges, setRfEdges, onEdgesChange] = useEdgesState(
+    visibleEdges.map(e => ({ id: e.source + '--' + e.target, source: e.source, target: e.target, type: 'relation', data: { edge: e } }))
+  );
+
+  // Keep nodes/edges in sync when filters change
+  useEffect(() => {
+    const layout = computeLayout(visibleCharacters);
+    setRfNodes(visibleCharacters.map(c => {
+      const pos = layout[c.slug] || { x: 0, y: 0 };
+      return { id: c.slug, type: 'character', position: pos, data: { character: c, gapCount: gapMap.get(c.slug)?.issues.length || 0, connectionCount: totalConnections[c.slug] || 0 } };
+    }));
+  }, [visibleCharacters, gapMap, totalConnections]); // eslint-disable-line
+
+  useEffect(() => {
+    setRfEdges(visibleEdges.map(e => ({ id: e.source + '--' + e.target, source: e.source, target: e.target, type: 'relation', data: { edge: e } })));
+  }, [visibleEdges]); // eslint-disable-line
+
+  // Highlight
+  const highlightedSlugs = useMemo(() => {
+    const seeds = [pinnedSlug, compareSlug, hoveredSlug].filter(Boolean);
+    if (!seeds.length) return null;
+    return collectNeighborhood(seeds, visibleAdjacency, graphState.neighborhoodDepth);
+  }, [pinnedSlug, compareSlug, hoveredSlug, visibleAdjacency, graphState.neighborhoodDepth]);
+
+  const ctxValue = useMemo(() => ({ highlightedSlugs, pinnedSlug, compareSlug, edgeMode: graphState.edgeMode }), [highlightedSlugs, pinnedSlug, compareSlug, graphState.edgeMode]);
+
+  // Handlers
+  function handleNodeClick(_e, node) {
+    if (pinnedSlug === node.id) { setPinnedSlug(null); setCompareSlug(null); }
+    else { setPinnedSlug(node.id); setCompareSlug(null); }
+  }
+  function handlePaneClick()            { setPinnedSlug(null); setCompareSlug(null); setHoveredSlug(null); }
+  function handleNodeMouseEnter(_e, n)  { setHoveredSlug(n.id); }
+  function handleNodeMouseLeave()       { setHoveredSlug(null); }
+
+  async function handleEncounterAction(slugA, slugB) {
+    const existing = encountersByPair.get(pairKey(slugA, slugB));
+    if (existing) { onOpenEncounter(existing.id); return; }
+    const result = await onCreateEncounter(slugA, slugB);
+    if (!result && showToast) showToast('Unable to create encounter', 'error');
+  }
+
+  // Inspector data
+  const pinnedCharacter  = pinnedSlug  ? bySlug.get(pinnedSlug)  : null;
+  const compareCharacter = compareSlug ? bySlug.get(compareSlug) : null;
+  const hoveredCharacter = !pinnedCharacter && hoveredSlug ? bySlug.get(hoveredSlug) : null;
+  const pinnedAnalysis   = pinnedCharacter ? analysisBySlug.get(pinnedCharacter.slug) : null;
+  const pinnedGap        = pinnedCharacter ? gapMap.get(pinnedCharacter.slug) : null;
+  const pairEdge         = pinnedCharacter && compareCharacter ? allEdges.find(e => pairKey(e.source, e.target) === pairKey(pinnedCharacter.slug, compareCharacter.slug)) : null;
+  const sharedNeighbors  = pinnedCharacter && compareCharacter
+    ? [...(visibleAdjacency.get(pinnedCharacter.slug) || new Set())]
+        .filter(s => s !== compareCharacter.slug && (visibleAdjacency.get(compareCharacter.slug) || new Set()).has(s))
+        .map(s => bySlug.get(s)).filter(Boolean)
+    : [];
+  const issueCount = gaps.filter(g => g.issues.some(i => !i.startsWith('broken-relations'))).length;
+
+  const inspector = !pinnedCharacter ? (
+    <div style={{ width: 340, borderLeft: '1px solid var(--border)', background: 'var(--surface)', padding: 20, overflowY: 'auto', flexShrink: 0 }}>
+      <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Graph</div>
       <div style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.7, marginBottom: 16 }}>
-        Click a character to inspect their connections. Click a second to compare a pair.
+        Hover to preview connections.<br />Click to inspect a character.
       </div>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
-        <StatChip label="Characters" value={totalCharacters} />
-        <StatChip label="Relations" value={relationCount} tone="accent" />
-        <StatChip label="Encounters" value={encounterCount} />
-        {issueCount > 0 ? <StatChip label="With issues" value={issueCount} tone="warning" /> : null}
+        <StatChip label="Characters" value={characters.length} />
+        <StatChip label="Relations" value={allEdges.filter(e => e.relation).length} tone="accent" />
+        <StatChip label="Encounters" value={allEdges.filter(e => e.encounter).length} />
+        {issueCount > 0 && <StatChip label="Issues" value={issueCount} tone="warning" />}
       </div>
-      {hoveredCharacter ? (
-        <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16 }}>
+      {hoveredCharacter && (
+        <div style={{ borderTop: '1px solid var(--border)', paddingTop: 14 }}>
           <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 8 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: hoveredCharacter.hue }} />
+            <div style={{ width: 30, height: 30, borderRadius: 8, background: hoveredCharacter.hue, flexShrink: 0 }} />
             <div>
               <div style={{ fontWeight: 600, fontSize: 13 }}>{hoveredCharacter.role}</div>
               <div style={{ fontSize: 11, color: 'var(--text-3)' }}>{hoveredCharacter.arcana}</div>
             </div>
           </div>
-          {hoveredCharacter.essence ? <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.6, fontStyle: 'italic' }}>{hoveredCharacter.essence}</div> : null}
+          {hoveredCharacter.essence && <p style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.6, fontStyle: 'italic', margin: 0 }}>{hoveredCharacter.essence}</p>}
         </div>
-      ) : null}
+      )}
     </div>
-  );
-}
-
-export default function GraphView({
-  characters,
-  encounters,
-  selectedCharacterSlug,
-  graphState,
-  onGraphStateChange,
-  onOpenCharacter,
-  onOpenEncounter,
-  onCreateEncounter,
-  showToast,
-}) {
-  const [hovered, setHovered] = useState(null);
-  const [viewBox, setViewBox] = useState(INITIAL_VIEWBOX);
-  const [isPanning, setIsPanning] = useState(false);
-  const svgRef = useRef(null);
-  const panStateRef = useRef(null);
-
-  const bySlug = useMemo(() => new Map(characters.map(character => [character.slug, character])), [characters]);
-  const positions = useMemo(() => buildLayout(characters), [characters]);
-  const gaps = useMemo(() => computeGraphGaps(characters), [characters]);
-  const gapMap = useMemo(() => new Map(gaps.map(gap => [gap.slug, gap])), [gaps]);
-
-  const { edges, encountersByPair } = useMemo(() => {
-    const pairMap = new Map();
-    const slugSet = new Set(characters.map(character => character.slug));
-
-    characters.forEach(character => {
-      (character.relations || []).forEach(target => {
-        if (!slugSet.has(target) || target === character.slug) return;
-        const key = pairKey(character.slug, target);
-        const [source, edgeTarget] = [character.slug, target].sort();
-        const edge = pairMap.get(key) || { source, target: edgeTarget, relation: false, encounter: false, encounterId: null, encounterTitle: null };
-        edge.relation = true;
-        pairMap.set(key, edge);
-      });
-    });
-
-    encounters.forEach(encounter => {
-      const participants = encounterParticipants(encounter).filter(slug => slugSet.has(slug));
-      if (participants.length < 2) return;
-
-      for (let index = 0; index < participants.length; index += 1) {
-        for (let nextIndex = index + 1; nextIndex < participants.length; nextIndex += 1) {
-          const sourceSlug = participants[index];
-          const targetSlug = participants[nextIndex];
-          if (sourceSlug === targetSlug) continue;
-          const key = pairKey(sourceSlug, targetSlug);
-          const [source, edgeTarget] = [sourceSlug, targetSlug].sort();
-          const edge = pairMap.get(key) || { source, target: edgeTarget, relation: false, encounter: false, encounterId: null, encounterTitle: null };
-          edge.encounter = true;
-          edge.encounterId = edge.encounterId || encounter.id;
-          edge.encounterTitle = edge.encounterTitle || encounter.title || encounter.id;
-          pairMap.set(key, edge);
-        }
-      }
-    });
-
-    const allEdges = Array.from(pairMap.values()).map(edge => ({
-      ...edge,
-      kind: edge.relation && edge.encounter ? 'both' : edge.relation ? 'relation' : 'encounter',
-      mismatch: edge.relation !== edge.encounter,
-    }));
-
-    const encounterMap = new Map();
-    encounters.forEach(encounter => {
-      const participants = encounterParticipants(encounter);
-      for (let index = 0; index < participants.length; index += 1) {
-        for (let nextIndex = index + 1; nextIndex < participants.length; nextIndex += 1) {
-          const key = pairKey(participants[index], participants[nextIndex]);
-          if (!encounterMap.has(key)) encounterMap.set(key, encounter);
-        }
-      }
-    });
-
-    return { edges: allEdges, encountersByPair: encounterMap };
-  }, [characters, encounters]);
-
-  const analysisBySlug = useMemo(() => {
-    const analysis = new Map();
-
-    characters.forEach(character => {
-      const declared = (character.relations || []).filter(slug => bySlug.has(slug));
-      const referencedBy = characters
-        .filter(other => other.slug !== character.slug && other.relations?.includes(character.slug))
-        .map(other => other.slug);
-      const encounterPartners = edges
-        .filter(edge => edge.encounter && (edge.source === character.slug || edge.target === character.slug))
-        .map(edge => edge.source === character.slug ? edge.target : edge.source);
-      const missingEncounterPartners = declared.filter(slug => !encounterPartners.includes(slug));
-      const encounterOnlyPartners = encounterPartners.filter(slug => !declared.includes(slug));
-      const oneWayOutgoing = declared.filter(slug => !bySlug.get(slug)?.relations?.includes(character.slug));
-      const oneWayIncoming = referencedBy.filter(slug => !declared.includes(slug));
-
-      analysis.set(character.slug, {
-        declared,
-        referencedBy,
-        encounterPartners,
-        missingEncounterPartners,
-        encounterOnlyPartners,
-        oneWayOutgoing,
-        oneWayIncoming,
-      });
-    });
-
-    return analysis;
-  }, [bySlug, characters, edges]);
-
-  const matchesIssueFilter = useMemo(() => {
-    return slug => {
-      const analysis = analysisBySlug.get(slug);
-      const gap = gapMap.get(slug);
-      const connectivity = (analysis?.declared.length || 0) + (analysis?.encounterOnlyPartners.length || 0);
-
-      switch (graphState.issueFilter) {
-        case 'content':
-          return Boolean(gap);
-        case 'coverage':
-          return Boolean(analysis?.missingEncounterPartners.length || analysis?.encounterOnlyPartners.length);
-        case 'asymmetry':
-          return Boolean(analysis?.oneWayOutgoing.length || analysis?.oneWayIncoming.length);
-        case 'isolated':
-          return connectivity === 0;
-        default:
-          return true;
-      }
-    };
-  }, [analysisBySlug, gapMap, graphState.issueFilter]);
-
-  const visibleCharacters = useMemo(() => {
-    return characters.filter(character => {
-      if (graphState.tierFilter && character.tier !== graphState.tierFilter) return false;
-      return matchesIssueFilter(character.slug);
-    });
-  }, [characters, graphState.tierFilter, matchesIssueFilter]);
-
-  const visibleSlugs = useMemo(() => new Set(visibleCharacters.map(character => character.slug)), [visibleCharacters]);
-
-  const visibleEdges = useMemo(() => {
-    return edges.filter(edge => {
-      if (!visibleSlugs.has(edge.source) || !visibleSlugs.has(edge.target)) return false;
-      if (graphState.edgeMode === 'relations') return edge.relation;
-      if (graphState.edgeMode === 'encounters') return edge.encounter;
-      if (graphState.edgeMode === 'mismatches') return edge.mismatch;
-      return true;
-    });
-  }, [edges, graphState.edgeMode, visibleSlugs]);
-
-  const visibleAdjacency = useMemo(() => buildAdjacency(visibleEdges), [visibleEdges]);
-
-  const highlightSeeds = graphState.pinnedSlug
-    ? [graphState.pinnedSlug, graphState.compareSlug].filter(Boolean)
-    : hovered
-      ? [hovered]
-      : selectedCharacterSlug
-        ? [selectedCharacterSlug]
-        : [];
-  const highlightedSet = highlightSeeds.length > 0
-    ? collectNeighborhood(highlightSeeds, visibleAdjacency, graphState.neighborhoodDepth)
-    : null;
-
-  const totalConnections = useMemo(() => {
-    const counts = {};
-    edges.forEach(edge => {
-      counts[edge.source] = (counts[edge.source] || 0) + 1;
-      counts[edge.target] = (counts[edge.target] || 0) + 1;
-    });
-    return counts;
-  }, [edges]);
-
-  const pinnedCharacter = graphState.pinnedSlug ? bySlug.get(graphState.pinnedSlug) : null;
-  const compareCharacter = graphState.compareSlug ? bySlug.get(graphState.compareSlug) : null;
-  const hoveredCharacter = hovered ? bySlug.get(hovered) : null;
-  const pinnedAnalysis = pinnedCharacter ? analysisBySlug.get(pinnedCharacter.slug) : null;
-  const pinnedGap = pinnedCharacter ? gapMap.get(pinnedCharacter.slug) : null;
-  const pair = pinnedCharacter && compareCharacter ? edges.find(edge => pairKey(edge.source, edge.target) === pairKey(pinnedCharacter.slug, compareCharacter.slug)) : null;
-  const sharedNeighbors = pinnedCharacter && compareCharacter
-    ? [...(visibleAdjacency.get(pinnedCharacter.slug) || new Set())]
-        .filter(slug => slug !== compareCharacter.slug && (visibleAdjacency.get(compareCharacter.slug) || new Set()).has(slug))
-        .map(slug => bySlug.get(slug))
-        .filter(Boolean)
-    : [];
-  const issueCount = gaps.filter(gap => gap.issues.some(issue => !issue.startsWith('broken-relations'))).length;
-
-  function updateGraphState(updater) {
-    onGraphStateChange(current => (typeof updater === 'function' ? updater(current) : updater));
-  }
-
-  function getSvgCoordinates(clientX, clientY, box = viewBox) {
-    const rect = svgRef.current?.getBoundingClientRect();
-    if (!rect || rect.width === 0 || rect.height === 0) return null;
-    return {
-      x: box.x + ((clientX - rect.left) / rect.width) * box.w,
-      y: box.y + ((clientY - rect.top) / rect.height) * box.h,
-    };
-  }
-
-  function focusNode(slug) {
-    updateGraphState(state => ({ ...state, pinnedSlug: slug, compareSlug: null }));
-  }
-
-  function toggleCompare(slug) {
-    updateGraphState(state => ({ ...state, compareSlug: state.compareSlug === slug ? null : slug }));
-  }
-
-  function handleNodeClick(slug) {
-    setHovered(null);
-    updateGraphState(state => {
-      if (!state.pinnedSlug) return { ...state, pinnedSlug: slug, compareSlug: null };
-      if (state.pinnedSlug === slug) {
-        if (state.compareSlug) return { ...state, compareSlug: null };
-        return { ...state, pinnedSlug: null };
-      }
-      if (state.compareSlug === slug) return { ...state, compareSlug: null };
-      return { ...state, compareSlug: slug };
-    });
-  }
-
-  function handleWheel(event) {
-    event.preventDefault();
-    const anchor = getSvgCoordinates(event.clientX, event.clientY);
-    const factor = event.deltaY > 0 ? 1.12 : 0.88;
-    setViewBox(current => zoomViewBox(current, factor, anchor?.x, anchor?.y));
-  }
-
-  function handlePointerDown(event) {
-    if (event.button !== 0) return;
-    if (event.target.closest?.('[data-graph-node="true"]')) return;
-    const anchor = getSvgCoordinates(event.clientX, event.clientY);
-    if (!anchor) return;
-    panStateRef.current = {
-      pointerId: event.pointerId,
-      origin: anchor,
-      startViewBox: viewBox,
-    };
-    setIsPanning(true);
-    event.currentTarget.setPointerCapture?.(event.pointerId);
-  }
-
-  function handlePointerMove(event) {
-    if (!panStateRef.current || panStateRef.current.pointerId !== event.pointerId) return;
-    const currentPoint = getSvgCoordinates(event.clientX, event.clientY, panStateRef.current.startViewBox);
-    if (!currentPoint) return;
-    const dx = currentPoint.x - panStateRef.current.origin.x;
-    const dy = currentPoint.y - panStateRef.current.origin.y;
-    setViewBox(clampViewBox({
-      ...panStateRef.current.startViewBox,
-      x: panStateRef.current.startViewBox.x - dx,
-      y: panStateRef.current.startViewBox.y - dy,
-    }));
-  }
-
-  function endPan(event) {
-    if (event && panStateRef.current?.pointerId !== event.pointerId) return;
-    panStateRef.current = null;
-    setIsPanning(false);
-  }
-
-  function edgeStyle(edge, active) {
-    const gapsMode = graphState.edgeMode === 'mismatches';
-    // In gaps mode, show the mismatch highlight. In all other modes, render by structural type.
-    if (gapsMode && edge.mismatch) {
-      return { color: active ? '#c45a2d' : '#e09070', dash: '4 3', width: active ? 2.5 : 1.4 };
-    }
-    if (edge.encounter && edge.relation) {
-      return { color: active ? '#4a4540' : '#9a9088', dash: undefined, width: active ? 2.4 : 1.6 };
-    }
-    if (edge.encounter && !edge.relation) {
-      return { color: active ? '#4a7fbd' : '#8ab0d8', dash: '5 3', width: active ? 1.8 : 1.1 };
-    }
-    // relation only
-    return { color: active ? '#b8964e' : '#c8a856', dash: undefined, width: active ? 1.8 : 1.1 };
-  }
-
-  function nodeRadius(character) {
-    const base = 19;
-    const bonus = Math.min((totalConnections[character.slug] || 0) * 1.4, 7);
-    return base + bonus;
-  }
-
-  async function handlePairEncounterAction(slugA, slugB) {
-    const existing = encountersByPair.get(pairKey(slugA, slugB));
-    if (existing) {
-      onOpenEncounter(existing.id);
-      return;
-    }
-    const result = await onCreateEncounter(slugA, slugB);
-    if (!result && showToast) showToast('Unable to create encounter', 'error');
-  }
-
-  const inspector = !pinnedCharacter ? (
-    <EmptyInspector
-      hoveredCharacter={hoveredCharacter}
-      relationCount={edges.filter(edge => edge.relation).length}
-      encounterCount={edges.filter(edge => edge.encounter).length}
-      issueCount={issueCount}
-      totalCharacters={characters.length}
-    />
   ) : (
-    <div style={{ width: 360, borderLeft: '1px solid var(--border)', background: 'var(--surface)', padding: 20, overflowY: 'auto', flexShrink: 0 }}>
-      {/* Character header — always visible */}
+    <div style={{ width: 340, borderLeft: '1px solid var(--border)', background: 'var(--surface)', padding: 20, overflowY: 'auto', flexShrink: 0 }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
-        <div style={{ width: 42, height: 42, borderRadius: 12, background: pinnedCharacter.hue, flexShrink: 0 }} />
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div style={{ fontSize: 17, fontWeight: 700, lineHeight: 1.15 }}>{pinnedCharacter.role}</div>
-          <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 3 }}>{pinnedCharacter.arcana}{pinnedCharacter.name ? ` · ${pinnedCharacter.name}` : ''}</div>
+        <div style={{ width: 40, height: 40, borderRadius: 10, background: pinnedCharacter.hue, flexShrink: 0 }} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 17, fontWeight: 700, lineHeight: 1.2 }}>{pinnedCharacter.role}</div>
+          <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 3 }}>{pinnedCharacter.arcana}{pinnedCharacter.name ? ' · ' + pinnedCharacter.name : ''}</div>
         </div>
+        <button className="btn btn-ghost btn-sm" style={{ padding: '2px 8px', fontSize: 12 }} onClick={() => { setPinnedSlug(null); setCompareSlug(null); }}>×</button>
       </div>
-
-      {pinnedCharacter.essence ? <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.65, fontStyle: 'italic', marginBottom: 12 }}>{pinnedCharacter.essence}</div> : null}
-
+      {pinnedCharacter.essence && <p style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.65, fontStyle: 'italic', margin: '0 0 12px' }}>{pinnedCharacter.essence}</p>}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
         <StatChip label="Relations" value={pinnedAnalysis?.declared.length || 0} tone="accent" />
         <StatChip label="Encounters" value={pinnedAnalysis?.encounterPartners.length || 0} />
-        {(pinnedGap?.issues.length || 0) > 0 ? <StatChip label="Issues" value={pinnedGap.issues.length} tone="warning" /> : null}
+        {(pinnedGap?.issues.length || 0) > 0 && <StatChip label="Issues" value={pinnedGap.issues.length} tone="warning" />}
       </div>
-
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-        <button className="btn btn-primary btn-sm" onClick={() => onOpenCharacter(pinnedCharacter.slug)}>Open Editor</button>
-        <button className="btn btn-ghost btn-sm" onClick={() => updateGraphState(state => ({ ...state, pinnedSlug: null, compareSlug: null }))}>Clear</button>
-      </div>
-
+      <button className="btn btn-primary btn-sm" style={{ marginBottom: 16 }} onClick={() => onOpenCharacter(pinnedCharacter.slug)}>Open Editor</button>
       <div style={{ borderTop: '1px solid var(--border)', paddingTop: 14 }}>
-
-        {/* Compare mode — always open when active */}
-        {compareCharacter ? (
-          <CollapsibleSection title="Compare" meta={pair ? `${pair.relation ? 'rel' : '—'} / ${pair.encounter ? 'enc' : '—'}` : 'no link'}>
-            <div style={{ border: '1px solid var(--border)', borderRadius: 8, padding: 12, background: 'var(--surface-2)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                <div style={{ width: 10, height: 10, borderRadius: '50%', background: compareCharacter.hue, flexShrink: 0 }} />
-                <div style={{ minWidth: 0, flex: 1 }}>
+        {compareCharacter && (
+          <CollapsibleSection title="Comparing with">
+            <div style={{ border: '1px solid var(--border)', borderRadius: 8, padding: 12, background: 'var(--surface-2)', marginBottom: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                <div style={{ width: 10, height: 10, borderRadius: '50%', background: compareCharacter.hue }} />
+                <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13, fontWeight: 600 }}>{compareCharacter.role}</div>
-                  <div style={{ fontSize: 11, color: 'var(--text-3)' }}>{compareCharacter.arcana}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-3)' }}>
+                    {pairEdge ? (pairEdge.relation ? 'relation' : '') + (pairEdge.encounter ? (pairEdge.relation ? ' + ' : '') + 'encounter' : '') : 'no direct link'}
+                  </div>
                 </div>
-                <button className="btn btn-ghost btn-sm" style={{ padding: '2px 6px', fontSize: 11 }} onClick={() => updateGraphState(state => ({ ...state, compareSlug: null }))}>×</button>
+                <button className="btn btn-ghost btn-sm" style={{ padding: '2px 6px' }} onClick={() => setCompareSlug(null)}>×</button>
               </div>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
-                <button className="btn btn-ghost btn-sm" onClick={() => onOpenCharacter(compareCharacter.slug)}>Editor</button>
-                <button className="btn btn-primary btn-sm" onClick={() => handlePairEncounterAction(pinnedCharacter.slug, compareCharacter.slug)}>{pair?.encounter ? 'Open Encounter' : 'Create Encounter'}</button>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button className="btn btn-ghost btn-sm" onClick={() => { setPinnedSlug(compareCharacter.slug); setCompareSlug(null); }}>Focus</button>
+                <button className="btn btn-primary btn-sm" onClick={() => handleEncounterAction(pinnedCharacter.slug, compareCharacter.slug)}>
+                  {pairEdge?.encounter ? 'Open Encounter' : 'Create Encounter'}
+                </button>
               </div>
-              {sharedNeighbors.length > 0 ? (
-                <div style={{ fontSize: 11, color: 'var(--text-3)', lineHeight: 1.5 }}>
-                  Shared: {sharedNeighbors.map(character => character.role).join(', ')}
-                </div>
-              ) : null}
+              {sharedNeighbors.length > 0 && <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 8, lineHeight: 1.5 }}>Shared: {sharedNeighbors.map(c => c.role).join(', ')}</div>}
             </div>
           </CollapsibleSection>
-        ) : null}
-
-        {/* Content issues — collapsed by default unless there are issues */}
-        {pinnedGap ? (
-          <CollapsibleSection title="Content gaps" count={pinnedGap.issues.length} defaultOpen={pinnedGap.issues.length <= 4}>
-            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
-              {pinnedGap.issues.map(issue => <span key={issue} style={{ fontSize: 10, padding: '2px 7px', borderRadius: 999, border: '1px solid #f2d7bf', background: '#fff4eb', color: '#9a3412', textTransform: 'uppercase', letterSpacing: '.05em' }}>{issueLabel(issue)}</span>)}
+        )}
+        {pinnedGap && (
+          <CollapsibleSection title="Content gaps" count={pinnedGap.issues.length} defaultOpen={pinnedGap.issues.length <= 5}>
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+              {pinnedGap.issues.map(i => <span key={i} style={{ fontSize: 10, padding: '2px 7px', borderRadius: 999, border: '1px solid #f2d7bf', background: '#fff4eb', color: '#9a3412', textTransform: 'uppercase', letterSpacing: '.05em' }}>{issueLabel(i)}</span>)}
             </div>
           </CollapsibleSection>
-        ) : null}
-
-        {/* Relations — the main section people want to see */}
-        {(pinnedAnalysis?.declared.length || 0) > 0 ? (
+        )}
+        {(pinnedAnalysis?.declared.length || 0) > 0 && (
           <CollapsibleSection title="Relations" count={pinnedAnalysis.declared.length}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {pinnedAnalysis.declared.map(slug => {
-                const partner = bySlug.get(slug);
-                if (!partner) return null;
+                const partner = bySlug.get(slug); if (!partner) return null;
                 const statuses = [];
-                if (pinnedAnalysis.encounterPartners.includes(slug)) statuses.push('encounter');
-                if (pinnedAnalysis.oneWayOutgoing.includes(slug)) statuses.push('one-way');
+                if (pinnedAnalysis.encounterPartners.includes(slug))        statuses.push('encounter');
                 if (pinnedAnalysis.missingEncounterPartners.includes(slug)) statuses.push('no encounter');
-                return <PartnerRow key={slug} character={partner} statuses={statuses} onFocus={() => focusNode(slug)} onCompare={() => toggleCompare(slug)} onOpenEditor={() => onOpenCharacter(slug)} onEncounterAction={() => handlePairEncounterAction(pinnedCharacter.slug, slug)} encounterLabel={encountersByPair.get(pairKey(pinnedCharacter.slug, slug)) ? 'Open Encounter' : 'Create Encounter'} />;
+                if (pinnedAnalysis.oneWayOutgoing.includes(slug))           statuses.push('one-way');
+                return <PartnerRow key={slug} character={partner} statuses={statuses}
+                  onFocus={() => { setPinnedSlug(slug); setCompareSlug(null); }}
+                  onOpenEditor={() => onOpenCharacter(slug)}
+                  onEncounterAction={() => handleEncounterAction(pinnedCharacter.slug, slug)}
+                  encounterLabel={encountersByPair.get(pairKey(pinnedCharacter.slug, slug)) ? 'Open Encounter' : 'Create Encounter'}
+                />;
               })}
             </div>
           </CollapsibleSection>
-        ) : null}
-
-        {/* Missing encounters — collapsed by default */}
-        {(pinnedAnalysis?.missingEncounterPartners.length || 0) > 0 ? (
+        )}
+        {(pinnedAnalysis?.missingEncounterPartners.length || 0) > 0 && (
           <CollapsibleSection title="Missing encounters" count={pinnedAnalysis.missingEncounterPartners.length} defaultOpen={false}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {pinnedAnalysis.missingEncounterPartners.map(slug => {
-                const partner = bySlug.get(slug);
-                if (!partner) return null;
-                return <PartnerRow key={slug} character={partner} statuses={['no encounter']} onFocus={() => focusNode(slug)} onCompare={() => toggleCompare(slug)} onOpenEditor={() => onOpenCharacter(slug)} onEncounterAction={() => handlePairEncounterAction(pinnedCharacter.slug, slug)} encounterLabel="Create Encounter" />;
+                const p = bySlug.get(slug); if (!p) return null;
+                return <PartnerRow key={slug} character={p} statuses={['no encounter']}
+                  onFocus={() => { setPinnedSlug(slug); setCompareSlug(null); }}
+                  onOpenEditor={() => onOpenCharacter(slug)}
+                  onEncounterAction={() => handleEncounterAction(pinnedCharacter.slug, slug)}
+                  encounterLabel="Create Encounter"
+                />;
               })}
             </div>
           </CollapsibleSection>
-        ) : null}
-
-        {/* Encounter-only — collapsed by default */}
-        {(pinnedAnalysis?.encounterOnlyPartners.length || 0) > 0 ? (
-          <CollapsibleSection title="Encounter-only links" count={pinnedAnalysis.encounterOnlyPartners.length} defaultOpen={false}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {pinnedAnalysis.encounterOnlyPartners.map(slug => {
-                const partner = bySlug.get(slug);
-                if (!partner) return null;
-                return <PartnerRow key={slug} character={partner} statuses={['no relation']} onFocus={() => focusNode(slug)} onCompare={() => toggleCompare(slug)} onOpenEditor={() => onOpenCharacter(slug)} onEncounterAction={() => handlePairEncounterAction(pinnedCharacter.slug, slug)} encounterLabel="Open Encounter" />;
-              })}
-            </div>
-          </CollapsibleSection>
-        ) : null}
-
-        {/* One-way incoming — collapsed by default */}
-        {(pinnedAnalysis?.oneWayIncoming.length || 0) > 0 ? (
+        )}
+        {(pinnedAnalysis?.oneWayIncoming.length || 0) > 0 && (
           <CollapsibleSection title="Reverse references" count={pinnedAnalysis.oneWayIncoming.length} defaultOpen={false}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {pinnedAnalysis.oneWayIncoming.map(slug => {
-                const partner = bySlug.get(slug);
-                if (!partner) return null;
-                return <PartnerRow key={slug} character={partner} statuses={['incoming only']} onFocus={() => focusNode(slug)} onCompare={() => toggleCompare(slug)} onOpenEditor={() => onOpenCharacter(slug)} />;
+                const p = bySlug.get(slug); if (!p) return null;
+                return <PartnerRow key={slug} character={p} statuses={['incoming only']}
+                  onFocus={() => { setPinnedSlug(slug); setCompareSlug(null); }}
+                  onOpenEditor={() => onOpenCharacter(slug)}
+                />;
               })}
             </div>
           </CollapsibleSection>
-        ) : null}
-
+        )}
       </div>
     </div>
   );
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      {/* Toolbar row 1: Filters */}
-      <div style={{ padding: '8px 20px', borderBottom: '1px solid var(--border)', background: 'var(--surface)', display: 'flex', alignItems: 'center', gap: 0, flexWrap: 'wrap', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingRight: 16, borderRight: '1px solid var(--border)', marginRight: 16 }}>
-          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '.06em' }}>Tier</span>
-          <button className={`btn btn-sm ${!graphState.tierFilter ? 'btn-primary' : 'btn-ghost'}`} onClick={() => updateGraphState(state => ({ ...state, tierFilter: null }))}>All</button>
-          {Object.entries(TIER_RINGS).map(([tier, { label }]) => <button key={tier} className={`btn btn-sm ${graphState.tierFilter === tier ? 'btn-primary' : 'btn-ghost'}`} onClick={() => updateGraphState(state => ({ ...state, tierFilter: state.tierFilter === tier ? null : tier }))}>{label}</button>)}
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingRight: 16, borderRight: '1px solid var(--border)', marginRight: 16 }}>
-          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '.06em' }}>Edges</span>
-          {EDGE_MODES.map(mode => <button key={mode.id} className={`btn btn-sm ${graphState.edgeMode === mode.id ? 'btn-primary' : 'btn-ghost'}`} onClick={() => updateGraphState(state => ({ ...state, edgeMode: mode.id }))}>{mode.label}</button>)}
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingRight: 16, borderRight: '1px solid var(--border)', marginRight: 16 }}>
-          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '.06em' }}>Filter</span>
-          <select className="field-input" style={{ width: 140, paddingTop: 4, paddingBottom: 4, fontSize: 12, background: 'var(--surface)' }} value={graphState.issueFilter} onChange={event => updateGraphState(state => ({ ...state, issueFilter: event.target.value }))}>
-            {ISSUE_FILTERS.map(filter => <option key={filter.id} value={filter.id}>{filter.label}</option>)}
-          </select>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
-          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '.06em' }}>Depth</span>
-          <button className={`btn btn-sm ${graphState.neighborhoodDepth === 1 ? 'btn-primary' : 'btn-ghost'}`} onClick={() => updateGraphState(state => ({ ...state, neighborhoodDepth: 1 }))}>1</button>
-          <button className={`btn btn-sm ${graphState.neighborhoodDepth === 2 ? 'btn-primary' : 'btn-ghost'}`} onClick={() => updateGraphState(state => ({ ...state, neighborhoodDepth: 2 }))}>2</button>
-          <div style={{ width: 1, height: 18, background: 'var(--border)', margin: '0 4px' }} />
-          <button className="btn btn-sm btn-ghost" onClick={() => setViewBox(current => zoomViewBox(current, 0.9))}>+</button>
-          <button className="btn btn-sm btn-ghost" onClick={() => setViewBox(current => zoomViewBox(current, 1.1))}>&minus;</button>
-          <button className="btn btn-sm btn-ghost" onClick={() => setViewBox(INITIAL_VIEWBOX)}>Reset</button>
-          <div style={{ width: 1, height: 18, background: 'var(--border)', margin: '0 4px' }} />
-          <span style={{ fontSize: 11, color: 'var(--text-3)' }}>{visibleCharacters.length} nodes &middot; {visibleEdges.length} edges</span>
-        </div>
-      </div>
-
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
-          <svg
-            ref={svgRef}
-            viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`}
-            style={{ flex: 1, height: '100%', background: '#fafaf8', cursor: isPanning ? 'grabbing' : 'grab', touchAction: 'none' }}
-            onMouseLeave={() => setHovered(null)}
-            onWheel={handleWheel}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={endPan}
-            onPointerCancel={endPan}
-          >
-            {Object.entries(TIER_RINGS).reverse().map(([tier, { r, color }]) => <circle key={tier} cx={W / 2} cy={H / 2} r={r + 40} fill={color} opacity={graphState.tierFilter && graphState.tierFilter !== tier ? 0.08 : 0.35} />)}
-
-            {Object.entries(TIER_RINGS).map(([tier, { r, label }]) => (
-              <text key={tier} x={W / 2 + r + 20} y={H / 2 + 4} textAnchor="start" fontSize={9} fill="#aaa" fontFamily="Inter, sans-serif" fontWeight={500} letterSpacing={0.5} opacity={graphState.tierFilter && graphState.tierFilter !== tier ? 0.3 : 0.7}>
-                {label}
-              </text>
-            ))}
-
-            {visibleEdges.map(edge => {
-              const sourcePosition = positions[edge.source];
-              const targetPosition = positions[edge.target];
-              if (!sourcePosition || !targetPosition) return null;
-              const active = highlightedSet ? highlightedSet.has(edge.source) && highlightedSet.has(edge.target) : false;
-              const dimmed = highlightedSet && !active;
-              const es = edgeStyle(edge, active);
-              return <line key={`${edge.source}--${edge.target}`} x1={sourcePosition.x} y1={sourcePosition.y} x2={targetPosition.x} y2={targetPosition.y} stroke={es.color} strokeWidth={es.width} opacity={dimmed ? 0.08 : active ? 1 : 0.55} strokeDasharray={es.dash} />;
-            })}
-
-            {visibleCharacters.map(character => {
-              const position = positions[character.slug];
-              if (!position) return null;
-              const radius = nodeRadius(character);
-              const isPinned = graphState.pinnedSlug === character.slug;
-              const isCompare = graphState.compareSlug === character.slug;
-              const isHovered = hovered === character.slug;
-              const isSelected = selectedCharacterSlug === character.slug;
-              const isHighlighted = highlightedSet ? highlightedSet.has(character.slug) : true;
-              const dimmed = highlightedSet && !isHighlighted;
-              const nodeIssues = gapMap.get(character.slug)?.issues.length || 0;
-
-              return (
-                <g key={character.slug} data-graph-node="true" transform={`translate(${position.x},${position.y})`} style={{ cursor: 'pointer' }} onClick={() => handleNodeClick(character.slug)} onMouseEnter={() => setHovered(character.slug)}>
-                  {isSelected && !isPinned ? <circle r={radius + 8} fill="none" stroke="#7f766d" strokeWidth={1} opacity={0.45} /> : null}
-                  {isPinned ? <circle r={radius + 8} fill="none" stroke="var(--text)" strokeWidth={2.2} /> : null}
-                  {isCompare ? <circle r={radius + 12} fill="none" stroke={character.hue} strokeWidth={2.2} strokeDasharray="5 4" /> : null}
-                  {isHovered && !isPinned && !isCompare ? <circle r={radius + 5} fill="none" stroke={character.hue} strokeWidth={1.4} opacity={0.6} /> : null}
-                  <circle r={radius} fill={character.hue} opacity={dimmed ? 0.2 : 1} stroke="white" strokeWidth={1.6} />
-                  {nodeIssues > 0 ? <circle cx={radius - 4} cy={-radius + 4} r={6} fill="#fff4eb" stroke="#9a3412" strokeWidth={1} /> : null}
-                  {nodeIssues > 0 ? <text x={radius - 4} y={-radius + 7} textAnchor="middle" fontSize={8} fill="#9a3412" fontFamily="Inter, sans-serif" fontWeight={700}>{Math.min(nodeIssues, 9)}</text> : null}
-                  <text textAnchor="middle" dy={4} fontSize={10} fill="white" fontFamily="Inter, sans-serif" fontWeight={700} opacity={dimmed ? 0.32 : 1}>{character.n}</text>
-                  <text textAnchor="middle" dy={radius + 13} fontSize={isPinned || isCompare || isHovered ? 11 : 10} fontWeight={isPinned ? 700 : isCompare ? 600 : isHighlighted ? 500 : 400} fill={isPinned ? 'var(--text)' : isCompare ? character.hue : 'var(--text-2)'} fontFamily="Inter, sans-serif" opacity={dimmed ? 0.24 : 1}>{character.role?.replace('The ', '')}</text>
-                </g>
-              );
-            })}
-          </svg>
-
-          <div style={{ position: 'absolute', bottom: 12, left: 12, background: 'rgba(255,255,253,0.92)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 14px', fontSize: 11, lineHeight: 1, backdropFilter: 'blur(4px)', pointerEvents: 'none' }}>
-            <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-3)', marginBottom: 8 }}>Edge types</div>
-            {EDGE_LEGEND.map(item => (
-              <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
-                <svg width={28} height={6} style={{ flexShrink: 0 }}>
-                  <line x1={0} y1={3} x2={28} y2={3} stroke={item.color} strokeWidth={item.width} strokeDasharray={item.dash} />
-                </svg>
-                <span style={{ color: 'var(--text-2)' }}>{item.label}</span>
-              </div>
-            ))}
-            <div style={{ borderTop: '1px solid var(--border)', marginTop: 6, paddingTop: 6, color: 'var(--text-3)', fontSize: 10 }}>
-              Click to pin &middot; click second to compare &middot; drag to pan
-            </div>
+    <GraphContext.Provider value={ctxValue}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {/* Toolbar */}
+        <div style={{ padding: '7px 16px', borderBottom: '1px solid var(--border)', background: 'var(--surface)', display: 'flex', alignItems: 'center', flexShrink: 0, flexWrap: 'wrap', gap: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, paddingRight: 14, borderRight: '1px solid var(--border)', marginRight: 14 }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '.07em' }}>Tier</span>
+            <button className={'btn btn-sm ' + (!graphState.tierFilter ? 'btn-primary' : 'btn-ghost')} onClick={() => updateGraphState(s => ({ ...s, tierFilter: null }))}>All</button>
+            {TIER_ORDER.map(t => <button key={t} className={'btn btn-sm ' + (graphState.tierFilter === t ? 'btn-primary' : 'btn-ghost')} onClick={() => updateGraphState(s => ({ ...s, tierFilter: s.tierFilter === t ? null : t }))}>{TIER_META[t].label}</button>)}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, paddingRight: 14, borderRight: '1px solid var(--border)', marginRight: 14 }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '.07em' }}>Edges</span>
+            {EDGE_MODES.map(m => <button key={m.id} className={'btn btn-sm ' + (graphState.edgeMode === m.id ? 'btn-primary' : 'btn-ghost')} onClick={() => updateGraphState(s => ({ ...s, edgeMode: m.id }))}>{m.label}</button>)}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, paddingRight: 14, borderRight: '1px solid var(--border)', marginRight: 14 }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '.07em' }}>Filter</span>
+            <select className="field-input" style={{ fontSize: 12, paddingTop: 3, paddingBottom: 3, background: 'var(--surface)', width: 140 }} value={graphState.issueFilter} onChange={e => updateGraphState(s => ({ ...s, issueFilter: e.target.value }))}>
+              {ISSUE_FILTERS.map(f => <option key={f.id} value={f.id}>{f.label}</option>)}
+            </select>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginLeft: 'auto' }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '.07em' }}>Depth</span>
+            {[1, 2].map(d => <button key={d} className={'btn btn-sm ' + (graphState.neighborhoodDepth === d ? 'btn-primary' : 'btn-ghost')} onClick={() => updateGraphState(s => ({ ...s, neighborhoodDepth: d }))}>{d}</button>)}
+            <span style={{ fontSize: 11, color: 'var(--text-3)', marginLeft: 8 }}>{visibleCharacters.length} nodes · {visibleEdges.length} edges</span>
           </div>
         </div>
 
-        {inspector}
+        {/* Graph + Inspector */}
+        <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+          <div style={{ flex: 1, position: 'relative' }}>
+            <ReactFlow
+              nodes={rfNodes}
+              edges={rfEdges}
+              nodeTypes={nodeTypes}
+              edgeTypes={edgeTypes}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onNodeClick={handleNodeClick}
+              onPaneClick={handlePaneClick}
+              onNodeMouseEnter={handleNodeMouseEnter}
+              onNodeMouseLeave={handleNodeMouseLeave}
+              nodeOrigin={[0.5, 0.5]}
+              fitView
+              minZoom={0.3}
+              maxZoom={2.5}
+              elementsSelectable={false}
+              selectNodesOnDrag={false}
+              selectionOnDrag={false}
+              style={{ background: '#f8f8f6' }}
+              proOptions={{ hideAttribution: true }}
+            >
+              <Background color="#d8d4cc" gap={28} size={1} variant="dots" />
+              <TierRings tiersPresent={tiersPresent} />
+              <Controls showInteractive={false} style={{ bottom: 14, left: 14 }} />
+              <div style={{ position: 'absolute', bottom: 14, right: 14, background: 'rgba(255,255,253,0.93)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 13px', fontSize: 11, backdropFilter: 'blur(6px)', pointerEvents: 'none', zIndex: 10 }}>
+                <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-3)', marginBottom: 7 }}>Edges</div>
+                {EDGE_LEGEND.map(item => (
+                  <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 4 }}>
+                    <svg width={26} height={6} style={{ flexShrink: 0 }}><line x1={0} y1={3} x2={26} y2={3} stroke={item.color} strokeWidth={1.8} strokeDasharray={item.dash} /></svg>
+                    <span style={{ color: 'var(--text-2)' }}>{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            </ReactFlow>
+          </div>
+          {inspector}
+        </div>
       </div>
-    </div>
+    </GraphContext.Provider>
+  );
+}
+
+// ─── Export ───────────────────────────────────────────────────────────────────
+export default function GraphView(props) {
+  return (
+    <ReactFlowProvider>
+      <GraphInner {...props} />
+    </ReactFlowProvider>
   );
 }

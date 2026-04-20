@@ -8,6 +8,7 @@ import Chronicle from './pages/Chronicle.jsx';
 import Encounters from './pages/Encounters.jsx';
 import Encounter from './pages/Encounter.jsx';
 import About from './pages/About.jsx';
+import Timeline from './pages/Timeline.jsx';
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="/tiers"               element={<Tiers />} />
         <Route path="/manifesto"           element={<Manifesto />} />
         <Route path="/chronicle"           element={<Chronicle />} />
+        <Route path="/timeline"            element={<Timeline />} />
         <Route path="/encounters"          element={<Encounters />} />
         <Route path="/encounter/:id"       element={<Encounter />} />
         <Route path="/about"               element={<About />} />
