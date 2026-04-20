@@ -5,6 +5,7 @@ export const ENCOUNTERS = [
   {
     "id": "curator--duchess",
     "title": "The Induction — Autumn in the Collective Hall, 1720",
+    "image": null,
     "participants": [
       "curator",
       "duchess"
@@ -15,6 +16,7 @@ export const ENCOUNTERS = [
   {
     "id": "curator--florist--gardener--oracle",
     "title": "The Assembly — A Room above the Canal, Autumn 1892",
+    "image": null,
     "participants": [
       "curator",
       "florist",
@@ -27,6 +29,7 @@ export const ENCOUNTERS = [
   {
     "id": "curator--florist--oracle",
     "title": "What the Archive Is Missing — The Cold Reading Room, November 1894",
+    "image": null,
     "participants": [
       "curator",
       "florist",
@@ -38,6 +41,7 @@ export const ENCOUNTERS = [
   {
     "id": "curator--florist",
     "title": "The Dictionary — Estate Gardens, Summer 1893",
+    "image": null,
     "participants": [
       "curator",
       "florist"
@@ -48,6 +52,7 @@ export const ENCOUNTERS = [
   {
     "id": "curator--gardener--mapmaker--oracle",
     "title": "The Street That Changes — Surveyor's Office, March 1895",
+    "image": null,
     "participants": [
       "curator",
       "gardener",
@@ -60,6 +65,7 @@ export const ENCOUNTERS = [
   {
     "id": "curator--merchant-prince",
     "title": "The Third Ledger — Administrative Gate, October 1879",
+    "image": null,
     "participants": [
       "curator",
       "merchant-prince"
@@ -70,6 +76,7 @@ export const ENCOUNTERS = [
   {
     "id": "curator--oracle",
     "title": "The Lost Ledger — Autumn in the Central Archive, 1906",
+    "image": null,
     "participants": [
       "curator",
       "oracle"
@@ -80,6 +87,7 @@ export const ENCOUNTERS = [
   {
     "id": "duchess--merchant-prince",
     "title": "What She Will Not Sell — The Collective Hall, Spring 1880",
+    "image": null,
     "participants": [
       "duchess",
       "merchant-prince"
@@ -88,8 +96,20 @@ export const ENCOUNTERS = [
     "hasContent": true
   },
   {
+    "id": "florist--gardener",
+    "title": "What Grows Here — The Estate Glasshouse, Early Summer 1891",
+    "image": "/assets/stories/gardener-florist.png",
+    "participants": [
+      "florist",
+      "gardener"
+    ],
+    "body": "Amelia had been on the estate for three weeks before she and Carla were properly alone together. The house had its routines — footsteps at certain hours, the particular silences that meant someone was listening — and so the glasshouse was useful. It was the kind of space that announced itself as productive. No one interrupted people who appeared to be working.\n\nThey were working. Amelia had been given the cut flowers from the previous morning's market order, and she was rebuilding the arrangements that the Duchess's housekeeper had assessed as too spare. Carla was repotting a row of pelargoniums that had been left too long, their roots pressing against the clay in the way that meant they had been waiting rather than growing. They did not speak for a long time. The glasshouse had that quality: it made silence seem like a reasonable activity.\n\nWhat broke it was a stem of red ranunculus. Amelia had been working around it for several minutes, placing it and removing it, and Carla had watched this without comment until she couldn't. She said: *It wants to be central.* Amelia looked up. Carla said it again, differently: not as advice but as observation — the kind of remark that comes from watching something closely enough that the thing itself seems to have an opinion. Amelia placed the ranunculus at the centre of the arrangement and did not move it again.\n\nLater, Carla would describe this as the beginning of their understanding. She would not say of what. Amelia, who kept her records in a cloth-covered notebook, made a note that evening: *ranunculus — she sees before I decide.* What Carla had noticed first, and did not yet say to Amelia, was that two of the pelargoniums nearest the north wall of the glasshouse had not grown at all since November, despite good soil and adequate light. She had no name for what was happening to them. She pressed her thumb into the earth beside the smallest pot and felt nothing wrong. That was the part that bothered her.",
+    "hasContent": true
+  },
+  {
     "id": "gardener-oracle--merchant-prince",
     "title": "The Northern Ground — River Quarter, Late Summer 1895",
+    "image": null,
     "participants": [
       "gardener",
       "oracle",

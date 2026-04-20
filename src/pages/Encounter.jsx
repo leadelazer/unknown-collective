@@ -45,6 +45,19 @@ export default function Encounter() {
           <div className={styles.ruleWrap}><DecoRule /></div>
         </header>
 
+        {enc.image && (
+          <div className={styles.heroWrap}>
+            <img
+              src={assetUrl(enc.image)}
+              alt=""
+              className={styles.hero}
+              loading="lazy"
+              decoding="async"
+            />
+            <div className={styles.heroShade} />
+          </div>
+        )}
+
         {participants.length > 0 && (
           <div className={styles.participants}>
             {participants.map(c => (

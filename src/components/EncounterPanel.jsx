@@ -51,6 +51,19 @@ export default function EncounterPanel({ encounter, onClose }) {
 
         <h2 className={`${styles.title} t-display`}>{encounter.title}</h2>
 
+        {encounter.image && (
+          <div className={styles.heroWrap}>
+            <img
+              src={assetUrl(encounter.image)}
+              alt=""
+              className={styles.hero}
+              loading="lazy"
+              decoding="async"
+            />
+            <div className={styles.heroShade} />
+          </div>
+        )}
+
         {participants.length > 0 && (
           <div className={styles.participants}>
             {participants.map(c => (

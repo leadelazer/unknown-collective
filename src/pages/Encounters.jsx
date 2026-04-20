@@ -5,6 +5,7 @@ import Nav from '../components/Nav.jsx';
 import Footer from '../components/Footer.jsx';
 import TextureBackdrop from '../components/TextureBackdrop.jsx';
 import { assetUrl } from '../utils/assetUrl.js';
+import { inlineMarkdown } from '../utils/inlineMarkdown.js';
 import styles from './Encounters.module.css';
 
 export default function Encounters() {
@@ -98,7 +99,7 @@ function EncounterCard({ enc, navigate }) {
       )}
 
       {preview && (
-        <p className={`${styles.cardPreview} t-body`}>{preview}</p>
+        <p className={`${styles.cardPreview} t-body`} dangerouslySetInnerHTML={{ __html: inlineMarkdown(preview) }} />
       )}
 
       <span className={`${styles.cardCta} t-deco`}>Read record →</span>

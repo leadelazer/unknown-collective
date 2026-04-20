@@ -59,10 +59,13 @@ function parseParticipants(basename, validSlugs) {
 
 function parseMd(raw) {
   const match = raw.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
-  if (!match) return { title: null, body: raw.trim() };
-  const titleMatch = match[1].match(/^title:\s*(.+)$/m);
+  if (!match) return { title: null, image: null, body: raw.trim() };
+  const fm = match[1];
+  const titleMatch = fm.match(/^title:\s*(.+)$/m);
+  const imageMatch = fm.match(/^image:\s*(.+)$/m);
   const title = titleMatch ? titleMatch[1].trim().replace(/^["']|["']$/g, '') : null;
-  return { title, body: match[2].trim() };
+  const image = imageMatch ? imageMatch[1].trim().replace(/^["']|["']$/g, '') : null;
+  return { title, image, body: match[2].trim() };
 }
 
 // ─── Build encounters array ───────────────────────────────────────────────────
@@ -75,12 +78,13 @@ if (fs.existsSync(encountersDir)) {
   for (const file of files) {
     const basename = path.basename(file, '.md');
     const raw = fs.readFileSync(path.join(encountersDir, file), 'utf-8');
-    const { title, body } = parseMd(raw);
+    const { title, image, body } = parseMd(raw);
     const participants = parseParticipants(basename, validSlugs);
 
     encounters.push({
       id: basename,
       title: title || basename,
+      image: image || null,
       participants,
       body,
       hasContent: body.length > 0,

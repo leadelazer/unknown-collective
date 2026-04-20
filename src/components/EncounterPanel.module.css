@@ -66,6 +66,35 @@
   flex-shrink: 0;
 }
 
+.heroWrap {
+  position: relative;
+  width: 100%;
+  height: clamp(160px, 30vh, 240px);
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-bottom: var(--space-6);
+}
+
+.hero {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  filter: brightness(0.82) saturate(0.88);
+  display: block;
+}
+
+.heroShade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    color-mix(in srgb, var(--color-ink) 75%, transparent) 100%
+  );
+  pointer-events: none;
+}
+
 .participants {
   display: flex;
   flex-wrap: wrap;
@@ -84,6 +113,8 @@
   border: var(--border-gold-faint);
   transition: border-color var(--transition-fast);
 }
+
+
 .participant:hover { border-color: color-mix(in srgb, var(--color-gold) 55%, transparent); }
 
 .participantAvatar {
@@ -109,9 +140,7 @@
 }
 
 .body {
-  flex: 1;
   padding: var(--space-6) var(--space-8);
-  overflow-y: auto;
 }
 
 .para {

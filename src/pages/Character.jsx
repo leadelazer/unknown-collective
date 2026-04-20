@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CHARACTERS } from '../data/characters.js';
 import { ENCOUNTERS } from '../data/encounters.js';
-import { resolveCharacterPalette } from '../data/paletteSystem.js';
+import { resolveCharacterPalette, getCharacterPaletteMeta } from '../data/paletteSystem.js';
 import { TIERS, ROMAN } from '../data/tiers.js';
 import Nav from '../components/Nav.jsx';
 import Footer from '../components/Footer.jsx';
@@ -128,6 +128,7 @@ export default function Character() {
 
 function DetailedCharacter({ c, tier, navigate }) {
   const palette = resolveCharacterPalette(c);
+  const paletteMeta = getCharacterPaletteMeta(c);
   const [activeEncounter, setActiveEncounter] = useState(null);
   const charEncounters = ENCOUNTERS.filter(e => e.participants.includes(c.slug));
 
@@ -160,10 +161,32 @@ function DetailedCharacter({ c, tier, navigate }) {
             </div>
 
             {palette.length > 0 && (
-              <div className={styles.palette}>
-                {palette.map((hex, i) => (
-                  <span key={i} className={styles.paletteSwatch} style={{ background: hex }} title={hex} />
-                ))}
+              <div className={styles.paletteTooltipWrap}>
+                <div
+                  className={styles.palette}
+                  aria-describedby={paletteMeta ? `palette-tooltip-${c.slug}` : undefined}
+                >
+                  {palette.map((hex, i) => (
+                    <span key={i} className={styles.paletteSwatch} style={{ background: hex }} />
+                  ))}
+                </div>
+
+                {paletteMeta && (
+                  <div
+                    className={styles.paletteTooltip}
+                    role="tooltip"
+                    id={`palette-tooltip-${c.slug}`}
+                  >
+                    <p className={styles.paletteTooltipRole}>{paletteMeta.arcanaRole}</p>
+                    <ul className={styles.paletteTooltipList}>
+                      {paletteMeta.entries.map(entry => (
+                        <li key={entry.label}>
+                          <span className={styles.paletteTooltipLabel}>{entry.label}:</span> {entry.meaning}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
 

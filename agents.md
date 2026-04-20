@@ -120,6 +120,76 @@ Encounter.jsx               (single encounter detail: /encounter/:id)
 
 ---
 
+## Encounter Writing Guidelines
+
+These rules apply to every encounter, whether written by a human or an agent. Read them before writing or editing any encounter file.
+
+### The Bind is available, not mandatory
+Not every encounter needs to connect to The Bind. Some scenes are simply about how two people see differently, or how a relationship forms before it becomes significant. The Bind radiates outward — sometimes a scene exists to establish the charge between two people who are going to matter later.
+
+Where the Bind *is* present, it does not need to be named. It can be felt as:
+- a gap in the records that shouldn't be there
+- something that won't grow in a specific place
+- a route or street that won't stay consistent
+- a decision that feels as if it has already been made
+- warmth where there should be cold; absence where there should be presence
+
+What every encounter *does* need: **a reason these two people are in the same room, and something that shifts before the scene ends.** That shift can be small — a stem placed at the centre of an arrangement, a drainage plan revised forty feet east. It does not have to be legible to the characters themselves.
+
+### The Collective is not a social club
+These people are not meeting at markets to discuss flowers. They are a body trying to read and resist something they agreed in 1698 never to formally name. Every scene should carry that weight, even if quietly and obliquely.
+
+### Dates must be chronologically possible
+Every character has a timeline entry (`src/data/timeline.js`) with a `sortStart` year. Do not place a character in a scene before their `sortStart`. Key constraints:
+- Weavers, Baker, Duchess, Cook: 1685–1703
+- Mapmaker, Curator, Keymaker, Doorwarden: 1714–1729
+- Firefighter: 1745–1750
+- Shieldbearer: 1806, Mirrormaker: 1855
+- Merchant Prince, Obsidian Count, Tailor, Brewer: 1878–1884
+- Oracle: 1889, Florist: 1891, Gardener: 1872, Ferryman: 1899
+
+### Cluster dates around meaningful eras
+Do not spread encounters randomly across centuries. The meaningful windows are:
+- **1700–1729** — The Duchess era: the Collective forming, the Bind becoming visible
+- **1745–1760** — The hall fire, crisis inductions
+- **1878–1906** — The Oracle's generation assembling its counter-strategy; the Merchant Prince's arrival; the flood
+
+### Scene over summary
+Show the room, the object, the gesture. Do not state the conclusion. The best encounters end unresolved — the Bind's logic is that things do not resolve cleanly.
+
+- Right: *He wrote her name in pencil inside the ledger, then scratched it out.*
+- Wrong: *They came to an understanding about the importance of the archive.*
+
+### Dialogue carries subtext
+Nobody says "the Bind is dangerous" or "we must protect the archive." They say:
+- *The third ledger is under ongoing review.*
+- *This building is on that line too.*
+- *I do not give you this.* (not: I cannot share this dangerous knowledge)
+
+Speak in the language of ordinary institutional life — ledgers, drainage plans, botanical notes — and let the strangeness come through the gap between that language and what is actually happening.
+
+### Each character has a specific register
+Let each participant notice something the others don't:
+- **Curator** — cold, precise, reads through records and gaps in records
+- **Oracle** — tactical, quiet, pattern-recognition before anyone else names the pattern
+- **Florist** — reads through objects and flowers; the floriographic notebook is her parallel archive
+- **Gardener** — reads through soil, growth, and physical absence; what won't grow where
+- **Mapmaker** — reads through geography; inconsistencies between map versions and reality
+- **Merchant Prince** — reads through commerce and systems; is changed by direct encounter with what resists systematisation
+- **Duchess** — reads through institutional history; protects the Collective's accumulated tacit knowledge
+
+### The Merchant Prince is the productive outsider
+He is the wrong kind of mind for the Bind — and that is why he belongs in scenes. He will try to leverage, fund, purchase, or systematise what resists those approaches. The encounter should show him being changed by that failure, quietly and without explanation. He revised a drainage plan forty feet east without comment. This is the model.
+
+### Tone
+- Restrained, third-person reconstruction — as if assembled from contemporary accounts, not omniscient narration
+- No flourishes, no adverbs of feeling (*she felt a deep unease*)
+- Concrete sensory detail where needed: temperature, sound, the smell of the room
+- 2–4 paragraphs; each paragraph should do something different (arrive, tension, shift, departure or irresolution)
+- Titles should be specific: *The Third Ledger — Administrative Gate, October 1879* — not *A Tense Meeting*
+
+---
+
 ## Encounter Filename Convention
 
 Files live in `src/data/encounters/`. Filename format:
@@ -232,14 +302,14 @@ The script outputs:
 | 11 | Justice | `obsidian-count` |
 | 12 | The Hanged Man | `baker` |
 | 13 | Death | `the-bind` |
-| 14 | Temperance | `timekeeper` |
+| 14 | Temperance | `cook` |
 | 15 | The Devil | `mirrormaker` |
-| 16 | The Tower | `firefighter` ← check |
+| 16 | The Tower | `doorwarden` |
 | 17 | The Star | `lightkeeper` |
-| 18 | The Moon | `cook` |
+| 18 | The Moon | `tailor` |
 | 19 | The Sun | `brewer` |
-| 20 | Judgement | `doorwarden` |
-| 21 | The World | `tailor` |
+| 20 | Judgement | `keymaker` |
+| 21 | The World | `veilwalker` |
 
 ---
 

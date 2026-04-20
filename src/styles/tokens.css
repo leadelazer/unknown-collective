@@ -1,22 +1,29 @@
 :root {
   /* ── Colors ── */
   /* Balanced warm and green palette */
-  --theme-saturation: 15%; /* Reduced slightly for more elegance */
+  --theme-hue: 150;
+  
+  /* Offsets from base hue */
+  --hue-paper: calc(var(--theme-hue) - 105); /* 45 */
+  --hue-gold: calc(var(--theme-hue) - 115);  /* 35 */
+  --hue-rose: calc(var(--theme-hue) - 140);  /* 10 */
+
+  --theme-saturation: 12%; /* Reduced slightly for more elegance */
   
   /* Deep Sage/Olive tones for darks */
-  --color-ink:       hsl(150 var(--theme-saturation) 6%); /* Darker, cooler green */
-  --color-ink-card:  hsl(150 var(--theme-saturation) 11%);
-  --color-muted-dk:  hsl(150 var(--theme-saturation) 22%);
+  --color-ink:       hsl(var(--theme-hue) var(--theme-saturation) 6%); /* Darker, cooler green */
+  --color-ink-card:  hsl(var(--theme-hue) var(--theme-saturation) 11%);
+  --color-muted-dk:  hsl(var(--theme-hue) var(--theme-saturation) 22%);
 
   /* Cream/Parchment tones for lights */
-  --color-paper:     hsl(45 var(--theme-saturation) 85%); /* Warmer, softer cream */
-  --color-paper-2:   hsl(45 calc(var(--theme-saturation) + 5%) 68%);
-  --color-muted:     hsl(45 var(--theme-saturation) 45%);
+  --color-paper:     hsl(var(--hue-paper) var(--theme-saturation) 85%); /* Warmer, softer cream */
+  --color-paper-2:   hsl(var(--hue-paper) calc(var(--theme-saturation) + 5%) 68%);
+  --color-muted:     hsl(var(--hue-paper) var(--theme-saturation) 49%);
 
   /* Rich Accents */
-  --color-gold:      hsl(35 calc(var(--theme-saturation) + 25%) 50%); /* Deeper, richer gold */
-  --color-gold-hi:   hsl(35 calc(var(--theme-saturation) + 40%) 65%);
-  --color-rose:      hsl(10 calc(var(--theme-saturation) + 20%) 58%); /* Softer terracotta */
+  --color-gold:      hsl(var(--hue-gold) calc(var(--theme-saturation) + 25%) 50%); /* Deeper, richer gold */
+  --color-gold-hi:   hsl(var(--hue-gold) calc(var(--theme-saturation) + 40%) 65%);
+  --color-rose:      hsl(var(--hue-rose) calc(var(--theme-saturation) + 20%) 58%); /* Softer terracotta */
 
   /* ── Typography ── */
   --font-display: 'Inter', 'Helvetica Neue', sans-serif;
