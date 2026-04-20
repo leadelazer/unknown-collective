@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Nav from '../components/Nav.jsx';
 import Footer from '../components/Footer.jsx';
 import TextureBackdrop from '../components/TextureBackdrop.jsx';
+import EncounterPanel from '../components/EncounterPanel.jsx';
+import InterpretationsPanel from '../components/InterpretationsPanel.jsx';
 import { TIMELINE_ENTRIES } from '../data/timeline.js';
 import { ENCOUNTERS } from '../data/encounters.js';
 import { assetUrl } from '../utils/assetUrl.js';
@@ -25,6 +27,14 @@ export default function Timeline() {
   const scrollerRef = useRef(null);
   const dotRefs = useRef({});
   const scrollTriggeredByKey = useRef(false);
+  const [activeEncounter, setActiveEncounter] = useState(null);
+  const [showInterpretations, setShowInterpretations] = useState(false);
+  const encArticleRef = useRef(null);
+
+  useEffect(() => {
+    if (!activeEncounter || !encArticleRef.current) return;
+    encArticleRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [activeEncounter]);
 
   const dated = useMemo(
     () => TIMELINE_ENTRIES.filter(e => e.hasPrecisePlacement).sort((a, b) => a.sortStart - b.sortStart || a.n - b.n),
@@ -89,22 +99,19 @@ export default function Timeline() {
     });
   }, [dated]);
 
+  const stageHeight = AXIS_OFFSET_TOP + 100;
+
   const [activeId, setActiveId] = useState(`char:${staggered[0]?.slug || ''}`);
 
-  const activeType = activeId?.startsWith('enc:') ? 'encounter' : 'character';
-  const activeSlug = activeType === 'character' ? activeId?.replace('char:', '') : null;
-  const activeEncId = activeType === 'encounter' ? activeId?.replace('enc:', '') : null;
+  const activeSlug = activeId?.replace('char:', '') || null;
 
   const active = useMemo(() => {
-    if (activeType === 'encounter') {
-      return datedEncounters.find(e => e.id === activeEncId) || null;
-    }
     return (
       staggered.find(e => e.slug === activeSlug) ||
       undated.find(e => e.slug === activeSlug) ||
       staggered[0]
     );
-  }, [activeId, staggered, undated, datedEncounters, activeType, activeSlug, activeEncId]);
+  }, [activeId, staggered, undated, activeSlug]);
 
   useEffect(() => {
     const onKey = e => {
@@ -124,7 +131,7 @@ export default function Timeline() {
   useEffect(() => {
     if (!scrollTriggeredByKey.current) return;
     scrollTriggeredByKey.current = false;
-    if (activeType !== 'character' || !activeSlug) return;
+    if (!activeSlug) return;
     const node = dotRefs.current[activeSlug];
     const scroller = scrollerRef.current;
     if (!node || !scroller) return;
@@ -147,35 +154,12 @@ export default function Timeline() {
     undated: 'Undated',
   };
 
-  const activeMeta = activeType === 'encounter'
-    ? `${active?.year || ''} · Encounter`
-    : [active?.displayDate, active?.certainty && active.certainty !== 'undated' ? certaintyLabel[active.certainty] : null]
-        .filter(Boolean)
-        .join(' · ');
-
-  const activeTypeLabel = activeType === 'encounter' ? 'Encounter' : 'Member';
-  const activeDateLabel = activeType === 'encounter' ? String(active?.year || 'Undated') : active?.displayDate;
-  const activeCertaintyLabel = activeType === 'encounter'
-    ? 'Recorded'
-    : certaintyLabel[active?.certainty || 'undated'];
-  const activeTitle = activeType === 'encounter' ? active?.title : active?.role;
-  const activeEvent = activeType === 'encounter'
-    ? active?.participants?.map(p => p.replace(/-/g, '\u00a0')).join(', ')
-    : active?.eventLabel;
-  const activeSummary = activeType === 'encounter'
-    ? active?.body?.split(/\n\n+/)[0]?.trim() || 'A recorded meeting within the archive chronology.'
-    : active?.summary;
-  const activeActionLabel = activeType === 'encounter' ? 'Open encounter' : 'Open profile';
-  const activeParticipants = activeType === 'encounter'
-    ? (active?.participants || []).map(slug => TIMELINE_ENTRIES.find(entry => entry.slug === slug)).filter(Boolean)
-    : [];
+  const activeTitle = active?.role;
+  const activeEvent = active?.eventLabel;
+  const activeSummary = active?.summary;
 
   function handleOpenActive() {
     if (!active) return;
-    if (activeType === 'encounter') {
-      navigate(`/encounter/${active.id}`);
-      return;
-    }
     navigate(`/character/${active.slug}`);
   }
 
@@ -193,10 +177,16 @@ export default function Timeline() {
           <p className={`${styles.intro} t-body`}>
             Click any mark to read its moment. Double-click to open. Drag or arrow-keys to travel.
           </p>
+          <button
+            className={`${styles.interpretationsBtn} t-deco`}
+            onClick={() => setShowInterpretations(true)}
+          >
+            Agent Interpretations →
+          </button>
         </div>
 
-        <div className={`${styles.infoCard} glass ${activeType === 'encounter' ? styles.infoCardEnc : ''}`} key={activeId}>
-          {activeType === 'character' && active?.img && (
+        <div className={`${styles.infoCard} glass`} key={activeId}>
+          {active?.img && (
             <div className={styles.icPortraitWrap}>
               <img src={assetUrl(active.img)} alt={activeTitle} className={styles.icPortrait} loading="lazy" decoding="async" />
               <div className={styles.icPortraitShade} />
@@ -204,30 +194,12 @@ export default function Timeline() {
           )}
 
           <div className={styles.icBody}>
-            {activeType === 'encounter' && activeParticipants.length > 0 && (
-              <div className={styles.icParticipants}>
-                {activeParticipants.map(participant => (
-                  <button
-                    key={participant.slug}
-                    className={styles.icParticipant}
-                    onClick={() => navigate(`/character/${participant.slug}`)}
-                  >
-                    <span
-                      className={styles.icParticipantPortrait}
-                      style={participant.img ? { backgroundImage: `url(${assetUrl(participant.img)})` } : undefined}
-                    />
-                    <span className={styles.icParticipantRole}>{participant.role}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-
             <span className={`${styles.icLabel} t-deco`}>Selected record</span>
             <span className={`${styles.icTitle} t-display`}>{activeTitle}</span>
             {activeSummary && <p className={`${styles.icSummary} t-body`}>{activeSummary}</p>}
             <div className={styles.icFooter}>
               {activeEvent && <span className={styles.icEvent}>{activeEvent}</span>}
-              <button className={`${styles.icAction} t-deco`} onClick={handleOpenActive}>{activeActionLabel} →</button>
+              <button className={`${styles.icAction} t-deco`} onClick={handleOpenActive}>Open profile →</button>
             </div>
           </div>
         </div>
@@ -237,7 +209,7 @@ export default function Timeline() {
         <div className={styles.axisFrame}>
         <div className={styles.scroller} ref={scrollerRef}>
           <div className={styles.axisStage} style={{ width: `${axisWidth + 160}px` }}>
-            <div className={styles.stageInner} style={{ width: `${axisWidth}px`, marginLeft: '80px' }}>
+            <div className={styles.stageInner} style={{ width: `${axisWidth}px`, marginLeft: '80px', minHeight: `${stageHeight}px` }}>
 
               {/* Labels above axis */}
               {staggered.map(entry => {
@@ -291,18 +263,25 @@ export default function Timeline() {
                 );
               })}
 
-              {/* Encounter diamonds — floating, no leader line */}
+              {/* Encounter diamonds — click loads article below */}
               {datedEncounters.map(enc => {
                 const x = xFor(enc.year);
-                const isActive = activeEncId === enc.id;
+                const fullEnc = ENCOUNTERS.find(e => e.id === enc.id);
+                const isActive = activeEncounter?.id === enc.id;
+                const shortTitle = enc.title.split(/\s*[—–-]\s*/)[0].trim();
                 return (
-                  <button
+                  <div
                     key={`enc-${enc.id}`}
-                    className={`${styles.diamond} ${isActive ? styles.diamondActive : ''}`}
+                    className={styles.diamondWrap}
                     style={{ left: `${x}px`, top: `${DIAMOND_Y}px` }}
-                    onClick={() => setActiveId(`enc:${enc.id}`)}
-                    aria-label={enc.title}
-                  />
+                  >
+                    <button
+                      className={`${styles.diamond} ${isActive ? styles.diamondActive : ''}`}
+                      onClick={() => setActiveEncounter(isActive ? null : (fullEnc || enc))}
+                      aria-label={enc.title}
+                    />
+                    <span className={`${styles.diamondLabel} t-deco`}>{shortTitle}</span>
+                  </div>
                 );
               })}
 
@@ -367,7 +346,72 @@ export default function Timeline() {
 
       </section>
 
+      {/* ── Recorded Encounters section ── */}
+      <section className={styles.encounterSection}>
+        <aside className={styles.encSidebar}>
+          <span className={`${styles.encNavLabel} t-deco`}>Recorded Encounters</span>
+          <div className={styles.encPills}>
+            {datedEncounters.map(enc => {
+              const fullEnc = ENCOUNTERS.find(e => e.id === enc.id);
+              const isActive = activeEncounter?.id === enc.id;
+              return (
+                <button
+                  key={enc.id}
+                  className={`${styles.encPill} ${isActive ? styles.encPillActive : ''}`}
+                  onClick={() => setActiveEncounter(isActive ? null : (fullEnc || enc))}
+                >
+                  <span className={`${styles.encPillYear} t-deco`}>{enc.year}</span>
+                  <span className={styles.encPillTitle}>{enc.title.split(/\s*[—–-]\s*/)[0].trim()}</span>
+                </button>
+              );
+            })}
+          </div>
+        </aside>
+
+        <div className={styles.encContent}>
+          {activeEncounter ? (
+            <article className={styles.encArticle} key={activeEncounter.id} ref={encArticleRef}>
+              <button className={`${styles.encArticleClose} t-deco`} onClick={() => setActiveEncounter(null)}>✕ Close</button>
+              <header className={styles.encArticleHeader}>
+                <h2 className={`${styles.encArticleTitle} t-display`}>{activeEncounter.title}</h2>
+                {activeEncounter.participants?.length > 0 && (
+                  <div className={styles.encArticleParticipants}>
+                    {activeEncounter.participants.map(slug => {
+                      const char = TIMELINE_ENTRIES.find(e => e.slug === slug);
+                      return char ? (
+                        <button key={slug} className={styles.encParticipant} onClick={() => navigate(`/character/${slug}`)}>
+                          {char.img && (
+                            <span
+                              className={styles.encParticipantAvatar}
+                              style={{ backgroundImage: `url(${assetUrl(char.img)})` }}
+                            />
+                          )}
+                          <span className={`${styles.encParticipantName} t-deco`}>{char.role}</span>
+                        </button>
+                      ) : null;
+                    })}
+                  </div>
+                )}
+              </header>
+              <div className={styles.encArticleBody}>
+                {activeEncounter.body?.split(/\n\n+/).map((para, i) => {
+                  if (para.startsWith('## ')) return <h3 key={i} className={`${styles.encBodyHeading} t-deco`}>{para.slice(3)}</h3>;
+                  if (para.startsWith('# ')) return <h2 key={i} className={`${styles.encBodyHeadingLg} t-display`}>{para.slice(2)}</h2>;
+                  return <p key={i} className={`${styles.encBodyPara} t-body`}>{para.trim()}</p>;
+                })}
+              </div>
+            </article>
+          ) : (
+            <p className={`${styles.encPrompt} t-deco`}>Select an encounter above or from the list →</p>
+          )}
+        </div>
+      </section>
+
       <Footer />
+
+      {showInterpretations && (
+        <InterpretationsPanel onClose={() => setShowInterpretations(false)} />
+      )}
     </div>
   );
 }

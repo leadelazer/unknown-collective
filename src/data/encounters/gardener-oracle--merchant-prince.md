@@ -1,5 +1,5 @@
 ---
-title: The Disputed Bouquets in the Northern District, March 1971
+title: The Northern Ground — River Quarter, Late Summer 1895
 ---
 
 In the northern district, an argument arose between the Gardener and the Merchant Prince. It transpired in a dimly lit shop filled with plants and a competing display of imported goods. The Gardener, dirt under fingernails, held a fresh bouquet. Its vibrant blooms, grown in her own patch, radiated life. The Merchant Prince examined them with a critical eye. 

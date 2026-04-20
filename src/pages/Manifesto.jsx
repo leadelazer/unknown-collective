@@ -18,13 +18,11 @@ export default function Manifesto() {
   const [visible, setVisible] = useState(0);
 
   useEffect(() => {
-    const id = setInterval(() => {
-      setVisible(v => {
-        if (v >= PARAGRAPHS.length) { clearInterval(id); return v; }
-        return v + 1;
-      });
-    }, 900);
-    return () => clearInterval(id);
+    // Trigger the fade-in transition immediately upon mounting
+    const id = setTimeout(() => {
+      setVisible(PARAGRAPHS.length);
+    }, 50);
+    return () => clearTimeout(id);
   }, []);
 
   return (
@@ -45,7 +43,8 @@ export default function Manifesto() {
           {PARAGRAPHS.map((p, i) => (
             <p
               key={i}
-              className={`${styles.para} ${i === 0 ? styles.paraLead : ''} ${i === PARAGRAPHS.length - 1 ? styles.paraFinal : ''} t-display ${i < visible ? styles.paraVisible : ''}`}
+              className={`${styles.para} ${i === 0 ? styles.paraLead : ''} ${i === PARAGRAPHS.length - 1 ? styles.paraFinal : ''} t-body ${i < visible ? styles.paraVisible : ''}`}
+              style={{ transitionDelay: `${i * 0.15}s` }}
             >
               {i === PARAGRAPHS.length - 1 && <span className={styles.fleuron}>⁂ </span>}
               {p}

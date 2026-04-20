@@ -1,11 +1,11 @@
 ---
-title: Records Transferred at the Administrative Gate, April 1819
+title: The Third Ledger — Administrative Gate, October 1879
 ---
 
-The administrative gate opened late that April. Rain made the stones slick along the southern edge of the government quarter. A bundle of ledgers sat under a cloth, bound tight, waiting on the bench by the iron door. Two men arrived at different hours; the Curator first, carrying a satchel of folded correspondence, and the Merchant Prince later, his umbrella angled over a polished shoe.
+The Merchant Prince had been a member of the Collective for less than a year when he made his first substantial offer to the archive. He proposed to fund the restoration of two entire shelves of deteriorating records, at his own cost and without conditions. The Curator accepted, publicly, in the terms the offer deserved. The private terms were not published.
 
-Eyewitness accounts from clerks describe terse words. The Curator handed over two ledgers, not three. The Merchant Prince examined the bindings, then counted the pages aloud. Five witnesses recall the sound of the lock as the door closed again. The balance of municipal debt and property transfer had shifted, but no signatures were exchanged.
+The private terms required the Curator to transfer three ledgers pertaining to the history of the city's canal infrastructure — specifically, the diversion of the river tributary that had run beneath the Weavers' quarter before the urban expansion of the 1690s. The Merchant Prince was mapping expansion routes for the coming industrial decade. The canal history was material to his calculations. He was, he said, simply working with the full record. He said this in the manner of a man who had learned to say the obvious thing first and wait for what it dislodged.
 
-The transaction ended quickly. The sky remained gray. One account notes the bench was left empty by evening. Archival staff found the ink stains on the stone.
+At the administrative gate in October, the Curator arrived with two ledgers in a satchel. The Merchant Prince counted them. He said nothing immediately. He turned each over in his hands and read the binding stamps. Then he said: *There should be three.* The Curator said the third was under review for condition. This was true; he had placed it under review himself, the previous week, by writing a single note in the margin of its catalogue entry. The Merchant Prince looked at him for a moment. *You understand,* he said, *that the two shelves are funded regardless.* The Curator said he appreciated that. He did not hand over the third ledger.
 
-Later correspondence references "the missing third ledger" and "the unsettled account of that April." No record exists of a formal reconciliation. The location and contents of the third ledger are disputed among municipal historians.
+The third ledger concerned not the canal infrastructure but the original commission of the Bind — the Weavers' formal arrangement with the Collective in 1698, including what they had agreed to provide and what the Collective had agreed never to dismantle. The Curator has never confirmed this. The ledger is listed in the archive as under ongoing review. The Merchant Prince funded three shelves instead of two the following year, without comment.

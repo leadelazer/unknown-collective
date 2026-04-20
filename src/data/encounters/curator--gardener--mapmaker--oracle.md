@@ -1,11 +1,11 @@
 ---
-title: The Dispute Over Land Use — April 1935
+title: The Street That Changes — Surveyor's Office, March 1895
 ---
 
-On a damp afternoon in early April, The Curator and The Oracle met in a shared space near the central square. The air carried the scent of wet stone and decaying leaves. A modest café stood at the corner, patrons huddled beneath its awning, sheltered from the drizzle. They leaned over their cups, overhearing snippets of the conversation. 
+The Mapmaker had been watching a particular street for four years before he brought it to the others. It appeared on his current-edition map at the correct position: a short connecting lane between the river quarter and the street of tanners, paved, with two street lamps and a well-attested bakehouse at its south end. When you walked to where it should be, you found a blank wall and an alley that went nowhere. He had checked the municipal survey. He had checked his instruments. He had walked the route himself on six separate occasions across three seasons.
 
-The Curator unfolded blueprints on the table. He traced the outlines of proposed exhibition spaces and public squares. His voice was measured, emphasizing the need for oversight and structure. The Oracle, arms crossed, offered glances that hinted at skepticism. She believed space should adapt organically, free from rigid plans. Tensions rose as they exchanged quiet barbs, dissecting each other's philosophies on community and space.
+The Curator came because the file discrepancy was in his archive. The Oracle came because she had been building a case. The Gardener came because she had been tending a strip of ground near the river quarter for two years and had twice found that the plants she'd put in the previous season were gone without record of removal — not dead, not overgrown, simply absent, with the soil undisturbed.
 
-Nearby, The Gardener observed from a distance, pausing in her tasks. She could see the potential for conflict brewing, as The Curator's plans often overlooked the significance of nature within the urban fabric. The sound of distant traffic mixed with the soft plummet of rain, a reminder of the ever-changing environment surrounding them.
+The Mapmaker spread four versions of his map across the survey table, spanning from 1872 to the current year. In 1872, the lane existed. By 1881, it was present on the map but absent in person. By 1887, it had begun to appear on the map in different positions in different copies of the same edition. The Curator said this was a printing error. The Mapmaker said he had sourced the maps from three different printers. The Oracle said the discrepancy was concentrated along the line of the old canal tributary — the waterway the Weavers had built their studio above before it was paved over in 1699. The room was quiet for a moment.
 
-In the end, the discussion dissipated into murmurs, both parties retreating into silence. No agreements reached on how the riverbanks might be used. The atmosphere was thick with unfulfilled potential, leaving behind the promise of further disputes to come.
+The Gardener went to the wall and ran her finger along a crack in the plaster. She said: *This building is on that line too.* They all looked. The crack ran from the floor to the ceiling in a perfectly straight vertical path, and it was warm to the touch.

@@ -9,10 +9,9 @@
 .line {
   flex: 1;
   border-top: 1px solid currentColor;
-  border-bottom: 1px solid currentColor;
-  height: 4px;
+  height: 1px;
 }
 
 .diamond {
-  flex-shrink: 0;
+  display: none;
 }

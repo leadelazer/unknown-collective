@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CHARACTERS } from '../data/characters.js';
 import { assetUrl } from '../utils/assetUrl.js';
+import { inlineMarkdown } from '../utils/inlineMarkdown.js';
 import styles from './EncounterPanel.module.css';
 
 export default function EncounterPanel({ encounter, onClose }) {
@@ -73,7 +74,7 @@ export default function EncounterPanel({ encounter, onClose }) {
         <div className={styles.body}>
           {paragraphs.length > 0 ? (
             paragraphs.map((para, i) => (
-              <p key={i} className={`${styles.para} t-body`}>{para}</p>
+              <p key={i} className={`${styles.para} t-body`} dangerouslySetInnerHTML={{ __html: inlineMarkdown(para) }} />
             ))
           ) : (
             <p className={`${styles.empty} t-body`}>No record of this encounter has survived.</p>

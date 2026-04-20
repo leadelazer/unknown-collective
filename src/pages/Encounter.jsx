@@ -6,6 +6,7 @@ import Footer from '../components/Footer.jsx';
 import TextureBackdrop from '../components/TextureBackdrop.jsx';
 import DecoRule from '../components/DecoRule.jsx';
 import { assetUrl } from '../utils/assetUrl.js';
+import { inlineMarkdown } from '../utils/inlineMarkdown.js';
 import styles from './Encounter.module.css';
 
 export default function Encounter() {
@@ -68,7 +69,7 @@ export default function Encounter() {
         <div className={styles.body}>
           {paragraphs.length > 0 ? (
             paragraphs.map((para, i) => (
-              <p key={i} className={`${styles.para} t-body`}>{para}</p>
+              <p key={i} className={`${styles.para} t-body`} dangerouslySetInnerHTML={{ __html: inlineMarkdown(para) }} />
             ))
           ) : (
             <p className={`${styles.empty} t-body`}>

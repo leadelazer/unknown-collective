@@ -52,16 +52,14 @@
 
 .card {
   padding: var(--space-6);
-  border: var(--border-gold-faint);
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
   cursor: pointer;
-  transition: border-color var(--transition-fast), transform var(--transition-fast);
+  transition: transform var(--transition-fast);
   text-align: left;
 }
 .card:hover {
-  border-color: color-mix(in srgb, var(--color-gold) 55%, transparent);
   transform: translateY(-2px);
 }
 .card:focus-visible {

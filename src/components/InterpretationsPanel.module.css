@@ -1,0 +1,192 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 10, 9, 0.65);
+  z-index: 200;
+  display: flex;
+  justify-content: flex-end;
+  animation: overlayIn var(--transition-fast) ease;
+}
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.panel {
+  width: min(620px, 96vw);
+  height: 100vh;
+  background: color-mix(in srgb, var(--color-ink) 97%, var(--color-gold) 3%);
+  border-left: var(--border-gold-faint);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: panelIn var(--transition-slow);
+  overscroll-behavior: contain;
+}
+
+@keyframes panelIn {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-6) var(--space-8);
+  border-bottom: var(--border-gold-faint);
+  flex-shrink: 0;
+}
+
+.eyebrow {
+  font-size: var(--text-xs);
+  color: var(--color-gold);
+  letter-spacing: 0.4em;
+  margin: 0;
+}
+
+.close {
+  background: none;
+  border: none;
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  letter-spacing: 0.2em;
+  padding: var(--space-2) var(--space-3);
+  transition: color var(--transition-fast);
+  cursor: pointer;
+}
+.close:hover { color: var(--color-gold-hi); }
+
+.intro {
+  padding: var(--space-5) var(--space-8);
+  border-bottom: var(--border-gold-faint);
+  flex-shrink: 0;
+}
+
+.introText {
+  font-size: 13px;
+  color: var(--color-muted);
+  line-height: 1.55;
+  margin: 0;
+  font-style: italic;
+}
+
+/* ── Model tabs ────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: var(--border-gold-faint);
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-4) var(--space-5);
+  border: none;
+  border-right: var(--border-gold-faint);
+  background: transparent;
+  text-align: left;
+  transition: background var(--transition-fast);
+  cursor: pointer;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.tab::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-gold);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.tab:hover { background: color-mix(in srgb, var(--color-gold) 5%, transparent); }
+.tabActive::after { opacity: 1; }
+.tabActive { background: color-mix(in srgb, var(--color-gold) 8%, transparent); }
+
+.tabModel {
+  font-size: 11px;
+  color: var(--color-paper);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tabVendor {
+  font-size: 10px;
+  color: var(--color-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Essay body ────────────────────────────────────────── */
+.body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  animation: essayIn 0.2s ease both;
+}
+
+@keyframes essayIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.essayHeader {
+  padding: var(--space-8) var(--space-8) var(--space-5);
+  border-bottom: var(--border-gold-faint);
+  flex-shrink: 0;
+}
+
+.tagline {
+  font-size: 10px;
+  color: var(--color-gold);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  margin: 0 0 var(--space-3);
+}
+
+.title {
+  font-size: clamp(22px, 3.5vw, 30px);
+  color: var(--color-paper);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.essay {
+  padding: var(--space-7) var(--space-8);
+  flex: 1;
+}
+
+.para {
+  font-size: 14px;
+  color: var(--color-paper-2);
+  line-height: 1.75;
+  margin: 0 0 var(--space-5);
+}
+
+.para:last-child { margin-bottom: 0; }
+
+.footer {
+  padding: var(--space-5) var(--space-8) var(--space-7);
+  border-top: var(--border-gold-faint);
+  flex-shrink: 0;
+}
+
+.attribution {
+  font-size: 10px;
+  color: var(--color-muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}

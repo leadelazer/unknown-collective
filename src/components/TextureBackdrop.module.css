@@ -4,13 +4,23 @@
 }
 
 .backdrop {
-  position: absolute;
+  position: fixed; /* Fixed so it covers the viewport nicely when scrolling */
   inset: 0;
-  background-size: 800px;
-  background-repeat: repeat;
-  mix-blend-mode: screen;
-  filter: saturate(0);
   pointer-events: none;
-  --backdrop-opacity: var(--texture-opacity, 0.2);
-  animation: subtleBreath 30s ease-in-out infinite;
+  --line-color: color-mix(in srgb, var(--color-paper) 6%, transparent);
+  --backdrop-opacity: var(--texture-opacity, 0.4); 
+  /* Architectural / Blueprint Layout Lines */
+  background-image: 
+    /* Center Spine */
+    linear-gradient(to right, transparent calc(50vw - 1px), var(--line-color) calc(50vw - 1px), var(--line-color) 50vw, transparent 50vw),
+    /* Left Text Bound (approx center - 450px) */
+    linear-gradient(to right, transparent calc(50vw - 450px), var(--line-color) calc(50vw - 450px), var(--line-color) calc(50vw - 449px), transparent calc(50vw - 449px)),
+    /* Right Text Bound (approx center + 450px) */
+    linear-gradient(to right, transparent calc(50vw + 450px), var(--line-color) calc(50vw + 450px), var(--line-color) calc(50vw + 451px), transparent calc(50vw + 451px)),
+    /* Header Baseline Crosshair */
+    linear-gradient(to bottom, transparent 90px, var(--line-color) 90px, var(--line-color) 91px, transparent 91px);
+  background-size: 100% 100%;
+  background-position: center top;
+  background-repeat: no-repeat;
+  z-index: 0;
 }

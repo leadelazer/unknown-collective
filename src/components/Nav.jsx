@@ -7,7 +7,7 @@ const NAV_LINKS = [
   { to: '/collective', label: 'The Collective' },
   { to: '/tiers',      label: 'Tiers' },
   { to: '/manifesto',  label: 'Manifesto' },
-  { to: '/chronicle',  label: 'Chronicle' },
+  { to: '/timeline',   label: 'Timeline' },
   { to: '/about',      label: 'About' },
 ];
 
