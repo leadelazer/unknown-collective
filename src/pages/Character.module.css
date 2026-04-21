@@ -225,7 +225,8 @@
   width: min(28rem, calc(100vw - 3rem));
   max-width: 400px;
   padding: var(--space-5) var(--space-6);
-  background: #17120f;
+  background: color-mix(in srgb, var(--color-ink-card) 92%, transparent);
+  backdrop-filter: blur(24px);
   border: var(--border-gold-faint);
   box-shadow:
     0 32px 72px color-mix(in srgb, var(--color-shadow) 55%, transparent),
