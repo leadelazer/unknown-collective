@@ -249,6 +249,7 @@ export default function Timeline() {
         <div className={`${styles.infoCard} glass`} key={activeId}>
           {active?.img && (
             <div className={styles.icPortraitWrap}>
+              <div className={`${styles.icPortraitShade} ${infoVideoEnded ? styles.icVignetteDim : ''}`} />
               <OptimizedPortrait img={active.img} role={activeTitle} hidden={infoVideoVisible} />
               <video
                 ref={infoVideoRef}
@@ -261,7 +262,6 @@ export default function Timeline() {
                 onEnded={() => setInfoVideoEnded(true)}
                 onError={() => setInfoVideoFailed(true)}
               />
-              <div className={`${styles.icPortraitShade} ${infoVideoEnded ? styles.icVignetteDim : ''}`} />
             </div>
           )}
 
