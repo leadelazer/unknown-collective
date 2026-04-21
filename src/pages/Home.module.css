@@ -197,8 +197,9 @@
 .portraitImage {
   position: absolute;
   inset: 10px;
-  background-size: cover;
-  background-position: center;
+  width: calc(100% - 20px);
+  height: calc(100% - 20px);
+  object-fit: cover;
 }
 
 .portraitNum {

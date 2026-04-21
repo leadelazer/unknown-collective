@@ -11,6 +11,70 @@ import DecoCorner from '../components/DecoCorner.jsx';
 import { assetUrl } from '../utils/assetUrl.js';
 import styles from './Home.module.css';
 
+const HOME_PORTRAIT_SIZES = '(max-width: 768px) 62vw, (max-width: 1200px) 30vw, 300px';
+
+function getPortraitBaseName(imgPath) {
+  if (!imgPath) return null;
+  const file = String(imgPath).split('/').pop() || '';
+  const dot = file.lastIndexOf('.');
+  return dot > 0 ? file.slice(0, dot) : null;
+}
+
+function pickFeaturedCharacters() {
+  const indices = new Set();
+
+  while (indices.size < 3) {
+    indices.add(Math.floor(Math.random() * CHARACTERS.length));
+  }
+
+  return Array.from(indices).map(i => CHARACTERS[i]);
+}
+
+function HomePortrait({ character, priority = false }) {
+  const baseName = getPortraitBaseName(character.img);
+
+  if (!character.img || !baseName) {
+    return (
+      <img
+        src={assetUrl(character.img)}
+        alt={character.role}
+        className={styles.portraitImage}
+        loading={priority ? 'eager' : 'lazy'}
+        decoding={priority ? 'sync' : 'async'}
+      />
+    );
+  }
+
+  return (
+    <picture>
+      <source
+        type="image/avif"
+        srcSet={[
+          `${assetUrl(`/assets/echos/optimized/${baseName}-480.avif`)} 480w`,
+          `${assetUrl(`/assets/echos/optimized/${baseName}-960.avif`)} 960w`,
+        ].join(', ')}
+        sizes={HOME_PORTRAIT_SIZES}
+      />
+      <source
+        type="image/webp"
+        srcSet={[
+          `${assetUrl(`/assets/echos/optimized/${baseName}-480.webp`)} 480w`,
+          `${assetUrl(`/assets/echos/optimized/${baseName}-960.webp`)} 960w`,
+        ].join(', ')}
+        sizes={HOME_PORTRAIT_SIZES}
+      />
+      <img
+        src={assetUrl(`/assets/echos/optimized/${baseName}-960.webp`)}
+        alt={character.role}
+        className={styles.portraitImage}
+        loading={priority ? 'eager' : 'lazy'}
+        fetchPriority={priority ? 'high' : 'auto'}
+        decoding={priority ? 'sync' : 'async'}
+      />
+    </picture>
+  );
+}
+
 export default function Home() {
   const navigate = useNavigate();
 
@@ -81,16 +145,8 @@ function HeroSection({ navigate }) {
 }
 
 function FeaturedPortraits({ navigate }) {
-  const [featured, setFeatured] = useState([]);
+  const [featured] = useState(() => pickFeaturedCharacters());
   const [hover, setHover] = useState(1);
-
-  useEffect(() => {
-    const indices = new Set();
-    while (indices.size < 3) {
-      indices.add(Math.floor(Math.random() * CHARACTERS.length));
-    }
-    setFeatured(Array.from(indices).map(i => CHARACTERS[i]));
-  }, []);
 
   return (
     <div className={styles.portraits}>
@@ -103,7 +159,7 @@ function FeaturedPortraits({ navigate }) {
           onClick={() => navigate(`/character/${c.slug}`)}
         >
           <div className={styles.portraitFrame} />
-          <div className={styles.portraitImage} style={{ backgroundImage: `url(${assetUrl(c.img)})` }} />
+          <HomePortrait character={c} priority />
           <div className={`${styles.portraitNum} t-deco`}>{ROMAN[c.n]}</div>
           <div className={styles.portraitCaption}>
             <span className={`${styles.portraitArcana} t-deco`}>{c.arcana}</span>
