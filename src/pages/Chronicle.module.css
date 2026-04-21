@@ -193,7 +193,7 @@
   font-size: var(--text-xs);
   letter-spacing: 0.3em;
   background: var(--color-gold-hi);
-  color: var(--color-ink);
+  color: var(--color-overlay);
   border: none;
   padding: 14px 28px;
   transition: background var(--transition-fast);

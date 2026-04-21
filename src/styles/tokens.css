@@ -1,14 +1,14 @@
 :root {
   /* ── Colors ── */
   /* Balanced warm and green palette */
-  --theme-hue: 150;
+  --theme-hue: 137;
+  --theme-saturation: -12%; /* Reduced slightly for more elegance */
+
   
   /* Offsets from base hue */
   --hue-paper: calc(var(--theme-hue) - 105); /* 45 */
   --hue-gold: calc(var(--theme-hue) - 115);  /* 35 */
   --hue-rose: calc(var(--theme-hue) - 140);  /* 10 */
-
-  --theme-saturation: 12%; /* Reduced slightly for more elegance */
   
   /* Deep Sage/Olive tones for darks */
   --color-ink:       hsl(var(--theme-hue) var(--theme-saturation) 6%); /* Darker, cooler green */
@@ -24,6 +24,24 @@
   --color-gold:      hsl(var(--hue-gold) calc(var(--theme-saturation) + 25%) 50%); /* Deeper, richer gold */
   --color-gold-hi:   hsl(var(--hue-gold) calc(var(--theme-saturation) + 40%) 65%);
   --color-rose:      hsl(var(--hue-rose) calc(var(--theme-saturation) + 20%) 58%); /* Softer terracotta */
+
+  /* Button chrome — separate from text gold so it can be tuned per-theme */
+  --color-btn-border: hsl(var(--hue-gold) calc(var(--theme-saturation) + 25%) 50%);
+  --color-btn-fill:   hsl(var(--hue-gold) calc(var(--theme-saturation) + 38%) 61%);
+  --color-btn-hover:  hsl(var(--hue-gold) calc(var(--theme-saturation) + 40%) 65%);
+
+  /* Shadow colour — tinted dark for a less sterile drop shadow */
+  --color-shadow: hsl(var(--theme-hue) 18% 3%);
+
+  /* Always-dark ink — never overridden by any theme.
+     Use for: image overlay gradients, text on gold/highlighted buttons, selection text. */
+  --color-overlay:   hsl(var(--theme-hue) var(--theme-saturation) 6%);
+
+  /* Always-light text — never overridden by any theme.
+     Use for: text that sits directly on image overlays or --color-overlay backgrounds. */
+  --color-on-overlay:   hsl(var(--hue-paper) var(--theme-saturation) 85%);
+  --color-on-overlay-2: hsl(var(--hue-paper) calc(var(--theme-saturation) + 5%) 68%);
+  --color-on-overlay-muted: hsl(var(--hue-gold) calc(var(--theme-saturation) + 22%) 65%);
 
   /* ── Typography ── */
   --font-display: 'Inter', 'Helvetica Neue', sans-serif;
@@ -63,10 +81,20 @@
   --border-gold-faint:  1px solid color-mix(in srgb, var(--color-gold) 33%, transparent);
   --border-gold-mid:    1px solid color-mix(in srgb, var(--color-gold) 55%, transparent);
 
+  /* ── Nav ── */
+  /* space-8 (32px) top + 28px logo + space-8 (32px) bottom + 1px border */
+  --nav-height: 93px;
+
   /* ── Transitions ── */
   --transition-fast:   0.3s ease;
   --transition-mid:    0.5s ease;
   --transition-slow:   0.6s cubic-bezier(.2,.7,.2,1);
+
+  /* ── Background animation ── */
+  --background-1: hsl(120, 10%, 8%);
+  --background-2: hsl(205, 9%, 7%);
+  --background-3: hsl(280, 6%, 8%);
+  --background-4: hsl(120, 10%, 8%);
 
   /* ── Texture ── */
   --texture-opacity: 0.1;
@@ -75,4 +103,36 @@
   --max-width:       1600px;
   --max-width-text:  900px;
   --page-padding:    var(--space-16);
+}
+
+[data-theme="light"] {
+  --background-1: hsl(var(--hue-paper) calc(var(--theme-saturation) + 16%) 97%);
+  --background-2: hsl(var(--hue-paper) calc(var(--theme-saturation) + 10%) 95%);
+  --background-3: hsl(var(--hue-paper) calc(var(--theme-saturation) + 13%) 91%);
+  --background-4: hsl(var(--hue-paper) calc(var(--theme-saturation) + 16%) 97%);
+
+  /* Surface colours — light in light mode */
+  --color-ink:       hsl(var(--hue-paper) calc(var(--theme-saturation) + 6%)  94%);
+  --color-ink-card:  hsl(var(--hue-paper) calc(var(--theme-saturation) + 3%)  87%);
+  --color-muted-dk:  hsl(var(--hue-paper) var(--theme-saturation)              70%);
+
+  /* Text colours — dark in light mode */
+  --color-paper:     hsl(var(--theme-hue) calc(var(--theme-saturation) - 4%)  8%);
+  --color-paper-2:   hsl(var(--theme-hue) calc(var(--theme-saturation) - 6%)  20%);
+  --color-muted:     hsl(var(--hue-paper) calc(var(--theme-saturation) - 2%)  44%);
+
+  /* Accents — richer/darker for readability on light bg */
+  --color-gold:      hsl(var(--hue-gold) calc(var(--theme-saturation) + 36%) 38%);
+  --color-gold-hi:   hsl(var(--hue-gold) calc(var(--theme-saturation) + 46%) 42%);
+  --color-rose:      hsl(var(--hue-rose) calc(var(--theme-saturation) + 30%) 36%);
+
+  /* Shadow colour — warm-tinted grey so drops feel at home on the parchment bg */
+  --color-shadow: hsl(var(--hue-paper) calc(var(--theme-saturation) + 18%) 28%);
+
+  /* Button chrome — lighter than text gold for comfort on light surfaces */
+  --color-btn-border: hsl(var(--hue-gold) calc(var(--theme-saturation) + 34%) 50%);
+  --color-btn-fill:   hsl(var(--hue-gold) calc(var(--theme-saturation) + 50%) 70%);
+  --color-btn-hover:  hsl(var(--hue-gold) calc(var(--theme-saturation) + 44%) 66%);
+
+  /* --color-overlay is intentionally NOT overridden here — it must always be dark */
 }

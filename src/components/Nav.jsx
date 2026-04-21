@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './Nav.module.css';
 
 const NAV_LINKS = [
@@ -16,6 +16,41 @@ export default function Nav() {
   const { pathname } = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [theme, setTheme] = useState(() => {
+    const storedTheme = window.localStorage.getItem('uc-theme');
+    if (storedTheme === 'light' || storedTheme === 'dark') {
+      return storedTheme;
+    }
+    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  });
+  const [chroma, setChroma] = useState(() => {
+    const stored = window.localStorage.getItem('uc-chroma');
+    const parsed = stored !== null ? parseInt(stored, 10) : NaN;
+    return !isNaN(parsed) ? parsed : 137;
+  });
+  const [chromaOpen, setChromaOpen] = useState(false);
+  const chromaRef = useRef(null);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem('uc-theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--theme-hue', String(chroma));
+    window.localStorage.setItem('uc-chroma', String(chroma));
+  }, [chroma]);
+
+  useEffect(() => {
+    if (!chromaOpen) return;
+    const handleClickOutside = (e) => {
+      if (chromaRef.current && !chromaRef.current.contains(e.target)) {
+        setChromaOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [chromaOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -54,7 +89,51 @@ export default function Nav() {
         ))}
       </ul>
 
-      <span className={`${styles.location} t-deco`}>MMXXVI</span>
+      <div className={styles.navEnd}>
+        <span className={`${styles.location} t-deco`}>
+          MMXXVI
+          <span className={styles.locationSep} aria-hidden="true"> / </span>
+          <button
+            className={`${styles.themeToggle} t-deco`}
+            onClick={() => setTheme(current => current === 'dark' ? 'light' : 'dark')}
+            aria-label="Toggle light and dark theme"
+            type="button"
+          >
+            {theme === 'dark' ? 'LUX' : 'NOX'}
+          </button>
+          <span className={styles.locationSep} aria-hidden="true"> / </span>
+          <span className={styles.chromaWrap} ref={chromaRef}>
+            <button
+              className={`${styles.chromaToggle} t-deco ${chromaOpen ? styles.chromaToggleOpen : ''}`}
+              onClick={() => setChromaOpen(o => !o)}
+              aria-label="Select hue"
+              aria-expanded={chromaOpen}
+              type="button"
+            >
+              CHROMA
+              <span
+                className={styles.chromaDot}
+                style={{ '--swatch-hue': chroma }}
+                aria-hidden="true"
+              />
+            </button>
+            {chromaOpen && (
+              <div className={styles.chromaFlyout} role="dialog" aria-label="Hue selection">
+                <input
+                  type="range"
+                  min="0"
+                  max="360"
+                  value={chroma}
+                  onChange={e => setChroma(Number(e.target.value))}
+                  className={styles.chromaSlider}
+                  aria-label="Hue"
+                />
+                <div className={styles.chromaSliderTrack} aria-hidden="true" />
+              </div>
+            )}
+          </span>
+        </span>
+      </div>
 
       <button
         className={styles.hamburger}

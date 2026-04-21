@@ -92,8 +92,9 @@
 
 .ctaPrimary {
   font-size: var(--text-xs);
-  background: var(--color-gold-hi);
-  color: var(--color-ink);
+  background: var(--color-btn-fill);
+  border: 1px solid var(--color-btn-border);
+  color: var(--color-overlay);
   border: none;
   padding: 16px 28px;
   letter-spacing: 0.3em;
@@ -101,7 +102,7 @@
 }
 
 .ctaPrimary:hover {
-  background: var(--color-gold);
+  background: var(--color-btn-hover);
 }
 
 .ctaSecondary {
@@ -154,13 +155,14 @@
   transform: rotate(6deg);
 }
 
-.portrait:not(.portraitActive) {
+.portrait:not(.portraitActive) .portraitImage {
   filter: brightness(0.72);
 }
 
 .portraitActive {
   filter: brightness(1);
   z-index: 10;
+  backdrop-filter: brightness(0.72);
 }
 
 .portrait:nth-child(1).portraitActive {
@@ -179,7 +181,7 @@
   position: absolute;
   inset: 0;
   border: var(--border-gold);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--color-shadow) 50%, transparent);
   transition: box-shadow 0.5s ease;
   pointer-events: none;
   z-index: 2;
@@ -187,7 +189,7 @@
 
 .portraitActive .portraitFrame {
   box-shadow:
-    0 30px 80px rgba(0, 0, 0, 0.7),
+    0 30px 80px color-mix(in srgb, var(--color-shadow) 70%, transparent),
     inset 0 0 0 4px var(--color-ink),
     inset 0 0 0 5px color-mix(in srgb, var(--color-gold) 55%, transparent);
 }
@@ -217,10 +219,10 @@
 
 .portraitCaption {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(to top, color-mix(in srgb, var(--color-ink) 93%, transparent), transparent);
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  background: linear-gradient(to top, color-mix(in srgb, var(--color-overlay) 93%, transparent), transparent);
   padding: 40px 20px 18px;
   display: flex;
   flex-direction: column;
@@ -230,13 +232,13 @@
 
 .portraitArcana {
   font-size: 9px;
-  color: var(--color-gold);
+  color: var(--color-on-overlay-muted);
   letter-spacing: 0.3em;
 }
 
 .portraitRole {
   font-size: 22px;
-  color: var(--color-paper);
+  color: var(--color-on-overlay);
 }
 
 /* ── Questions strip ── */

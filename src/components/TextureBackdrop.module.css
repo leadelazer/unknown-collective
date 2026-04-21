@@ -17,8 +17,8 @@
     linear-gradient(to right, transparent calc(50vw - 450px), var(--line-color) calc(50vw - 450px), var(--line-color) calc(50vw - 449px), transparent calc(50vw - 449px)),
     /* Right Text Bound (approx center + 450px) */
     linear-gradient(to right, transparent calc(50vw + 450px), var(--line-color) calc(50vw + 450px), var(--line-color) calc(50vw + 451px), transparent calc(50vw + 451px)),
-    /* Header Baseline Crosshair */
-    linear-gradient(to bottom, transparent 90px, var(--line-color) 90px, var(--line-color) 91px, transparent 91px);
+    /* Header Baseline Crosshair — aligns with nav bottom border */
+    linear-gradient(to bottom, transparent var(--nav-height), var(--line-color) var(--nav-height), var(--line-color) calc(var(--nav-height) + 1px), transparent calc(var(--nav-height) + 1px));
   background-size: 100% 100%;
   background-position: center top;
   background-repeat: no-repeat;

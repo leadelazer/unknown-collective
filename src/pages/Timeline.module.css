@@ -5,7 +5,7 @@
     linear-gradient(180deg, color-mix(in srgb, var(--color-paper) 2%, var(--color-ink)) 0%, var(--color-ink) 42%),
     var(--color-ink);
   color: var(--color-paper);
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .page::before {
@@ -677,6 +677,48 @@
 }
 
 /* ── Encounter section ─────────────────────────────────── */
+/* ── Records drawer (collapsed state) ── */
+.recordsDrawer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  width: 100%;
+  padding: var(--space-5) var(--page-padding);
+  background: none;
+  border: none;
+  border-top: var(--border-gold-faint);
+  cursor: pointer;
+  color: var(--color-muted);
+  transition: color var(--transition-fast);
+}
+
+.recordsDrawer:hover {
+  color: var(--color-gold);
+}
+
+.recordsDrawerRule {
+  flex: 1;
+  height: 1px;
+  background: color-mix(in srgb, var(--color-gold) 18%, transparent);
+  transition: background var(--transition-fast);
+}
+
+.recordsDrawer:hover .recordsDrawerRule {
+  background: color-mix(in srgb, var(--color-gold) 40%, transparent);
+}
+
+.recordsDrawerLabel {
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  flex-shrink: 0;
+}
+
+/* ── Encounter section (expanded state) ── */
+@keyframes recordsExpand {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .encounterSection {
   padding: var(--space-10) var(--page-padding) var(--space-16);
   border-top: var(--border-gold-faint);
@@ -686,6 +728,7 @@
   grid-template-columns: 220px 1fr;
   gap: clamp(32px, 4vw, 64px);
   align-items: start;
+  animation: recordsExpand 0.35s ease both;
 }
 
 .encSidebar {
@@ -805,6 +848,7 @@
   line-height: 1.05;
   color: var(--color-paper);
   margin-bottom: var(--space-6);
+  max-width: 85%;
 }
 
 .encArticleParticipants {

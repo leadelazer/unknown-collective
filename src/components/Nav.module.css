@@ -1,7 +1,6 @@
 .nav {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: var(--space-8) var(--page-padding);
   border-bottom: var(--border-gold-faint);
   position: sticky;
@@ -33,6 +32,8 @@
 
 .links {
   display: flex;
+  flex: 1;
+  justify-content: center;
   gap: var(--space-10);
   list-style: none;
 }
@@ -60,6 +61,153 @@
   font-size: var(--text-xs);
   color: var(--color-muted);
   letter-spacing: 0.2em;
+  display: flex;
+  align-items: center;
+}
+
+.locationSep {
+  opacity: 0.4;
+  letter-spacing: 0;
+  margin: 0 8px;
+}
+
+.navEnd {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-shrink: 0;
+}
+
+.themeToggle {
+  display: inline;
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  padding: 0;
+  cursor: pointer;
+  font-size: var(--text-xs);
+  letter-spacing: 0.2em;
+  transition: color var(--transition-fast);
+}
+
+.themeToggle:hover {
+  color: var(--color-gold);
+}
+
+/* ── Chroma flyout ── */
+.chromaWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.chromaToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  padding: 0;
+  cursor: pointer;
+  font-size: var(--text-xs);
+  letter-spacing: 0.2em;
+  transition: color var(--transition-fast);
+}
+
+.chromaToggle:hover,
+.chromaToggleOpen {
+  color: var(--color-gold);
+}
+
+.chromaDot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: hsl(calc(var(--swatch-hue) - 115) 28% 65%);
+  flex-shrink: 0;
+  transition: background 0.3s ease;
+}
+
+.chromaFlyout {
+  position: absolute;
+  top: calc(100% + 14px);
+  right: 0;
+  width: 160px;
+  padding: 14px 16px 12px;
+  background: color-mix(in srgb, var(--color-ink-card) 92%, transparent);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: var(--border-gold-faint);
+  z-index: 20;
+  /* subtle entrance */
+  animation: chromaFlyoutIn 0.18s ease both;
+}
+
+@keyframes chromaFlyoutIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* wrapper holds the gradient track + the range thumb on top */
+.chromaFlyout {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.chromaSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 3px;
+  border-radius: 3px;
+  /* Each stop shows the actual gold-hi color: hsl(slider_hue - 115, 28%, 65%) */
+  background: linear-gradient(
+    to right,
+    hsl(245 28% 65%),
+    hsl(275 28% 65%),
+    hsl(305 28% 65%),
+    hsl(335 28% 65%),
+    hsl(5   28% 65%),
+    hsl(35  28% 65%),
+    hsl(65  28% 65%),
+    hsl(95  28% 65%),
+    hsl(125 28% 65%),
+    hsl(155 28% 65%),
+    hsl(185 28% 65%),
+    hsl(215 28% 65%),
+    hsl(245 28% 65%)
+  );
+  outline: none;
+  cursor: pointer;
+  border: none;
+}
+
+.chromaSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: hsl(calc(var(--theme-hue) - 115) 28% 65%);
+  border: 1.5px solid color-mix(in srgb, var(--color-paper) 60%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-ink) 40%, transparent);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.chromaSlider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.chromaSlider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: hsl(calc(var(--theme-hue) - 115) 28% 65%);
+  border: 1.5px solid color-mix(in srgb, var(--color-paper) 60%, transparent);
+  cursor: pointer;
 }
 
 .hamburger {
@@ -75,6 +223,10 @@
   .nav {
     flex-wrap: wrap;
     position: relative;
+  }
+
+  .navEnd {
+    margin-left: auto;
   }
 
   .location {

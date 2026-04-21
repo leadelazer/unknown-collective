@@ -56,21 +56,20 @@
   font-size: var(--text-xs);
   background: transparent;
   color: var(--color-paper-2);
-  border: var(--border-gold-mid);
+  border: 1px solid color-mix(in srgb, var(--color-btn-border) 55%, transparent);
   padding: 8px 16px;
   letter-spacing: 0.25em;
   transition: all var(--transition-fast);
 }
 
 .filterBtn:hover {
-  border-color: var(--color-gold-hi);
-  color: var(--color-gold-hi);
+  border-color: var(--color-btn-hover);
 }
 
 .filterActive {
-  background: var(--color-gold-hi);
-  color: var(--color-ink);
-  border-color: var(--color-gold-hi);
+  background: var(--color-btn-fill);
+  color: var(--color-overlay);
+  border-color: var(--color-btn-fill);
 }
 
 /* ── Grid ── */
@@ -177,7 +176,7 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(to top, color-mix(in srgb, var(--color-ink) 96%, transparent) 10%, color-mix(in srgb, var(--color-ink) 50%, transparent) 40%, transparent 70%);
+  background: linear-gradient(to top, color-mix(in srgb, var(--color-overlay) 96%, transparent) 10%, color-mix(in srgb, var(--color-overlay) 50%, transparent) 40%, transparent 70%);
   padding: 20px 18px;
   display: flex;
   flex-direction: column;
@@ -196,7 +195,7 @@
 .cardOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, color-mix(in srgb, var(--color-ink) 96%, transparent) 10%, color-mix(in srgb, var(--color-ink) 50%, transparent) 40%, transparent 70%);
+  background: linear-gradient(to top, color-mix(in srgb, var(--color-overlay) 96%, transparent) 10%, color-mix(in srgb, var(--color-overlay) 50%, transparent) 40%, transparent 70%);
   padding: 20px 18px;
   display: flex;
   flex-direction: column;
@@ -206,17 +205,17 @@
 
 .cardRole {
   font-size: 22px;
-  color: var(--color-paper);
+  color: var(--color-on-overlay);
 }
 
 .cardName {
   font-size: var(--text-sm);
-  color: var(--color-paper-2);
+  color: var(--color-on-overlay-2);
 }
 
 .cardEssence {
   font-size: var(--text-sm);
-  color: var(--color-paper-2);
+  color: var(--color-on-overlay-2);
   line-height: 1.2;
   max-height: 0;
   opacity: 0;
@@ -246,7 +245,7 @@
   height: 8px;
   border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--color-paper) 18%, transparent);
-  box-shadow: 0 0 0 1px rgba(7, 10, 9, 0.5) inset;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-shadow) 50%, transparent) inset;
 }
 
 .cardCorner {
@@ -316,4 +315,21 @@
   .header {
     padding: var(--space-12) var(--page-padding) var(--space-8);
   }
+}
+
+/* ── Light theme overrides ── */
+:global([data-theme="light"]) .cardVignette {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.08) 0%,
+    rgb(110 108 104 / 26%) 100%
+  );
+}
+
+:global([data-theme="light"]) .cardVignetteDim {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.08) 0%,
+    rgb(110 108 104 / 26%) 100%
+  );
 }

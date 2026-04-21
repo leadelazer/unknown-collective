@@ -14,14 +14,14 @@ html {
 }
 
 @keyframes subtleInkShift {
-  0%   { background-color: hsl(120, 10%, 8%); }
-  33%  { background-color: hsl(205, 9%,  7%); }
-  66%  { background-color: hsl(280, 6%, 8%); }
-  100% { background-color: hsl(120, 10%, 8%); }
+  0%   { background-color: var(--background-1); }
+  33%  { background-color: var(--background-2); }
+  66%  { background-color: var(--background-3); }
+  100% { background-color: var(--background-4); }
 }
 
 body {
-  background: var(--color-ink);
+  background: var(--background-1);
   color: var(--color-paper);
   font-family: var(--font-body);
   font-size: var(--text-base);
@@ -46,7 +46,7 @@ input:focus {
 
 ::selection {
   background: var(--color-gold);
-  color: var(--color-ink);
+  color: var(--color-overlay);
 }
 
 img {

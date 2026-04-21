@@ -64,6 +64,7 @@ export default function Timeline() {
   const scrollTriggeredByKey = useRef(false);
   const [activeEncounter, setActiveEncounter] = useState(null);
   const [scrollEncounterIntoView, setScrollEncounterIntoView] = useState(false);
+  const [recordsOpen, setRecordsOpen] = useState(false);
   const [showInterpretations, setShowInterpretations] = useState(false);
   const [infoVideoVisible, setInfoVideoVisible] = useState(false);
   const [infoVideoFailed, setInfoVideoFailed] = useState(false);
@@ -224,6 +225,14 @@ export default function Timeline() {
     navigate(`/character/${active.slug}`);
   }
 
+  function handleOpenRecords() {
+    setRecordsOpen(true);
+    if (!activeEncounter && datedEncounters.length > 0) {
+      const first = ENCOUNTERS.find(e => e.id === datedEncounters[0].id) || datedEncounters[0];
+      setActiveEncounter(first);
+    }
+  }
+
   return (
     <div className={styles.page}>
       <TextureBackdrop />
@@ -353,7 +362,11 @@ export default function Timeline() {
                         else delete encRefs.current[enc.id];
                       }}
                       className={`${styles.diamond} ${isActive ? styles.diamondActive : ''}`}
-                      onClick={() => setActiveEncounter(isActive ? null : (fullEnc || enc))}
+                      onClick={() => {
+                        const next = isActive ? null : (fullEnc || enc);
+                        setActiveEncounter(next);
+                        if (next) { setRecordsOpen(true); setScrollEncounterIntoView(true); }
+                      }}
                       aria-label={enc.title}
                     />
                     <span className={`${styles.diamondLabel} t-deco`}>{shortTitle}</span>
@@ -423,6 +436,13 @@ export default function Timeline() {
       </section>
 
       {/* ── Recorded Encounters section ── */}
+      {!recordsOpen ? (
+        <button className={`${styles.recordsDrawer} t-deco`} onClick={handleOpenRecords}>
+          <span className={styles.recordsDrawerRule} aria-hidden="true" />
+          <span className={styles.recordsDrawerLabel}>Open the Records</span>
+          <span className={styles.recordsDrawerRule} aria-hidden="true" />
+        </button>
+      ) : (
       <section className={styles.encounterSection}>
         <aside className={styles.encSidebar}>
           <span className={`${styles.encNavLabel} t-deco`}>Recorded Encounters</span>
@@ -496,6 +516,7 @@ export default function Timeline() {
           )}
         </div>
       </section>
+      )}
 
       <Footer />
 
