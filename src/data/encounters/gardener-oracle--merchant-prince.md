@@ -1,5 +1,6 @@
 ---
 title: The Bouquet in the Import Hall — River Quarter, Late Summer 1895
+image: /assets/stories/carlas-bouquet.jpeg
 ---
 
 Konrad had opened the new import hall the previous month. It was not a shop, strictly, but a display floor: potted cacti from the southern colonies, cut orchids packed in ice, a rack of eucalyptus branches priced by the metre. A buyer's room. He was standing in it at four in the afternoon when Carla came in through the side entrance with a bouquet in her arms that she had built from her own patch an hour earlier — late roses, borage, a single stem of red poppy, held together with garden twine.

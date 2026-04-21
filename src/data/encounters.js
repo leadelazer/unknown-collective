@@ -109,7 +109,7 @@ export const ENCOUNTERS = [
   {
     "id": "gardener-oracle--merchant-prince",
     "title": "The Bouquet in the Import Hall — River Quarter, Late Summer 1895",
-    "image": null,
+    "image": "/assets/stories/carlas-bouquet.jpeg",
     "participants": [
       "gardener",
       "oracle",
