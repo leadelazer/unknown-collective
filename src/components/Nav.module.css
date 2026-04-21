@@ -11,7 +11,6 @@
 
 .nav.blurred {
   backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
 }
 
 .logo {
@@ -139,7 +138,6 @@
   padding: 14px 16px 12px;
   background: color-mix(in srgb, var(--color-ink-card) 92%, transparent);
   backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
   border: var(--border-gold-faint);
   z-index: 20;
   /* subtle entrance */
@@ -249,7 +247,6 @@
     flex-direction: column;
     background: color-mix(in srgb, var(--color-ink) 95%, transparent);
     backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border-bottom: var(--border-gold-faint);
     padding: var(--space-3) var(--space-5) var(--space-5);
     gap: 0;
