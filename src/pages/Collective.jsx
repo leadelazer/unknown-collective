@@ -18,16 +18,38 @@ function getPortraitBaseName(imgPath) {
   return dot > 0 ? file.slice(0, dot) : null;
 }
 
-function OptimizedPortrait({ img, role, hidden }) {
+export function OptimizedPortrait({ img, role, hidden, className, priority = false }) {
   const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef(null);
   const baseName = getPortraitBaseName(img);
+  const imgClass = className ?? styles.cardImage;
+
+  useEffect(() => {
+    if (imgRef.current?.complete) setLoaded(true);
+  }, []);
+
+  const opacityStyle = { opacity: loaded ? 1 : 0, ...(hidden ? { visibility: 'hidden' } : {}) };
 
   if (!img || !baseName || failed) {
-    return <img src={assetUrl(img)} alt={role} className={styles.cardImage} loading="lazy" decoding="async" style={hidden ? { visibility: 'hidden' } : undefined} />;
+    return (
+      <img
+        ref={imgRef}
+        src={assetUrl(img)}
+        alt={role}
+        className={imgClass}
+        loading={priority ? 'eager' : 'lazy'}
+        fetchPriority={priority ? 'high' : 'auto'}
+        decoding="async"
+        style={opacityStyle}
+        onLoad={() => setLoaded(true)}
+      />
+    );
   }
 
   return (
     <img
+      ref={imgRef}
       src={assetUrl(`/assets/echos/optimized/${baseName}-960.webp`)}
       srcSet={[
         `${assetUrl(`/assets/echos/optimized/${baseName}-480.webp`)} 480w`,
@@ -35,10 +57,13 @@ function OptimizedPortrait({ img, role, hidden }) {
       ].join(', ')}
       sizes={CARD_IMAGE_SIZES}
       alt={role}
-      className={styles.cardImage}
-      loading="lazy"
+      className={imgClass}
+      loading={priority ? 'eager' : 'lazy'}
+      fetchPriority={priority ? 'high' : 'auto'}
       decoding="async"
+      style={opacityStyle}
       onError={() => setFailed(true)}
+      onLoad={() => setLoaded(true)}
     />
   );
 }
@@ -77,7 +102,7 @@ export default function Collective() {
       </section>
 
       <section className={styles.grid}>
-        {list.map(c => <CharCard key={c.slug} c={c} navigate={navigate} />)}
+        {list.map((c, i) => <CharCard key={c.slug} c={c} navigate={navigate} priority={i < 6} />)}
       </section>
 
       <Footer />
@@ -85,7 +110,7 @@ export default function Collective() {
   );
 }
 
-function CharCard({ c, navigate }) {
+function CharCard({ c, navigate, priority = false }) {
   const [hov, setHov] = useState(false);
   const [videoVisible, setVideoVisible] = useState(false);
   const [videoFailed, setVideoFailed] = useState(false);
@@ -154,7 +179,7 @@ function CharCard({ c, navigate }) {
 
       <div className={styles.cardImageWrap}>
         {c.img ? (
-          <OptimizedPortrait img={c.img} role={c.role} hidden={hasVideo} />
+          <OptimizedPortrait img={c.img} role={c.role} hidden={hasVideo} priority={priority} />
         ) : (
           <PortraitPlaceholder role={c.role} hue={c.hue} />
         )}

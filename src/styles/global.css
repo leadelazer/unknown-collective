@@ -21,13 +21,20 @@ html {
 }
 
 body {
-  background: var(--background-1);
   color: var(--color-paper);
   font-family: var(--font-body);
   font-size: var(--text-base);
   font-weight: 300;
-  line-height: 1.5; /* Slightly cleaner */
+  line-height: 1.5;
   min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--background-1);
   animation: subtleInkShift 30s ease-in-out infinite;
 }
 

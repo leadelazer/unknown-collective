@@ -18,7 +18,7 @@
   /* Cream/Parchment tones for lights */
   --color-paper:     hsl(var(--hue-paper) var(--theme-saturation) 85%); /* Warmer, softer cream */
   --color-paper-2:   hsl(var(--hue-paper) calc(var(--theme-saturation) + 5%) 68%);
-  --color-muted:     hsl(var(--hue-paper) var(--theme-saturation) 49%);
+  --color-muted:     hsl(var(--hue-paper) var(--theme-saturation) 60%);
 
   /* Rich Accents */
   --color-gold:      hsl(var(--hue-gold) calc(var(--theme-saturation) + 25%) 50%); /* Deeper, richer gold */
@@ -119,7 +119,7 @@
   /* Text colours — dark in light mode */
   --color-paper:     hsl(var(--theme-hue) calc(var(--theme-saturation) - 4%)  8%);
   --color-paper-2:   hsl(var(--theme-hue) calc(var(--theme-saturation) - 6%)  20%);
-  --color-muted:     hsl(var(--hue-paper) calc(var(--theme-saturation) - 2%)  44%);
+  --color-muted:     hsl(var(--hue-paper) calc(var(--theme-saturation) - 2%)  33%);
 
   /* Accents — richer/darker for readability on light bg */
   --color-gold:      hsl(var(--hue-gold) calc(var(--theme-saturation) + 36%) 38%);

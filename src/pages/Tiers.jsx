@@ -5,8 +5,7 @@ import { getTierChroma, resolveCharacterPalette } from '../data/paletteSystem.js
 import Nav from '../components/Nav.jsx';
 import Footer from '../components/Footer.jsx';
 import TextureBackdrop from '../components/TextureBackdrop.jsx';
-import { PortraitPlaceholder } from './Collective.jsx';
-import { assetUrl } from '../utils/assetUrl.js';
+import { PortraitPlaceholder, OptimizedPortrait } from './Collective.jsx';
 import styles from './Tiers.module.css';
 
 export default function Tiers() {
@@ -56,7 +55,7 @@ export default function Tiers() {
                 <button key={c.slug} className={styles.charBtn} onClick={() => navigate(`/character/${c.slug}`)}>
                   <div className={styles.charImg}>
                     {c.img
-                      ? <img src={assetUrl(c.img)} alt={c.role} className={styles.charImgEl} loading="lazy" decoding="async" />
+                      ? <OptimizedPortrait img={c.img} role={c.role} className={styles.charImgEl} />
                       : <PortraitPlaceholder role={c.role} hue={c.hue} />
                     }
                   </div>

@@ -5,10 +5,9 @@ import App from './App.jsx'
 
 const THEME_KEY = 'uc-theme'
 const savedTheme = window.localStorage.getItem(THEME_KEY)
-const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches
 const initialTheme = savedTheme === 'dark' || savedTheme === 'light'
   ? savedTheme
-  : prefersLight ? 'light' : 'dark'
+  : 'dark'
 
 document.documentElement.dataset.theme = initialTheme
 

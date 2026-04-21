@@ -257,7 +257,7 @@ export const CHARACTERS = [
     n: 4,
     arcana: "The Emperor",
     role: "The Merchant Prince",
-    name: "Konrad Reif",
+    name: "Conrad Reif",
     tier: "luminaries",
     slug: "merchant-prince",
     img: "/assets/echos/merchant-prince.png",

@@ -126,7 +126,7 @@
   object-fit: cover;
   filter: brightness(0.78) grayscale(0.15);
   transform: scale(1);
-  transition: filter var(--transition-slow), transform var(--transition-slow);
+  transition: opacity 0.4s ease, filter var(--transition-slow), transform var(--transition-slow);
 }
 
 .card:hover .cardImage {

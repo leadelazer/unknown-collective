@@ -21,12 +21,14 @@ export default function Nav() {
     if (storedTheme === 'light' || storedTheme === 'dark') {
       return storedTheme;
     }
-    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    return 'dark';
   });
   const [chroma, setChroma] = useState(() => {
     const stored = window.localStorage.getItem('uc-chroma');
     const parsed = stored !== null ? parseInt(stored, 10) : NaN;
-    return !isNaN(parsed) ? parsed : 137;
+    if (!isNaN(parsed)) return parsed;
+    const cssHue = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--theme-hue'), 10);
+    return !isNaN(cssHue) ? cssHue : 137;
   });
   const [chromaOpen, setChromaOpen] = useState(false);
   const chromaRef = useRef(null);

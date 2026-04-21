@@ -2,7 +2,7 @@
 n: 4
 arcana: The Emperor
 role: The Merchant Prince
-name: Konrad Reif
+name: Conrad Reif
 tier: luminaries
 slug: merchant-prince
 hue: "#7A2F2F"
