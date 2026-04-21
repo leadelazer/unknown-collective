@@ -5,10 +5,10 @@ role: The Tailor
 name: Elijah Noman
 tier: grounded
 slug: tailor
-hue: "#4A5A7A"
-flower: "Evening Primrose"
-flowerMeaning: "inconstancy"
-palette: ["#4A5A7A", "#7A8AAA", "#2A2E40"]
+hue: "#6B5A5A"
+flower: Evening Primrose
+flowerMeaning: inconstancy
+palette: ["#6B5A5A", "#A89890", "#3A2E2E"]
 keywords: [illusion, subconscious, intuition]
 essence: Fine silk. A very tight squeeze.
 detail: true

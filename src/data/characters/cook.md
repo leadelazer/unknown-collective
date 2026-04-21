@@ -2,7 +2,7 @@
 n: 14
 arcana: Temperance
 role: The Cook
-name: null
+name: Johann Strube
 tier: grounded
 slug: cook
 hue: "#8B7355"

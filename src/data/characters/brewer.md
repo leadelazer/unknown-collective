@@ -2,7 +2,7 @@
 n: 19
 arcana: The Sun
 role: The Brewer
-name: null
+name: Kaspar Bühler
 tier: grounded
 slug: brewer
 hue: "#C89040"

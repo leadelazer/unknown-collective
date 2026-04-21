@@ -2,7 +2,7 @@
 n: 12
 arcana: The Hanged Man
 role: The Baker
-name: null
+name: Otto Keller
 tier: grounded
 slug: baker
 hue: "#A88655"

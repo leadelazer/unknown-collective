@@ -8,7 +8,41 @@ import InterpretationsPanel from '../components/InterpretationsPanel.jsx';
 import { TIMELINE_ENTRIES } from '../data/timeline.js';
 import { ENCOUNTERS } from '../data/encounters.js';
 import { assetUrl } from '../utils/assetUrl.js';
+import { inlineMarkdown } from '../utils/inlineMarkdown.js';
 import styles from './Timeline.module.css';
+
+function getPortraitBaseName(imgPath) {
+  if (!imgPath) return null;
+  const file = String(imgPath).split('/').pop() || '';
+  const dot = file.lastIndexOf('.');
+  return dot > 0 ? file.slice(0, dot) : null;
+}
+
+function OptimizedPortrait({ img, role, hidden }) {
+  const [failed, setFailed] = useState(false);
+  const baseName = getPortraitBaseName(img);
+
+  if (!img || !baseName || failed) {
+    return <img src={assetUrl(img)} alt={role} className={styles.icPortrait} loading="lazy" decoding="async" style={hidden ? { visibility: 'hidden' } : undefined} />;
+  }
+
+  return (
+    <img
+      src={assetUrl(`/assets/echos/optimized/${baseName}-960.webp`)}
+      srcSet={[
+        `${assetUrl(`/assets/echos/optimized/${baseName}-480.webp`)} 480w`,
+        `${assetUrl(`/assets/echos/optimized/${baseName}-960.webp`)} 960w`,
+      ].join(', ')}
+      sizes="(max-width: 768px) 48vw, (max-width: 1200px) 31vw, 23vw"
+      alt={role}
+      className={styles.icPortrait}
+      loading="lazy"
+      decoding="async"
+      style={hidden ? { visibility: 'hidden' } : undefined}
+      onError={() => setFailed(true)}
+    />
+  );
+}
 
 const PX_PER_YEAR = 14;
 const EDGE_PAD_YEARS = 8;
@@ -26,15 +60,33 @@ export default function Timeline() {
   const navigate = useNavigate();
   const scrollerRef = useRef(null);
   const dotRefs = useRef({});
+  const encRefs = useRef({});
   const scrollTriggeredByKey = useRef(false);
   const [activeEncounter, setActiveEncounter] = useState(null);
+  const [scrollEncounterIntoView, setScrollEncounterIntoView] = useState(false);
   const [showInterpretations, setShowInterpretations] = useState(false);
+  const [infoVideoVisible, setInfoVideoVisible] = useState(false);
+  const [infoVideoFailed, setInfoVideoFailed] = useState(false);
+  const [infoVideoEnded, setInfoVideoEnded] = useState(false);
+  const infoVideoRef = useRef(null);
   const encArticleRef = useRef(null);
 
   useEffect(() => {
-    if (!activeEncounter || !encArticleRef.current) return;
-    encArticleRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [activeEncounter]);
+    if (!infoVideoVisible || infoVideoEnded || !infoVideoRef.current) return;
+    infoVideoRef.current.play().catch(() => {});
+  }, [infoVideoVisible, infoVideoEnded]);
+
+  useEffect(() => {
+    if (!activeEncounter || !scrollEncounterIntoView || !scrollerRef.current) return;
+    const node = encRefs.current[activeEncounter.id];
+    if (!node) return;
+
+    const nodeRect = node.getBoundingClientRect();
+    const scrollerRect = scrollerRef.current.getBoundingClientRect();
+    const nodeCenter = scrollerRef.current.scrollLeft + (nodeRect.left - scrollerRect.left) + nodeRect.width / 2;
+    scrollerRef.current.scrollTo({ left: Math.max(0, nodeCenter - scrollerRef.current.clientWidth / 2), behavior: 'smooth' });
+    setScrollEncounterIntoView(false);
+  }, [activeEncounter, scrollEncounterIntoView]);
 
   const dated = useMemo(
     () => TIMELINE_ENTRIES.filter(e => e.hasPrecisePlacement).sort((a, b) => a.sortStart - b.sortStart || a.n - b.n),
@@ -104,6 +156,15 @@ export default function Timeline() {
   const [activeId, setActiveId] = useState(`char:${staggered[0]?.slug || ''}`);
 
   const activeSlug = activeId?.replace('char:', '') || null;
+
+  useEffect(() => {
+    setInfoVideoVisible(false);
+    setInfoVideoFailed(false);
+    setInfoVideoEnded(false);
+    if (infoVideoRef.current) {
+      infoVideoRef.current.currentTime = 0;
+    }
+  }, [activeId]);
 
   const active = useMemo(() => {
     return (
@@ -188,8 +249,19 @@ export default function Timeline() {
         <div className={`${styles.infoCard} glass`} key={activeId}>
           {active?.img && (
             <div className={styles.icPortraitWrap}>
-              <img src={assetUrl(active.img)} alt={activeTitle} className={styles.icPortrait} loading="lazy" decoding="async" />
-              <div className={styles.icPortraitShade} />
+              <OptimizedPortrait img={active.img} role={activeTitle} hidden={infoVideoVisible} />
+              <video
+                ref={infoVideoRef}
+                className={`${styles.icPortraitVideo} ${infoVideoVisible ? styles.icPortraitVideoVisible : ''}`}
+                src={assetUrl(`/assets/echos/videos/${activeSlug}.mp4`)}
+                muted
+                playsInline
+                preload="metadata"
+                onCanPlay={() => setInfoVideoVisible(true)}
+                onEnded={() => setInfoVideoEnded(true)}
+                onError={() => setInfoVideoFailed(true)}
+              />
+              <div className={`${styles.icPortraitShade} ${infoVideoEnded ? styles.icVignetteDim : ''}`} />
             </div>
           )}
 
@@ -239,7 +311,7 @@ export default function Timeline() {
                     <line
                       key={`leader-${entry.slug}`}
                       x1={x} x2={x}
-                      y1={top + LABEL_HEIGHT} y2={AXIS_OFFSET_TOP}
+                      y1={top} y2={AXIS_OFFSET_TOP}
                       className={`${styles.leader} ${isActive ? styles.leaderActive : ''}`}
                     />
                   );
@@ -276,6 +348,10 @@ export default function Timeline() {
                     style={{ left: `${x}px`, top: `${DIAMOND_Y}px` }}
                   >
                     <button
+                      ref={node => {
+                        if (node) encRefs.current[enc.id] = node;
+                        else delete encRefs.current[enc.id];
+                      }}
                       className={`${styles.diamond} ${isActive ? styles.diamondActive : ''}`}
                       onClick={() => setActiveEncounter(isActive ? null : (fullEnc || enc))}
                       aria-label={enc.title}
@@ -358,7 +434,15 @@ export default function Timeline() {
                 <button
                   key={enc.id}
                   className={`${styles.encPill} ${isActive ? styles.encPillActive : ''}`}
-                  onClick={() => setActiveEncounter(isActive ? null : (fullEnc || enc))}
+                  onClick={() => {
+                    if (isActive) {
+                      setActiveEncounter(null);
+                      setScrollEncounterIntoView(false);
+                    } else {
+                      setActiveEncounter(fullEnc || enc);
+                      setScrollEncounterIntoView(true);
+                    }
+                  }}
                 >
                   <span className={`${styles.encPillYear} t-deco`}>{enc.year}</span>
                   <span className={styles.encPillTitle}>{enc.title.split(/\s*[—–-]\s*/)[0].trim()}</span>
@@ -397,7 +481,13 @@ export default function Timeline() {
                 {activeEncounter.body?.split(/\n\n+/).map((para, i) => {
                   if (para.startsWith('## ')) return <h3 key={i} className={`${styles.encBodyHeading} t-deco`}>{para.slice(3)}</h3>;
                   if (para.startsWith('# ')) return <h2 key={i} className={`${styles.encBodyHeadingLg} t-display`}>{para.slice(2)}</h2>;
-                  return <p key={i} className={`${styles.encBodyPara} t-body`}>{para.trim()}</p>;
+                  return (
+                    <p
+                      key={i}
+                      className={`${styles.encBodyPara} t-body`}
+                      dangerouslySetInnerHTML={{ __html: inlineMarkdown(para.trim()) }}
+                    />
+                  );
                 })}
               </div>
             </article>

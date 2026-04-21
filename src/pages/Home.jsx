@@ -68,8 +68,8 @@ function HeroSection({ navigate }) {
             <button className={`${styles.ctaPrimary} t-deco`} onClick={() => navigate('/collective')}>
               Enter the Archive
             </button>
-            <button className={`${styles.ctaSecondary} t-deco`} onClick={() => navigate('/manifesto')}>
-              Read the Manifesto
+            <button className={`${styles.ctaSecondary} t-deco`} onClick={() => navigate('/about')}>
+              About this Project
             </button>
           </div>
         </div>

@@ -1,8 +1,9 @@
 ---
 title: The Dictionary — Estate Gardens, Summer 1893
+image: /assets/stories/florist-curator.png
 ---
 
-He had walked the estate gardens for an hour before he noticed her. She was on the far terrace, building an arrangement from what looked like ordinary garden cuttings — lavender, late roses, a stem of foxglove the gardeners had missed. He watched from a distance and told himself he was inspecting the hedgerows.
+Freddy had walked the estate gardens for an hour before he noticed her. Amelia was on the far terrace, building an arrangement from what looked like ordinary garden cuttings — lavender, late roses, a stem of foxglove the gardeners had missed. He watched from a distance and told himself he was inspecting the hedgerows.
 
 When he did approach, it was to criticise. He said the foxglove was wrong for the occasion, that its meaning in the standard floriographic canon was insincerity, and that someone had probably sent it deliberately. She looked at him steadily and said the standard canon was out of date in four regions and that he should know that, if he read what he claimed to read. He said nothing. She handed him the arrangement and asked him to hold it while she reached for her notebook.
 

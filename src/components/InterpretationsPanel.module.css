@@ -34,7 +34,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-6) var(--space-8);
+  padding: var(--space-6) var(--space-7);
   border-bottom: var(--border-gold-faint);
   flex-shrink: 0;
 }
@@ -59,7 +59,7 @@
 .close:hover { color: var(--color-gold-hi); }
 
 .intro {
-  padding: var(--space-5) var(--space-8);
+  padding: var(--space-5) var(--space-7);
   border-bottom: var(--border-gold-faint);
   flex-shrink: 0;
 }
@@ -87,7 +87,7 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: var(--space-4) var(--space-5);
+  padding: var(--space-4) var(--space-7);
   border: none;
   border-right: var(--border-gold-faint);
   background: transparent;
@@ -144,7 +144,7 @@
 }
 
 .essayHeader {
-  padding: var(--space-8) var(--space-8) var(--space-5);
+  padding: var(--space-7) var(--space-7) var(--space-5);
   border-bottom: var(--border-gold-faint);
   flex-shrink: 0;
 }
@@ -165,7 +165,7 @@
 }
 
 .essay {
-  padding: var(--space-7) var(--space-8);
+  padding: var(--space-7);
   flex: 1;
 }
 
@@ -179,7 +179,7 @@
 .para:last-child { margin-bottom: 0; }
 
 .footer {
-  padding: var(--space-5) var(--space-8) var(--space-7);
+  padding: var(--space-5) var(--space-7) var(--space-7);
   border-top: var(--border-gold-faint);
   flex-shrink: 0;
 }

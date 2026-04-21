@@ -156,11 +156,11 @@ const CHARACTER_PALETTE_NOTES = {
     ],
   },
   mapmaker: {
-    arcanaRole: "Cyclical redundancy tracking. His spectrum measures the physical wear of repetition — operational polish, peak friction, and slow temporal degradation.",
+    arcanaRole: "Cyclical redundancy tracking. His spectrum is the surveyor's kit — ink carried in the glass, paper held against the wall, stone under the chain.",
     entries: [
-      { label: 'Primary', meaning: "Operative alloy polished by transit." },
-      { label: 'Secondary', meaning: "Peak friction, high-stress output." },
-      { label: 'Tertiary', meaning: "Temporal degradation, inevitable rust." },
+      { label: 'Primary', meaning: "Indigo ink, the mark that outlives the street." },
+      { label: 'Secondary', meaning: "Sand and parchment, the substrate of every revision." },
+      { label: 'Tertiary', meaning: "Stone grey, the city as it sits beneath the drawing." },
     ],
   },
   'obsidian-count': {
@@ -204,11 +204,11 @@ const CHARACTER_PALETTE_NOTES = {
     ],
   },
   doorwarden: {
-    arcanaRole: "Structural failure analysis. His spectrum offers the forensic record of a breach — critical load thermal, absolute failure point, and the carbon remainder.",
+    arcanaRole: "Structural patience. Her spectrum is the threshold held in green — lichen on the jamb, moss in the seam, the long damp of a wall that has not moved.",
     entries: [
-      { label: 'Primary', meaning: "Post-breach thermal, scorched failure red." },
-      { label: 'Secondary', meaning: "Critical load captured at rupture." },
-      { label: 'Tertiary', meaning: "Carbon remainder, dead char." },
+      { label: 'Primary', meaning: "Fir green, the colour of a door that waits." },
+      { label: 'Secondary', meaning: "Deep pine, shadow at the lintel before entry." },
+      { label: 'Tertiary', meaning: "Sage highlight, the breath of air once the latch gives." },
     ],
   },
   lightkeeper: {
@@ -220,11 +220,11 @@ const CHARACTER_PALETTE_NOTES = {
     ],
   },
   tailor: {
-    arcanaRole: "Specialist in optical camouflage. His spectrum exploits standard visual processing errors — atmospheric distortion, drained saturation, and unidentifiable mass.",
+    arcanaRole: "Specialist in what the fabric already knows. His spectrum is the workroom at dusk — worn wool, silver thread caught in the lamp, the shadow under the cutting table.",
     entries: [
-      { label: 'Primary', meaning: "Atmospheric distortion where the eye lies." },
-      { label: 'Secondary', meaning: "Drained saturation bleeding confidence." },
-      { label: 'Tertiary', meaning: "Unidentifiable mass invisible in low light." },
+      { label: 'Primary', meaning: "Dusky mauve-brown, the register of handled cloth." },
+      { label: 'Secondary', meaning: "Silver-dust, a moon whisper in the weave." },
+      { label: 'Tertiary', meaning: "Dark earth, the fitting that happens before the mirror." },
     ],
   },
   brewer: {

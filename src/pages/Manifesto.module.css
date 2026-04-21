@@ -23,8 +23,7 @@
 }
 
 .title {
-  font-size: var(--text-3xl); /* Scaled down highly stylized loud text slightly */
-  letter-spacing: -0.05em; /* Tighter letter-spacing given uppercase nature */
+  font-size: var(--text-4xl);
   color: var(--color-paper);
   text-align: center;
   margin-top: var(--space-4);

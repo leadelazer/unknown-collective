@@ -5,10 +5,10 @@ role: The Doorwarden
 name: Elara Neumann
 tier: guardians
 slug: doorwarden
-hue: "#6E3A2B"
+hue: "#4A6552"
 flower: "Thistle"
 flowerMeaning: "austerity, defiance"
-palette: ["#6E3A2B", "#A85A3A", "#3A2218"]
+palette: ["#4A6552", "#2E3F32", "#8AAA90"]
 keywords: [upheaval, chaos, revelation]
 essence: The wall broke. He stayed put.
 detail: true

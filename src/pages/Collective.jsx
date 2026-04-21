@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CHARACTERS } from '../data/characters.js';
 import { TIERS } from '../data/tiers.js';
@@ -18,12 +18,12 @@ function getPortraitBaseName(imgPath) {
   return dot > 0 ? file.slice(0, dot) : null;
 }
 
-function OptimizedPortrait({ img, role }) {
+function OptimizedPortrait({ img, role, hidden }) {
   const [failed, setFailed] = useState(false);
   const baseName = getPortraitBaseName(img);
 
   if (!img || !baseName || failed) {
-    return <img src={assetUrl(img)} alt={role} className={styles.cardImage} loading="lazy" decoding="async" />;
+    return <img src={assetUrl(img)} alt={role} className={styles.cardImage} loading="lazy" decoding="async" style={hidden ? { visibility: 'hidden' } : undefined} />;
   }
 
   return (
@@ -87,7 +87,53 @@ export default function Collective() {
 
 function CharCard({ c, navigate }) {
   const [hov, setHov] = useState(false);
+  const [videoVisible, setVideoVisible] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
+  const [videoEnded, setVideoEnded] = useState(false);
+  const videoRef = useRef(null);
+  const hoverTimerRef = useRef(null);
   const palette = resolveCharacterPalette(c);
+  const hasVideo = !videoFailed && videoVisible;
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(hoverTimerRef.current);
+    };
+  }, []);
+
+  function handleVideoCanPlay() {
+    setVideoVisible(true);
+    if (hov && !videoEnded && videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    }
+  }
+
+  function handleVideoEnded() {
+    setVideoEnded(true);
+  }
+
+  function handleMouseEnter() {
+    setHov(true);
+    if (videoEnded || !hasVideo || !videoRef.current) return;
+
+    if (videoRef.current.readyState >= 3) {
+      videoRef.current.play().catch(() => {});
+    } else {
+      hoverTimerRef.current = setTimeout(() => {
+        if (videoRef.current && !videoEnded) {
+          videoRef.current.play().catch(() => {});
+        }
+      }, 800);
+    }
+  }
+
+  function handleMouseLeave() {
+    setHov(false);
+    clearTimeout(hoverTimerRef.current);
+    if (videoRef.current && !videoEnded) {
+      videoRef.current.pause();
+    }
+  }
 
   return (
     <article
@@ -97,8 +143,8 @@ function CharCard({ c, navigate }) {
         '--card-secondary': palette[1],
         '--card-tertiary': palette[2],
       }}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       onClick={() => navigate(`/character/${c.slug}`)}
     >
       <div className={`${styles.cardMeta} t-deco`}>
@@ -108,10 +154,24 @@ function CharCard({ c, navigate }) {
 
       <div className={styles.cardImageWrap}>
         {c.img ? (
-          <OptimizedPortrait img={c.img} role={c.role} />
+          <OptimizedPortrait img={c.img} role={c.role} hidden={hasVideo} />
         ) : (
           <PortraitPlaceholder role={c.role} hue={c.hue} />
         )}
+
+        <video
+          ref={videoRef}
+          className={`${styles.cardVideo} ${videoVisible ? styles.cardVideoVisible : ''}`}
+          src={assetUrl(`/assets/echos/videos/${c.slug}.mp4`)}
+          muted
+          playsInline
+          preload="metadata"
+          onCanPlay={handleVideoCanPlay}
+          onEnded={handleVideoEnded}
+          onError={() => setVideoFailed(true)}
+        />
+
+        <div className={`${styles.cardVignette} ${videoEnded ? styles.cardVignetteDim : ''}`} />
 
         <div className={styles.cardOverlay}>
           <div className={styles.cardPalette} aria-label={`${c.role} palette`}>

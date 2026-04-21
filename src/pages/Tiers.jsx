@@ -23,14 +23,16 @@ export default function Tiers() {
       <Nav />
 
       <section className={styles.header}>
-        <p className={`${styles.eyebrow} t-deco`}>Five Tiers · One Pattern</p>
+        <p className={`${styles.eyebrow} t-deco`}>Five Orders · One Body</p>
         <h1 className={`${styles.title} t-display`}>
           The <span className={styles.titleAccent}>Orders</span>
         </h1>
         <p className={`${styles.intro} t-body`}>
-          Members of the Collective form an intricate web, subtly hierarchical yet
-          profoundly united. Each tier serves its purpose in maintaining the city's
-          spiritual equilibrium.
+          The Collective is not ranked. It is ordered by the kind of work each member
+          does against the Bind — by whether the work is done in soil, in the archive,
+          on a threshold, or somewhere the records cannot quite reach. These are the
+          five Orders as they appear in the admission ledger: descriptions of function,
+          not of standing.
         </p>
       </section>
 

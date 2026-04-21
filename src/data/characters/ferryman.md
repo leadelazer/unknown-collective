@@ -2,7 +2,7 @@
 n: 9
 arcana: The Hermit
 role: The Ferryman
-name: null
+name: Ansel Graff
 tier: guardians
 slug: ferryman
 hue: "#4A4A5A"

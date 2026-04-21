@@ -143,6 +143,12 @@ function DetailedCharacter({ c, tier, navigate }) {
           <div className={styles.portraitWrap}>
             <AnimatedPortrait c={c} />
             <div className={`${styles.romanBadge} t-deco`}>{ROMAN[c.n]}</div>
+            {c.name && (
+              <figcaption className={styles.portraitCaption}>
+                <span className={`${styles.portraitCaptionName} t-display`}>{c.name}</span>
+                <span className={`${styles.portraitCaptionMeta} t-deco`}>{c.role}</span>
+              </figcaption>
+            )}
           </div>
 
           <div className={styles.details}>
@@ -150,7 +156,6 @@ function DetailedCharacter({ c, tier, navigate }) {
               {c.flower ? `${c.flower} · ${c.flowerMeaning}` : `Tier of the ${tier.short}`}
             </p>
             <h1 className={`${styles.detailName} t-display`}>{c.role}</h1>
-            {c.name && <p className={`${styles.detailPersonName} t-display`}>{c.name}</p>}
 
             <div className={styles.ruleWrap}><DecoRule /></div>
 

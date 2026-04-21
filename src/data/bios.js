@@ -129,9 +129,9 @@ export const bios = {
     "Her shadow, however, is the heavy burden of the past. What began as protection can calcify into resistance — a guardian so devoted to what was that she struggles to make room for what must become."
   ],
   "tailor": [
-    "Elijah was born in a northern capital in 1850 and apprenticed to his father's tailoring trade from childhood. He grew up during the height of the industrial era, witnessing the city and its people in constant transformation — changing faster than language could name.",
+    "Elijah was born in a northern capital in 1850 and apprenticed to his father's tailoring trade from childhood. He grew up during the height of the industrial era, witnessing the city and its people in constant transformation, changing faster than language could name.",
     "His garments were more than fabric and thread. They were reflections of the people who wore them — their hopes, their aspirations, the aspects of themselves they were just beginning to understand. He could bring out hidden qualities in a person simply by attending, carefully, to the shape they inhabited.",
-    "Every client — factory worker or noble — left his shop with more than a new garment. They left feeling seen. This was not a skill Elijah had tried to develop. It seemed to be simply what happened when someone paid close enough attention.",
+    "Every client, factory worker or noble, left his shop with more than a new garment. They left feeling seen. This was not a skill Elijah had tried to develop. It seemed to be simply what happened when someone paid close enough attention.",
     "In the early 1880s, a persistent restlessness drew him away. He had heard of a vibrant art scene in another city and felt an inexplicable pull toward it. He packed his tools and went, opening a small shop in the city's heart that quickly gained its own reputation.",
     "A member of the Collective came to him one afternoon — not for a garment, but to observe. She watched him work for an hour and then offered him a place among them. He accepted, sensing that the Collective needed someone whose art was attention. He became the Tailor, and understood immediately that the work was the same."
   ],
@@ -141,13 +141,6 @@ export const bios = {
     "The Bind does not speak. Its presence is felt the way a knot is felt — not seen, but encountered when something will not move. Members of the Collective describe it differently: a pressure behind the eyes, a sense that some decisions have already been made, a pattern in events that should not connect but does.",
     "Its ties to the Weavers are its oldest and most fraught. Heinrich and Matilda regard what they made with a mixture of reverence and grief — they built something that surpassed them and cannot be recalled. The rest of the Collective maintains a respectful wariness. Even the Curator, who maps everything, has found no entry point into the Bind's logic.",
     "It is neither good nor evil. It is the city's accumulated will — patient, inescapable, and older than any of its members. The Bind does not constrain without reason. Whether those reasons are benevolent is a question the Collective has never been able to answer."
-  ],
-  "timekeeper": [
-    "The veilwalker has always walked the boundary between what is and what was — a figure whose age is difficult to determine and whose arrival in the Collective no one can reliably date. She appears in the records intermittently, always in the margins.",
-    "She holds a deep understanding of the balance between existence and the unknown — not as philosophy but as practice. She moves through the city's history the way water moves through rock: not forcing anything, but present at every transformation.",
-    "Within the Collective, she serves as a guide through completion — the one who appears when something is ending and helps to mark it properly. She does not hasten conclusions or delay them. She simply witnesses, with the particular attention of someone who knows that how a thing ends shapes what comes next.",
-    "Those who encounter her often find themselves attuned to the subtle energies that flow through their own lives — the threads that connect past choices to present moments. She offers not answers but a quality of attention that allows the answers to become visible.",
-    "She is not interested in completion as finality, but as integration — the gathering of all that has been learned into something that can be carried forward. She tends the spaces between what was and what will be, and trusts that the dance continues."
   ],
   "veilwalker": [
     "The Veilwalker has always walked the boundary between what is and what was — a figure whose age is difficult to determine and whose arrival in the Collective no one can reliably date. She appears in the records intermittently, always in the margins.",

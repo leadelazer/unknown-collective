@@ -7,11 +7,11 @@ import DecoCorner from '../components/DecoCorner.jsx';
 import styles from './Manifesto.module.css';
 
 const PARAGRAPHS = [
-  "We, the Collective, stand unified in our diversity, weaving an intricate tapestry that breathes life into the heart of the city.",
-  "We embrace the timeless dance between shadow and light, chaos and order, the tangible and intangible. We are the keepers of balance, harmony, and the rhythm of existence.",
-  "We believe in the power of stories, in their ability to shape reality, to give meaning to the mundane, and to echo through time. We vow to preserve these narratives, honoring the past and inspiring the future.",
-  "This is our pact, our promise, our pledge to the city. Through our collective efforts, we strive to maintain the balance, to keep the rhythm, to preserve the harmony.",
-  "For in every hand, a key; in every heart, a story. This is the Collective, forever intertwined with the city, forever shaping its story.",
+  "We are twenty-two. We meet because the city needs reading, and because some of what is in it cannot be named without changing shape. We agreed, in 1698, not to name it.",
+  "We do not solve. We read. The ledger, the drainage plan, the absence where a record should be, the room that goes cold without cause. We learn the grammar of what resists us, and we do not mistake that grammar for a puzzle to be closed.",
+  "We disagree on purpose. Each of us is an axis the others need. A Collective that agreed about the Bind would already have lost to it.",
+  "We keep what we cannot use yet. A name scratched out in pencil. A key found in a shuttle. A stem placed at the centre of an arrangement. What passes through us is stored, not resolved, and remains available to whoever comes after.",
+  "This is what we offer the city: not protection, not escape, not a story that ends. Only that someone continues to read — carefully, and out loud enough that the reading survives us.",
 ];
 
 export default function Manifesto() {
@@ -53,7 +53,7 @@ export default function Manifesto() {
         </div>
 
         <div className={styles.ruleWrap}><DecoRule /></div>
-        <p className={`${styles.signed} t-deco`}> –  Signed, the Twenty-Two  – </p>
+        <p className={`${styles.signed} t-deco`}> –  Signed, the Twenty-Two · by hand, by habit, by refusal  – </p>
       </section>
 
       <Footer />

@@ -19,7 +19,7 @@
 }
 
 .title {
-  font-size: 84px;
+  font-size: var(--text-4xl);
   color: var(--color-paper);
 }
 

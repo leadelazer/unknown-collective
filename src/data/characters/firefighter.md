@@ -2,7 +2,7 @@
 n: 8
 arcana: Strength
 role: The Firefighter
-name: null
+name: Joachim Richter
 tier: guardians
 slug: firefighter
 hue: "#B25A2F"

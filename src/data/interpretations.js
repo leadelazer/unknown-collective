@@ -49,4 +49,23 @@ Members were inducted for their unique ability to perceive the Bind's invisible 
 
 The defining fracture in this history arrived in the late 19th century with the Oracle. Gifted with a strategic, pattern-recognizing mind, she broke from the tradition of passive observation. In 1892, she gathered the Florist, the Gardener, and the Curator to share their isolated findings. By overlaying their distinct observations, they mapped the exact shape of the Bind’s suppression. This assembly marked the Collective's first true counter-strategy. The central tension of the Collective's history is the precipice of that choice: whether to continue protecting the city by hiding its greatest anomaly, or to finally step out of the shadows and attempt to unmake it.`,
   },
+  {
+    id: 'claude-opus',
+    model: 'Claude Opus 4.7',
+    vendor: 'Anthropic',
+    date: '2026',
+    title: 'The Shape of What Is Not Said',
+    tagline: 'A reading of the Collective through its omissions',
+    body: `The most telling pages in the Collective's archive are the ones that are missing. Ledgers end mid-year without explanation. A meeting in 1847 is referenced in three subsequent documents and recorded in none. The Curator's catalogue of suppressions is itself suppressed — kept, but not shelved. Any honest reading of this institution has to start with the fact that its silences are not failures of bookkeeping. They are the bookkeeping.
+
+The Collective's founding gesture is the Weavers' tapestry, and the tapestry's defining property is that it absorbed more than it was meant to hold. Every subsequent generation inherits that lesson in a different key. The Duchess recruits people who can stay in a difficult room without filling it with speech. The Cook is chosen for the steadiness of his hands, not the sharpness of his opinions. The Doorwarden stands at thresholds and says almost nothing. The Gardener notes which corridors of soil go quiet and keeps the note for forty years before anyone asks. These are not eccentricities of casting. They are a method.
+
+What the Oracle's generation changes is not the method but the permission. She does not break the silence; she widens the circle of people allowed to sit inside it together. The 1892 assembly above the canal is usually read as a shift toward action. It is more accurate to read it as a shift in acoustics. Four people who had each been holding a partial observation in private were, for the first time, allowed to hold it in the same room. No document was produced. That absence is the point. The Florist's notebook for that week contains a pressed sprig of rue and the date. That is the minutes.
+
+The Merchant Prince is the clearest test of the method, because he is the member most trained to translate experience into language, leverage, and plan. The record of his encounter with the Bind is a revised drainage line forty feet to the east and three shelves of funding without comment. He did not write what he saw. He moved a pipe. The Collective treats this as a successful reading.
+
+If there is a thesis running under the whole institution, it is this: some conditions of the city cannot be addressed without first being protected from the kind of attention that would convert them into something else. The Bind is one such condition. The Collective's long refusal to fully name it is not cowardice or mysticism. It is a working hypothesis about what survives description and what does not. The archive is built to hold the parts that can bear to be written down. Everything else is held by the people, in the room, between them, in the time before anyone speaks.
+
+Read this way, the Collective is not a society of experts on a hidden object. It is a long, patient argument about the ethics of looking.`,
+  },
 ];

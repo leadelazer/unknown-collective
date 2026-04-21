@@ -257,6 +257,7 @@ export const CHARACTERS = [
     n: 4,
     arcana: "The Emperor",
     role: "The Merchant Prince",
+    name: "Konrad Reif",
     tier: "luminaries",
     slug: "merchant-prince",
     img: "/assets/echos/merchant-prince.png",
@@ -423,6 +424,7 @@ export const CHARACTERS = [
     n: 8,
     arcana: "Strength",
     role: "The Firefighter",
+    name: "Joachim Richter",
     tier: "guardians",
     slug: "firefighter",
     img: "/assets/echos/firefighter.png",
@@ -480,6 +482,7 @@ export const CHARACTERS = [
     n: 9,
     arcana: "The Hermit",
     role: "The Ferryman",
+    name: "Ansel Graff",
     tier: "guardians",
     slug: "ferryman",
     img: "/assets/echos/ferryman.png",
@@ -529,13 +532,13 @@ export const CHARACTERS = [
     tier: "custodians",
     slug: "mapmaker",
     img: "/assets/echos/mapmaker.png",
-    hue: "#8C6E3A",
+    hue: "#3A4A6E",
     flower: "Snowdrop",
     flowerMeaning: "hope, consolation in adversity",
     palette: [
-          "#8C6E3A",
-          "#C4A65E",
-          "#4A3A22"
+          "#3A4A6E",
+          "#C4A878",
+          "#6B6861"
     ],
     keywords: [
           "cycles",
@@ -636,6 +639,7 @@ export const CHARACTERS = [
     n: 12,
     arcana: "The Hanged Man",
     role: "The Baker",
+    name: "Otto Keller",
     tier: "grounded",
     slug: "baker",
     img: "/assets/echos/baker.png",
@@ -739,6 +743,7 @@ export const CHARACTERS = [
     n: 14,
     arcana: "Temperance",
     role: "The Cook",
+    name: "Johann Strube",
     tier: "grounded",
     slug: "cook",
     img: "/assets/echos/cook.png",
@@ -841,13 +846,13 @@ export const CHARACTERS = [
     tier: "guardians",
     slug: "doorwarden",
     img: "/assets/echos/doorwarden.png",
-    hue: "#6E3A2B",
+    hue: "#4A6552",
     flower: "Thistle",
     flowerMeaning: "austerity, defiance",
     palette: [
-          "#6E3A2B",
-          "#A85A3A",
-          "#3A2218"
+          "#4A6552",
+          "#2E3F32",
+          "#8AAA90"
     ],
     keywords: [
           "upheaval",
@@ -936,13 +941,13 @@ export const CHARACTERS = [
     tier: "grounded",
     slug: "tailor",
     img: "/assets/echos/tailor.png",
-    hue: "#4A5A7A",
+    hue: "#6B5A5A",
     flower: "Evening Primrose",
     flowerMeaning: "inconstancy",
     palette: [
-          "#4A5A7A",
-          "#7A8AAA",
-          "#2A2E40"
+          "#6B5A5A",
+          "#A89890",
+          "#3A2E2E"
     ],
     keywords: [
           "illusion",
@@ -980,6 +985,7 @@ export const CHARACTERS = [
     n: 19,
     arcana: "The Sun",
     role: "The Brewer",
+    name: "Kaspar Bühler",
     tier: "grounded",
     slug: "brewer",
     img: "/assets/echos/brewer.png",
@@ -1027,6 +1033,7 @@ export const CHARACTERS = [
     n: 20,
     arcana: "Judgment",
     role: "The Keymaker",
+    name: "Theo Sandler",
     tier: "custodians",
     slug: "keymaker",
     img: "/assets/echos/keymaker.png",
@@ -1074,57 +1081,6 @@ export const CHARACTERS = [
     ],
     artifact: "A folded diagram, left on the Curator's desk, showing a schematic of a cabinet that does not yet exist. The tags in its drawers are labelled with future dates.",
     quote: "Try again. But ask differently.",
-  },
-  {
-    n: 21,
-    arcana: "The World",
-    role: "The Veilwalker",
-    tier: "guides",
-    slug: "veilwalker",
-    img: "/assets/echos/veilwalker.png",
-    hue: "#3A3A55",
-    flower: "Laurel",
-    flowerMeaning: "glory, accomplishment",
-    palette: [
-          "#3A3A55",
-          "#5A5A7A",
-          "#1E1E30"
-    ],
-    keywords: [
-          "completion",
-          "integration",
-          "travel"
-    ],
-    essence: "Tick. Tock. It is later now.",
-    detail: true,
-    bio: bios["veilwalker"],
-    talisman: "The veilwalker's talisman emanates wisdom and transcendence. Holders may find themselves attuned to the subtle energies that flow through existence — perceiving hidden threads that connect all things, glimpsing the world's interconnectedness. The gift is not power over time but presence within it: an ability to see the whole arc and to move within it with grace.",
-    shadow: "The shadow of the veilwalker urges caution in venturing too far into the void — the danger of becoming lost in the enigma of the unknown, drifting between worlds without grounding or purpose. The bearer risks mistaking detachment for wisdom, and observation for participation. To watch the world from too great a distance is to miss the life within it.",
-    relations: [
-          "ferryman",
-          "lightkeeper",
-          "curator",
-          "the-bind"
-    ],
-    relationNotes: [
-          {
-                "slug": "ferryman",
-                "note": "The Ferryman's last crossing aligns with the veilwalker's late count. One of them adjusts for the other."
-          },
-          {
-                "slug": "lightkeeper",
-                "note": "The lamp timing has shifted three minutes over four years. The veilwalker has not mentioned it."
-          },
-          {
-                "slug": "curator",
-                "note": "The Curator found a clock in the archive that runs seven minutes fast. The veilwalker wound it."
-          },
-          {
-                "slug": "the-bind",
-                "note": "The Bind took a record the veilwalker had marked completed. The record was not returned."
-          }
-    ],
-    quote: "Nothing ends. It only changes what it is becoming.",
   },
   {
     n: 21,
