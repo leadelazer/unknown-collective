@@ -18,7 +18,7 @@ function getPortraitBaseName(imgPath) {
   return dot > 0 ? file.slice(0, dot) : null;
 }
 
-export function OptimizedPortrait({ img, role, hidden, className, priority = false }) {
+export function OptimizedPortrait({ img, role, hidden, className, priority = false, reveal = true }) {
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const imgRef = useRef(null);
@@ -26,10 +26,13 @@ export function OptimizedPortrait({ img, role, hidden, className, priority = fal
   const imgClass = className ?? styles.cardImage;
 
   useEffect(() => {
-    if (imgRef.current?.complete) setLoaded(true);
-  }, []);
+    if (reveal && imgRef.current?.complete) setLoaded(true);
+  }, [reveal]);
 
-  const opacityStyle = { opacity: loaded ? 1 : 0, ...(hidden ? { visibility: 'hidden' } : {}) };
+  const opacityStyle = {
+    ...(reveal ? { opacity: loaded ? 1 : 0 } : null),
+    ...(hidden ? { visibility: 'hidden' } : null),
+  };
 
   if (!img || !baseName || failed) {
     return (
@@ -42,7 +45,9 @@ export function OptimizedPortrait({ img, role, hidden, className, priority = fal
         fetchPriority={priority ? 'high' : 'auto'}
         decoding="async"
         style={opacityStyle}
-        onLoad={() => setLoaded(true)}
+        onLoad={() => {
+          if (reveal) setLoaded(true);
+        }}
       />
     );
   }
@@ -63,7 +68,9 @@ export function OptimizedPortrait({ img, role, hidden, className, priority = fal
       decoding="async"
       style={opacityStyle}
       onError={() => setFailed(true)}
-      onLoad={() => setLoaded(true)}
+      onLoad={() => {
+        if (reveal) setLoaded(true);
+      }}
     />
   );
 }
@@ -179,7 +186,7 @@ function CharCard({ c, navigate, priority = false }) {
 
       <div className={styles.cardImageWrap}>
         {c.img ? (
-          <OptimizedPortrait img={c.img} role={c.role} hidden={hasVideo} priority={priority} />
+          <OptimizedPortrait img={c.img} role={c.role} hidden={hasVideo} priority={priority} reveal={false} />
         ) : (
           <PortraitPlaceholder role={c.role} hue={c.hue} />
         )}

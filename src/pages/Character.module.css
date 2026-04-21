@@ -225,9 +225,11 @@
   width: min(28rem, calc(100vw - 3rem));
   max-width: 400px;
   padding: var(--space-5) var(--space-6);
-  background: color-mix(in srgb, var(--color-ink) 50%, color-mix(in srgb, var(--color-paper) 18%, transparent));
+  background: rgba(14, 12, 10, 0.52);
   backdrop-filter: blur(32px) saturate(1.8);
   -webkit-backdrop-filter: blur(32px) saturate(1.8);
+  isolation: isolate;
+  overflow: hidden;
   border: var(--border-gold-faint);
   box-shadow:
     0 32px 72px color-mix(in srgb, var(--color-shadow) 55%, transparent),
@@ -239,6 +241,18 @@
   transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
   pointer-events: none;
   z-index: 10;
+  transform: translate3d(0, 8px, 0);
+}
+
+.paletteTooltip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02) 24%, transparent 100%),
+    rgba(14, 12, 10, 0.36);
+  pointer-events: none;
+  z-index: -1;
 }
 
 .paletteTooltipWrap:hover .paletteTooltip,
